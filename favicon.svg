@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Tmavé pozadí ladící s bg-elevated proměnnou webu -->
+  <rect width="32" height="32" rx="7" fill="#0d1220" />
+
+  <!-- Okénko filmového pásu - žlutý pás (accent barva) s perforací a tmavým rámečkem uprostřed -->
+  <rect x="6" y="4" width="20" height="24" rx="3" fill="#ffc857" />
+
+  <!-- Perforace vlevo -->
+  <rect x="8" y="7" width="3" height="3" rx="0.8" fill="#0d1220" />
+  <rect x="8" y="14.5" width="3" height="3" rx="0.8" fill="#0d1220" />
+  <rect x="8" y="22" width="3" height="3" rx="0.8" fill="#0d1220" />
+
+  <!-- Perforace vpravo -->
+  <rect x="21" y="7" width="3" height="3" rx="0.8" fill="#0d1220" />
+  <rect x="21" y="14.5" width="3" height="3" rx="0.8" fill="#0d1220" />
+  <rect x="21" y="22" width="3" height="3" rx="0.8" fill="#0d1220" />
+
+  <!-- Prostřední okénko (rámeček snímku) -->
+  <rect x="13" y="9" width="6" height="14" rx="1.4" fill="#05070d" />
+</svg>

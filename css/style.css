@@ -1,0 +1,2395 @@
+/* -------------------------------------------------------------------- */
+/*  Tokeny                                                               */
+/* -------------------------------------------------------------------- */
+:root {
+  --bg: #05070d;
+  --bg-elevated: #0d1220;
+  --surface: #131a2c;
+  --surface-hover: #1a2338;
+  --border: #262f47;
+  --border-soft: #1c2438;
+
+  --text: #eef1fb;
+  --text-dim: #9aa4c2;
+  --text-faint: #5d6684;
+
+  --accent: #ffc857;       /* Star Wars žlutá - výchozí, přepsáno níže per-franšíza */
+  --accent-dim: #a97f2e;
+  --accent-glow: rgba(255, 200, 87, 0.35);
+  /* text barva NA vyplněné --accent pozadí (aktivní pilulka apod.) - tmavá,
+     doplňková k --accent, měněná spolu s ním níže */
+  --accent-ink: #24190a;
+
+  --done: #34d399;         /* zelená pro zhlédnuto */
+  --done-dim: #16643f;
+  --done-glow: rgba(52, 211, 153, 0.45);
+
+  /* Fialová pro "Others" - katalog zbytkových otherEarth titulů bez
+     vlastní jmenované barvy (dnes: Your Friendly Neighborhood Spider-Man's
+     Earth-86445 a Marvel Zombies' Earth-89521 - viz EARTH_BUCKETS v
+     data.js pro celý výčet) - a taky výchozí rodina pro cokoliv BEZ
+     vlastního přepisu níže vůbec (--other-earth-current defaultuje sem).
+     Uživatelský požadavek (barevné odlišení všech pojmenovaných multiverz
+     v Multiverse filtru): každé jmenované univerzum teď má vlastní
+     barvu (viz páry níže) - "Others" jako jediný bez jednoho konkrétního
+     Earth dostal zbylou, jinam nepřidělenou barvu z palety, fialovou,
+     schválně DALEKO od žluté/oranžové/červené rodiny, kterou zabírají
+     X-Men/Spider-Man/Sacred Timeline níže. Zelená se nikde v týhle
+     paletě nesmí objevit ani náhodou - ta je vyhrazená čistě pro
+     "zhlédnuto" (--done výš). */
+  --other-earth: #9668d1;
+  --other-earth-dim: #5a3e7d;
+  --other-earth-glow: rgba(150, 104, 209, 0.35);
+
+  /* Kobaltová modrá - Earth-828 (The Fantastic Four: First Steps - viz
+     movie.otherEarth na fantasticfour1 v data.js), na uživatelský
+     požadavek "barva, která se k F4 hodí" - modrá je barva jejich
+     klasického komiksového kostýmu/loga, takže tu nešlo o svévolný výběr
+     z palety jako u ostatních. (Tohle je stejná hodnota, kterou dřív -
+     před tímhle kolem barevného odlišení - používalo Earth-10005 níže,
+     než se X-Men přebarvili na žlutou a tahle modrá se uvolnila pro F4,
+     kam sedí líp.) */
+  --other-earth-828: #4d8fd6;
+  --other-earth-828-dim: #2f5a8a;
+  --other-earth-828-glow: rgba(77, 143, 214, 0.35);
+
+  /* Zlatavě žlutá - Earth-10005 (Foxí X-Men filmy - viz movie.otherEarth
+     na xmen1/xmen2/xmen3/xmenfirstclass/deadpool3 v data.js). Dřív ocelová
+     modrá (viz --other-earth-828 výš, kam se ta modrá přesunula, protože
+     Fantastic Four ji potřebovali víc) - X-Men žádnou "svou" barvu z
+     vlastní značky nemají tak jednoznačně jako F4, takže tu šlo čistě o
+     to, najít odstín, který se v celé paletě nikde jinde neopakuje (žlutá/
+     zlatá, ne oranžová jako Spider-Man rodina níže ani fialová jako
+     Others výš). */
+  --other-earth-10005: #d4b03c;
+  --other-earth-10005-dim: #7f6a24;
+  --other-earth-10005-glow: rgba(212, 176, 60, 0.35);
+
+  /* Spider-Man rodina - TŘI odjinud přilepená univerza, jedno pro každou
+     samostatnou živoucí filmovou kontinuitu (Sonyho Spider-Man Universe,
+     Raimiho trilogie, Webbova dvoudílná řada - viz movie.otherEarth na
+     venom1../spidermanraimi1../amazingspiderman1.. v data.js), na
+     uživatelský požadavek sdílející JEDNU rodinu odstínů (teplá oranžová/
+     červenooranžová), ať jsou na první pohled poznat jako "tak nějak
+     spider-manovské", ale každé přece jen svou vlastní, rozlišitelnou
+     variantou - žádné dvě netrefily úplně stejný odstín.
+       Earth-688 (Sonyho SSU - Venom/Morbius/Madame Web/Kraven, žádný z
+     nich samotného Spider-Mana na plátně) je základní/nejsytější odstín
+     rodiny - nejvíc titulů, nejvíc "prostě oranžová".
+       Earth-96283 (Maguire/Raimi) je o kus světlejší/teplejší varianta -
+     "nostalgická" trilogie dostala teplejší, jasnější tón.
+       Earth-120703 (Garfield/Webb) je naopak temnější, víc do červena -
+     drsnější, "temnější reboot" tón - na uživatelský požadavek "podobný
+     odstín [Maguirovi], ale jemně odliš". */
+  --other-earth-688: #e0762e;
+  --other-earth-688-dim: #86471c;
+  --other-earth-688-glow: rgba(224, 118, 46, 0.35);
+
+  --other-earth-96283: #e8944a;
+  --other-earth-96283-dim: #8b592c;
+  --other-earth-96283-glow: rgba(232, 148, 74, 0.35);
+
+  --other-earth-120703: #c9572a;
+  --other-earth-120703-dim: #793419;
+  --other-earth-120703-glow: rgba(201, 87, 42, 0.35);
+
+  /* Bílá - vlastní, samostatná barva jen pro "Outside Time" (Loki, What
+     If...? - viz season.otherEarth v data.js), na požadavek symbolicky
+     zcela odlišná od zbytku palety: každá jiná "odjinud přilepená" barva
+     výš je pořád SYTÁ barva, jen jiný odstín - bílá je jediná, která se
+     vizuálně vymyká úplně, ne jen odstínem, přesně proto, že "mimo čas" má
+     číst jako mimo celý zbytek barevného systému, ne jako další univerzum
+     ve výčtu. --other-earth-outsidetime-dim je zámerně tlumený šedý odstín
+     (ne čistě bílý), aby si i tahle rodina zachovala stejný "hlavní barva
+     silná, dim tlumenější" vztah jako každá jiná - čistá bílá na obojí by
+     dim variantu vizuálně nijak neodlišila od current. */
+  --other-earth-outsidetime: #ffffff;
+  --other-earth-outsidetime-dim: #9a9ea8;
+  --other-earth-outsidetime-glow: rgba(255, 255, 255, 0.35);
+
+  /* Nepřímá vrstva - každé pravidlo obarvující "cizí" obsah čte TYHLE tři
+     proměnné, nikdy --other-earth(-dim/-glow) přímo, takže konkrétní
+     univerzum (viz [data-other-earth-label] níže, nastavené v JS na kartě/
+     year-bandu) může lokálně přepsat, která rodina barev platí, aniž by se
+     muselo sahat do samotných pravidel - stačí přidat nový token pár + o
+     jeden přepis navíc. --other-earth zůstává výchozí rodina pro cokoliv
+     bez vlastního přepisu (Earth-86445, Earth-89521 - dnešní "Others"
+     bucket, viz jeho vlastní komentář výš). */
+  --other-earth-current: var(--other-earth);
+  --other-earth-current-dim: var(--other-earth-dim);
+  --other-earth-current-glow: var(--other-earth-glow);
+
+  /* VELKÁ ZMĚNA: barva "plakátové" dlaždice (žádná skutečná grafika už
+     nikde na webu, viz posterPlaceholderHtml() v app.js). Prošlo pěti koly
+     ladění, hodně z nich zkoušelo obarvit i POZADÍ dlaždice podle
+     univerza (color-mix z --tile-color) - pokaždé to skončilo buď příliš
+     výrazné (soutěžilo s bílým nadpisem přes něj), nebo příliš ploché/
+     nudné, nebo si to žádalo vlastní podklad za textem (chip), který zase
+     sám o sobě nebyl dobrý nápad. Páté, finální kolo (uživatelský
+     požadavek) se rozchodu s celou tou myšlenkou úplně: pozadí je teď
+     JEDNOTNÉ pro každou dlaždici bez ohledu na univerzum - prostě
+     --surface, stejná barva jako zbytek `.card__frame` pod ním (viz
+     .card__poster-placeholder níže), takže dlaždice vizuálně splývá s
+     kartou i s celkovým tmavým laděním stránky. JEDINÝ vizuální nositel
+     "tohle je jiné univerzum" zůstává ikona filmového pásu - viz
+     --tile-icon-color(-strong) níže, pořád odvozené z --tile-color stejným
+     color-mix() vzorcem jako dřív.
+       GOTCHA (stále platí pro ikonu, ne už pro pozadí): --tile-icon-
+     color(-strong) se NEPŘEPOČÍTAJÍ samy, když se --tile-color přepíše dál
+     ve stromu (např. na .card--other-earth) - `var()` uvnitř hodnoty
+     vlastní custom property se substituuje podle toho, KDE je ta property
+     naposledy DEKLAROVANÁ (tady, v :root), ne podle elementu, na kterém se
+     nakonec čte. Proto .card--other-earth (style.css níže) musí OBĚ tyhle
+     proměnné předeklarovat znovu na sobě samém, se stejným vzorcem, ne jen
+     --tile-color samotnou - --tile-bg už do tohohle přepisu nepatří, není
+     na --tile-color vůbec závislá. Jakékoli další místo, které by v
+     budoucnu potřebovalo vlastní --tile-color (další filtr/stav), potřebuje
+     stejné opakování jen pro tyhle dvě, ne čtyři jako dřív. */
+  --tile-color: var(--accent);
+  /* Tlumená verze --tile-color - stejný pár jako --accent/--accent-dim
+     (nebo --other-earth-current/-dim), jen pod jedním jménem nezávislým na
+     tom, které z nich zrovna platí. Čte ji .card__meta níže (border-top +
+     jemný gradient wash) - uživatelský požadavek "stylizace všech buněk má
+     být stejná, liší se jen barva": karta ze Sacred Timeline i karta z
+     cizího Earth teď obě dostávají STEJNOU dělicí linku/wash pod dlaždicí,
+     jen jinou barvou, přes tenhle jeden token, ne přes samostatné
+     .card--other-earth/[data-other-earth-label] přepisy .card__meta jako
+     dřív (ty teď nejsou vůbec potřeba - .card__meta čte --tile-color(-dim)
+     přímo). Prostý alias, ne color-mix() z --tile-color jako řádky níže -
+     proto se na něj Gotcha o "var() uvnitř vlastní custom property"
+     nevztahuje, i tak se ale musí (stejně jako --tile-color samotná)
+     předeklarovat na .card--other-earth na jinou HODNOTU - to je běžné
+     přepisování proměnné, ne ta gotcha. */
+  --tile-color-dim: var(--accent-dim);
+  --tile-bg: var(--surface);
+  /* Zeslabeno z 36%/50% (uživatelský požadavek - ikona pod bílým nadpisem
+     pořád byla dost výrazná na to, aby s ním kontrastovala/soutěžila) -
+     stejný color-mix() vzorec, jen nižší podíl --tile-color, ať ikona
+     pořád nese svůj barevný styl (dřív bledě žlutá/modrá/oranžová apod. na
+     tmavém pozadí), jen o dost tlumeněji, blíž --bg-elevated - nadpis nad
+     ní tak zůstane jednoznačně nejsvětlejší/nejkontrastnější prvek na
+     dlaždici. */
+  --tile-icon-color: color-mix(in srgb, var(--tile-color) 24%, var(--bg-elevated));
+  --tile-icon-color-strong: color-mix(in srgb, var(--tile-color) 34%, var(--bg-elevated));
+
+  --line: #3a4363;
+
+  /* Výchozí hodnoty pro první vykreslení, než JS (viz sizeTimelineToViewport
+     v js/app.js) dopočítá skutečné rozměry podle výšky okna. Karty se pak
+     vždy zmenší/zvětší tak, aby se celá časová osa vešla na výšku a stránka
+     nikdy nescrollovala svisle – jen do stran. */
+  --card-w: 168px;
+  --poster-h: 252px;
+  /* filmy mají plakát (a tím i celou kartu) o 15 % větší než seriály - viz
+     MOVIE_POSTER_SCALE a .card--movie níže */
+  --movie-card-w: calc(var(--card-w) * 1.15);
+  --movie-poster-h: calc(var(--poster-h) * 1.15);
+  /* opačně - krátký bonusový film (Marvel One-Shoty, runtimeMin pod
+     SHORT_RUNTIME_THRESHOLD_MIN v app.js) má plakát o 15 % MENŠÍ než
+     seriál, ne větší - viz SHORT_POSTER_SCALE a .card--short níže */
+  --short-card-w: calc(var(--card-w) * 0.85);
+  --short-poster-h: calc(var(--poster-h) * 0.85);
+  --meta-h: 55px;
+  --track-h: calc((var(--poster-h) + var(--meta-h)) * 1.57);
+  --era-label-h: 44px;
+  /* strip for the in-universe year band - 0 unless the active ordering
+     defines yearBands (chronological), see render() in app.js */
+  --year-band-h: 0px;
+  --era-gap: 96px;
+  /* extra breathing room pulled in front of an era marked gapBefore, on
+     top of --era-gap - reads as "a lot of time passes here" */
+  --era-gap-extra: 160px;
+  /* same idea as --era-gap-extra, one level finer - a single CARD marked
+     card--gap-before (see era.cardGapBefore in data.js) pulled further
+     from its predecessor, on top of .era-block's own 66px inner gap, for
+     an ordering with no era boundaries to hang the coarser mechanism off
+     of (ORDERINGS_MARVEL's Chronological). Smaller than --era-gap-extra
+     on purpose - there's no title bar/year-band split reinforcing the
+     jump here the way a real era boundary gets, so this has to read as
+     "a lot of time passes" through spacing alone, but doesn't need to
+     match a whole extra era's worth of visual weight. */
+  --card-gap-extra: 110px;
+  /* floor under the era title bar's width, so a narrow/single-card era
+     still gets flanking lines with real presence instead of two short
+     slivers - wide eras are unaffected (already past this width) */
+  --era-title-min-w: 600px;
+
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* Konkrétní "odjinud přilepené" univerzum přepisuje --other-earth-current
+   (viz jeho vlastní koment u :root výše) - [data-other-earth-label] se
+   nastavuje v JS (buildCard()/buildSeriesCard() na kartě, drawYearBands()
+   na year-bandu, drawConnectors() na SVG <line> - viz jejich komentáře
+   v app.js) přímo na hodnotu otherEarth.label z data.js, takže tohle
+   pravidlo nemusí nijak parsovat/hádat, o jaké univerzum jde - jen
+   porovnává stejný text. Karta/year-band dědí přepsanou proměnnou na své
+   potomky automaticky (CSS custom properties dědí dolů stromem); spojnice
+   v SVG vrstvě potomkem není, proto má vlastní přímé pravidlo níže u
+   .connector-line--other-earth. */
+[data-other-earth-label="Earth-828"] {
+  --other-earth-current: var(--other-earth-828);
+  --other-earth-current-dim: var(--other-earth-828-dim);
+  --other-earth-current-glow: var(--other-earth-828-glow);
+}
+
+[data-other-earth-label="Earth-10005"] {
+  --other-earth-current: var(--other-earth-10005);
+  --other-earth-current-dim: var(--other-earth-10005-dim);
+  --other-earth-current-glow: var(--other-earth-10005-glow);
+}
+
+[data-other-earth-label="Earth-688"] {
+  --other-earth-current: var(--other-earth-688);
+  --other-earth-current-dim: var(--other-earth-688-dim);
+  --other-earth-current-glow: var(--other-earth-688-glow);
+}
+
+[data-other-earth-label="Earth-96283"] {
+  --other-earth-current: var(--other-earth-96283);
+  --other-earth-current-dim: var(--other-earth-96283-dim);
+  --other-earth-current-glow: var(--other-earth-96283-glow);
+}
+
+[data-other-earth-label="Earth-120703"] {
+  --other-earth-current: var(--other-earth-120703);
+  --other-earth-current-dim: var(--other-earth-120703-dim);
+  --other-earth-current-glow: var(--other-earth-120703-glow);
+}
+
+[data-other-earth-label="Outside Time"] {
+  --other-earth-current: var(--other-earth-outsidetime);
+  --other-earth-current-dim: var(--other-earth-outsidetime-dim);
+  --other-earth-current-glow: var(--other-earth-outsidetime-glow);
+}
+
+/* Per-franšízová accent barva - `data-franchise` se nastavuje na <html>
+   v applyFranchiseData() (app.js), pokaždé když se přepne aktivní
+   franšíza (i při prvním načtení stránky, ne jen při ručním přepnutí).
+   Přes 25 pravidel v celém souboru čte --accent/--accent-dim/--accent-glow/
+   --accent-ink jako proměnné (pilulky, badge, nadpisy er, year-band...) -
+   jediné přepsání tady je stačí, nic z toho samo neví, že existuje víc
+   franšíz. --other-earth(-dim/-glow) a jejich per-Earth sourozenci výš
+   NEJSOU součástí týhle přepisu schválně - ty patří titulům mimo Sacred
+   Timeline (viz .card--other-earth výše) a mají zůstat svou vlastní
+   barvou bez ohledu na to, jaká franšíza/accent barva je zrovna
+   aktivní. */
+:root[data-franchise="marvel"] {
+  --accent: #ff4d5e;       /* Marvel červená - jen pro Sacred Timeline obsah */
+  --accent-dim: #a8323f;
+  --accent-glow: rgba(255, 77, 94, 0.35);
+  --accent-ink: #2b0a0c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* stránka nikdy nescrolluje svisle – jen osa do stran */
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  height: 100vh;
+  height: 100dvh; /* respektuje mobilní UI lišty, kde je podporováno */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* -------------------------------------------------------------------- */
+/*  Hvězdné pozadí                                                       */
+/* -------------------------------------------------------------------- */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 80% 10%, #fff, transparent 60%),
+    radial-gradient(1.5px 1.5px at 60% 70%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 30% 80%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 90% 60%, #fff, transparent 60%),
+    radial-gradient(1.5px 1.5px at 45% 35%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 20% 55%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 70% 90%, #fff, transparent 60%),
+    radial-gradient(ellipse at 20% -10%, #131c33 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 0%, #1c1430 0%, transparent 50%),
+    var(--bg);
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+/* -------------------------------------------------------------------- */
+/*  Header                                                               */
+/* -------------------------------------------------------------------- */
+.site-header {
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, rgba(13, 18, 32, 0.9), rgba(13, 18, 32, 0.4));
+  backdrop-filter: blur(6px);
+}
+
+/* Stejný z-index:1 jako .timeline-section (viz níže) je záměr, ne
+   přehlédnutí - když je rozbalená sezóna, .season-backdrop uvnitř
+   .timeline-section má "spolknout" úplně všechno mimo tu jednu otevřenou
+   kartu, hlavičku nevyjímaje (při shodném z-indexu vyhrává pozdější v DOM,
+   tedy .timeline-section - hlavička zůstává "pod" ním). Jenže STEJNÁ
+   past (Gotcha #4 v CLAUDE.md) platí i obráceně: cokoliv v hlavičce, co
+   přesahuje pod její dolní okraj - otevřené .franchise-menu/.story-line-menu/
+   .multiverse-menu - by za normálních okolností bylo neklikatelné, spolknuté
+   tou samou .timeline-section. Řešení NENÍ trvale zvýšit z-index hlavičky
+   (to by naopak prorazilo skrz .season-backdrop, viz výše) - jen DOČASNĚ,
+   po dobu, kdy je fakticky otevřené některé z jejích menu (viz
+   open/closeFranchiseMenu, open/closeStoryLineMenu a
+   open/closeMultiverseMenu v app.js) - v ten moment žádná sezóna otevřená
+   být nemůže (backdrop by kliknutí na tlačítko menu stejně spolkl dřív). */
+.site-header--menu-open {
+  z-index: 3;
+}
+
+.site-header__inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 12px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* "Watch Order" + the franchise picker sit side by side as one matched
+   pair of headings now - no more eyebrow/subtitle clutter around them
+   (used to be a 3-line stack: eyebrow, title, subtitle). */
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.9vw, 22px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Roste a vyplní prostor mezi .brand a .progress-group v hlavičce (viz
+   .site-header__inner výše, teď tři přímé děti místo dvou) - to je to, co
+   dává .order-switch__desc níže reálnou šířku, ne jen šířku na míru svého
+   vlastního obsahu. .progress-group už NENÍ uvnitř .controls (bývalo, viz
+   git historie) - je to teď samostatný sourozenec přímo v
+   .site-header__inner, aby se mohl roztáhnout (align-self: stretch, viz
+   níž) na výšku CELÉHO .controls sloupce (přepínač řazení + popisek pod
+   ním), ne jen na výšku prvního řádku - přesně to "časové osy mají využít
+   prostor obou řádků" z požadavku, který tuhle strukturu zavedl.
+   flex-basis MUSÍ být 0 (ne "auto") - s "auto" by prohlížeč počítal
+   hypotetickou šířku .controls z jeho NEZALOMENÉHO obsahu, a protože
+   .order-switch__desc mění text (kratší u Chronological, delší u Release
+   Order), delší varianta by hlavičku přetekla a vynutila zalomení na nový
+   řádek - přesně tenhle bug. S "0" .controls jen vyplní zbylý prostor a
+   zalomení textu uvnitř řeší normální wrapping, ne velikost kontejneru. */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* Přepínač pořadí + výběr dějové linky vedle sebe, jako první řádek
+   .controls (.order-switch__desc pod nimi využívá stejnou šířku - viz
+   .controls výše). */
+.order-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.order-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 3px;
+  gap: 3px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.order-switch__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.order-switch__btn:hover {
+  color: var(--text);
+}
+
+.order-switch__btn[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Třetí, rozklikávací tab vedle Chronological/Release Order (.order-switch
+   nalevo) - "Storylines" - se stejnou váhou jako ty dva, ne filtr nad nimi
+   (viz buildStoryLineSelect + render v app.js, STORY_LINES v data.js).
+   Vlastní tlačítko + <div role="listbox">, stejný důvod jako u
+   .franchise-select níž (nativní <select> nejde v otevřeném stavu
+   skinovat). Vzhledem schválně blíž k .order-switch (obrys pilulky,
+   podobná výška) než k .franchise-select - čte se to jako třetí možnost
+   ve stejném přepínači, ne samostatná, vizuálně nesouvisející volba. */
+.story-line-select {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin: 0;
+  padding: 6px 14px;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.story-line-select:hover,
+.story-line-select:focus-visible {
+  color: var(--text);
+  border-color: var(--accent-dim);
+  outline: none;
+}
+
+/* Aktivní dějová linka dostane STEJNÉ plné zvýraznění jako aktivní pilulka
+   v .order-switch (.order-switch__btn[aria-selected="true"]), ne jen
+   tenčí obrys - je to rovnocenná třetí volba ve stejném přepínači, takže
+   musí vypadat stejně "vybraně" jako Chronological/Release Order by na
+   jejím místě. Šipka (.story-line-select__chevron) barvu dědí, takže s ní
+   ztmavne automaticky. */
+.story-line-select[data-active="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.story-line-select__chevron {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.story-line-select[aria-expanded="true"] .story-line-select__chevron {
+  transform: rotate(180deg);
+}
+
+.story-line-select-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+/* Stejný vizuální jazyk jako .franchise-menu (surface/border/box-shadow
+   trojice sdílená s .card__frame) */
+.story-line-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  min-width: 170px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
+}
+
+.story-line-menu[hidden] {
+  display: none;
+}
+
+.story-line-menu__option {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.story-line-menu__option:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.story-line-menu__option[aria-selected="true"] {
+  color: var(--accent);
+}
+
+/* Čtvrtý ovládací prvek vedle Chronological/Release Order/Storylines -
+   "Multiverse" (viz buildMultiverseSelect + render v app.js, EARTH_BUCKETS
+   v data.js). Na rozdíl od Storylines to NENÍ další vzájemně vylučující se
+   režim - je to FILTR nad tím, co je právě aktivní (ordering i případná
+   dějová linka běží dál beze změny), proto vzhledem schválně o kousek
+   tlumenější než .story-line-select (žádné plné podbarvení při aktivním
+   filtru, jen tenčí obrys - viz [data-active] níž) - je to doplněk k
+   hlavnímu přepínači, ne rovnocenná čtvrtá volba v něm. Skrytý úplně, když
+   aktivní franšíza nemá žádný otherEarth obsah (viz populateMultiverseMenu
+   v app.js) - dnes tedy jen u Star Wars. */
+.multiverse-select {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  margin: 0;
+  padding: 6px 14px;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.multiverse-select:hover,
+.multiverse-select:focus-visible {
+  color: var(--text);
+  border-color: var(--accent-dim);
+  outline: none;
+}
+
+/* Aktivní filtr (aspoň jedno universe odškrtnuté) - jen obrys akcentovou
+   barvou, ne plné podbarvení jako u .story-line-select[data-active] -
+   viz komentář nahoře nad .multiverse-select pro proč. */
+.multiverse-select[data-active="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.multiverse-select__chevron {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.multiverse-select[aria-expanded="true"] .multiverse-select__chevron {
+  transform: rotate(180deg);
+}
+
+.multiverse-select-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+/* Stejný vizuální jazyk jako .story-line-menu/.franchise-menu výše */
+.multiverse-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 3;
+  min-width: 220px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
+}
+
+.multiverse-menu[hidden] {
+  display: none;
+}
+
+/* <label> obalující <input type="checkbox"> - celý řádek je klikací
+   plocha (label), ne jen malý čtvereček checkboxu samotného. */
+.multiverse-menu__option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.multiverse-menu__option:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.multiverse-menu__option input[type="checkbox"] {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Locked while "Watchlist for Doomsday" is on (checkbox.disabled, see
+   populateMultiverseMenu()/updateMultiverseSelectUI() in app.js) - dimmed
+   further than the option's own already-muted --text-dim default, and the
+   whole row stops reading as clickable (cursor), so it's visually obvious
+   at a glance which boxes are locked, not just non-functional on click. */
+.multiverse-menu__option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.multiverse-menu__option input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+/* Single-checkbox toggle, not a dropdown (see its own section in app.js
+   for why) - same pill shape/sizing as .multiverse-select right before it
+   so all three read as one consistent row of header controls, but
+   simpler: no chevron, no menu, the checkbox itself IS the whole control.
+   Shared by BOTH "Core MCU" (#coreMcuWrap) and "Watchlist for Doomsday"
+   (#doomsdayWatchlistWrap) - same shape, same behavior (lock Multiverse
+   to "all" while active, mutually exclusive with each other - see
+   buildCoreMcuToggle()/buildDoomsdayWatchlistToggle() in app.js), so one
+   shared class instead of duplicating this whole block per toggle. Hidden
+   entirely (inline style.display, same Gotcha #3 dodge as the other
+   header dropdowns) whenever the active franchise has no otherEarth
+   content at all to filter by - Star Wars today, same condition
+   Multiverse itself already hides on. */
+.header-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.header-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+/* Checked - full accent treatment (border + text + glow), deliberately
+   MORE prominent than .multiverse-select[data-active] gets for a partial
+   filter (that one stays a thin outline, see its own comment for why) -
+   this isn't a small tweak to the current view, it locks Multiverse and
+   swaps the whole axis down to a fixed subset, so it earns a louder "this
+   is ON" signal than a few unchecked universes do. */
+.header-toggle[data-active="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.header-toggle input[type="checkbox"] {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Vysvětlující text aktivního pořadí (viz updateOrderingDescription v app.js) -
+   mění se při přepnutí taby, stejně jako per-era popisek na ose */
+/* Pevná výška na přesně 2 řádky (Chronological je jednořádkový, Release
+   Order dvouřádkový) - jinak by se .controls, a tím celá .site-header,
+   mezi taby měnila výškou a posouvala celou osu pod sebou. overflow:
+   hidden je pojistka, kdyby některý budoucí popisek přesáhl 2 řádky - lépi
+   tiše oříznout než znovu rozbít fixní výšku hlavičky. */
+.order-switch__desc {
+  margin: 0;
+  /* zarovnané na text v první pilulce nahoře, ne na hranu .order-switch
+     samotného - border (1px) + jeho padding (3px) + tlačítkův padding-left
+     (16px) = 20px, než uvnitř zaobleného pilulkového tvaru vůbec začíná
+     text; bez tohohle odsazení popisek vizuálně trčí víc vlevo než pilulky
+     nad ním, protože zaoblený tvar zleva "ujídá" místo, které margin:0 sám
+     nezohlední */
+  margin-left: 20px;
+  color: var(--text-dim);
+  font-size: 11.5px;
+  line-height: 1.4;
+  height: 2.8em;
+  overflow: hidden;
+}
+
+/* Výběr franšíze - zatím jen "Star Wars", ale postavené jako skutečná
+   tlačítko+menu komponenta (viz buildFranchiseSelect ve app.js), aby
+   přidání další franšíze v budoucnu znamenalo jen novou položku ve
+   FRANCHISES (data.js), ne novou komponentu. Sedí hned vedle "Watch Order"
+   v .brand a je stylovaný jako stejně velký nadpis (viz .brand__title) -
+   akcentová barva/glow ho odlišuje jako tu interaktivní část dvojice,
+   převzato z bývalého <span> na "Watch Order" (to teď zůstává v obyčejné
+   barvě, viz .brand__title výše).
+   Vlastní tlačítko + <div role="listbox"> místo nativního <select> - jeho
+   rozbalený seznam nejde přes CSS nijak skinovat (vzhled diktuje OS/
+   prohlížeč), takže by v otevřeném stavu vždycky vypadal cize proti zbytku
+   téhle tmavé, ručně stylované stránky. */
+.franchise-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.franchise-select {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  color: var(--accent);
+  text-shadow: 0 0 16px var(--accent-glow);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.9vw, 22px); /* musí odpovídat .brand__title */
+  letter-spacing: 0.01em;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.franchise-select:hover,
+.franchise-select:focus-visible {
+  opacity: 0.8;
+  outline: none;
+}
+
+.franchise-select__chevron {
+  font-size: 15px;
+  transition: transform 0.2s ease;
+}
+
+.franchise-select[aria-expanded="true"] .franchise-select__chevron {
+  transform: rotate(180deg);
+}
+
+/* Rozbalené menu - stejné vizuální jazyko jako zbytek stránky (.card__frame
+   níže má stejnou trojici surface/border/box-shadow) */
+.franchise-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 3;
+  min-width: 180px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
+}
+
+.franchise-menu[hidden] {
+  display: none;
+}
+
+.franchise-menu__option {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.franchise-menu__option:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.franchise-menu__option[aria-selected="true"] {
+  color: var(--accent);
+}
+
+/* Progress - .progress-group stacks the unit-count bar (episodes/movies
+   checked off) above the runtime bar (actual minutes watched, see
+   updateProgress() in app.js), each its own track+label pair with real
+   breathing room between them (gap below) - they used to sit almost flush
+   against each other, reading as one smashed-together blob instead of two
+   distinct readouts. The subtle surface/border card around it (same
+   tokens as .order-switch's own pill) sets it apart as its own header
+   section instead of bars floating bare in the corner.
+     align-self: stretch makes this card as tall as .controls (order-
+   switch row + the description paragraph below it) rather than just the
+   order-switch row alone - .controls' own height is effectively FIXED
+   regardless of which pill is active (.order-switch__desc reserves a
+   constant 2.8em and just wraps its text differently per ordering, see
+   its own comment), so stretching to match it, and spending real padding/
+   gap on the two rows inside it, costs nothing extra: the header doesn't
+   grow a single px from this, it just fills height .controls was already
+   reserving. justify-content: center keeps the pair vertically centered
+   in whatever extra room that leaves.
+     Verify with the usual "diff: scrollHeight - clientHeight, exact, no
+   tolerance" check across a few window sizes before growing this
+   padding/gap further - there's real headroom today (.controls' own
+   height, ~74px at a typical width, comfortably covers the current
+   content), but it's still a real ceiling, not an infinite one. */
+.progress-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: stretch;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.progress {
+  /* Wide enough for the runtime bar's own label even fully watched (e.g.
+     "Watched 227h 26m / 227h 26m", formatRuntime() in app.js) without
+     overflowing sideways past the card - that string alone measures
+     ~170px at this font/letter-spacing. Both bars share this width so
+     they stay flush with each other regardless of which one's label is
+     actually the longest right now. */
+  width: 180px;
+  flex: 0 0 auto;
+}
+
+.progress__track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--done-dim), var(--done));
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.progress__label {
+  margin: 4px 0 0;
+  text-align: right;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.progress__label span {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------------------------------------------------------------------- */
+/*  Timeline                                                             */
+/* -------------------------------------------------------------------- */
+.timeline-section {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0; /* umožní sekci reálně se zmenšit v rámci 100vh, ne jen růst */
+  display: flex;
+  flex-direction: column;
+  padding: 14px 0;
+}
+
+.timeline-scroll-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Nenápadné šipky naznačující, že osa jde do stran – místo textového hintu.
+   Mizí, když už není kam v daném směru scrollovat (viz updateScrollHints v app.js). */
+.scroll-hint {
+  position: absolute;
+  top: 0;
+  bottom: 14px;
+  z-index: 2;
+  width: 56px;
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  color: var(--text-faint);
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.25s ease;
+}
+
+.scroll-hint--left {
+  left: 0;
+  justify-content: flex-start;
+  padding-left: 8px;
+  background: linear-gradient(90deg, var(--bg) 0%, transparent 100%);
+}
+
+.scroll-hint--right {
+  right: 0;
+  justify-content: flex-end;
+  padding-right: 8px;
+  background: linear-gradient(270deg, var(--bg) 0%, transparent 100%);
+}
+
+.scroll-hint.is-hidden {
+  opacity: 0;
+}
+
+.timeline-scroll {
+  height: 100%;
+  display: flex;
+  /* cards deliberately don't fill the whole height (see FILL_RATIO in
+     app.js), so the axis centers vertically with breathing room above and
+     below. "safe" is the key part: plain `center` can scroll content
+     off-screen with NO way to reach it once it's taller than the box
+     (a well-known flexbox trap) - `safe` falls back to start-alignment
+     automatically whenever that would happen, which is exactly the
+     fallback for a card so extremely long even the biggest poster can't
+     fit it in two rows (see .card--overflow). No JS needed to detect it:
+     the browser only engages the fallback when content truly overflows. */
+  align-items: safe center;
+  overflow-x: auto;
+  /* auto, not hidden: sizing is tuned so this never actually triggers in
+     practice - it's purely the fallback for the extreme case above, so
+     nothing is ever silently clipped */
+  overflow-y: auto;
+  padding: 0 32px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.timeline-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.timeline-track {
+  position: relative;
+  flex: 0 0 auto; /* nesmí se smrsknout – šířku dorovnává horizontální scroll */
+  display: flex;
+  align-items: flex-start;
+  /* mezera MEZI érami – citelně větší než mezi kartami uvnitř éry, ať je
+     na první pohled vidět, kde jedna éra končí a další začíná */
+  gap: var(--era-gap);
+  width: max-content;
+  min-width: 100%;
+  padding-top: calc(var(--era-label-h) + var(--year-band-h));
+}
+
+/* SVG vrstva se spojnicemi mezi plakáty, leží pod kartami */
+.connector-layer {
+  position: absolute;
+  top: calc(var(--era-label-h) + var(--year-band-h));
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Pruh s daty (in-universe rok, nebo reálný rok vydání u Release Order) -
+   jen když aktivní ordering yearBands definuje (--year-band-h je jinak 0,
+   takže tahle vrstva prostě nezabírá místo). Sedí POD titulkem éry
+   (.era-block__label níže) - hlavní osa s (případnými) etapami je nahoře
+   jako střešní záhlaví celé časové osy, konkrétní datace jednotlivých
+   karet pod ní, blíž kartám samotným, kterých se týká. Štítky se pozicují
+   v JS (drawYearBands) podle skutečně vykreslených karet, stejně jako
+   spojnice v .connector-layer. */
+.year-band-layer {
+  position: absolute;
+  top: var(--era-label-h);
+  left: 0;
+  height: var(--year-band-h);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.year-band {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+/* Miniosa pod popiskem/vysvětlujícím textem - úchyt "⊓" natažený přes
+   celou šířku pásma (stejně jako .year-band samotné, viz jeho
+   .style.width), ať je na první pohled jasné, kterých karet se daná
+   datace týká - přes jednu, nebo klidně přes víc (span > 1, např.
+   "Spring 2010" nad Iron Man 2 + Hulk + Thor), vždycky ale nějaká.
+   Bez ní by u víckartového pásma text jen visel nad prostřední kartou a
+   vypadal, že patří jen jí - u jednokartového pásma nejde o nejasnost, ale
+   o vizuální konzistenci: stejný "tohle se týká TĚCHTO karet" prvek všude.
+     Barva stejná jako u data nad ní (--accent-dim výchozí, přepsáno níže
+   pro milestone/otherEarth pásmo stejně jako .year-band__label samotné) -
+   pořád ale ta MÉNĚ výrazná ze dvou linek na ose: tenká (1px), bez záře.
+   Hlavní, výrazná linka je titulek éry (.era-block__title, accent barva +
+   záře, plná šířka) úplně nahoře nad vším ostatním - tahle drobná linka
+   je jen jemný "reach" indikátor u konkrétního data, ne součást hlavní
+   struktury osy. */
+.year-band__span {
+  width: 100%;
+  height: 5px;
+  margin-top: 2px;
+  border-top: 1px solid var(--accent-dim);
+  border-left: 1px solid var(--accent-dim);
+  border-right: 1px solid var(--accent-dim);
+  border-radius: 2px 2px 0 0;
+}
+
+.year-band--milestone .year-band__span {
+  border-color: var(--accent);
+}
+
+.year-band--other-earth .year-band__span {
+  border-color: var(--other-earth-current);
+}
+
+.year-band__label {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.year-band__milestone {
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--accent-dim);
+  white-space: nowrap;
+}
+
+/* Bitva o Yavin - rok 0, jediný bod, který osa výslovně vyznačuje */
+.year-band--milestone .year-band__label {
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* Pásmo patřící titulu "přilepenému" na osu odjinud, mimo Sacred Timeline
+   (viz movie.otherEarth v data.js a .card--other-earth výše) - rok stejnou
+   barvou jako .year-band__earth řádek pod ním (--other-earth-current), ne
+   akcentovou ani šedou, ať i samotná osa v tomhle bodě viditelně vypadne
+   ze svého normálního plynutí, ne jen karta pod ní, a oba řádky pásma
+   (rok i "EARTH-828"/"EARTH-10005") čtou jako jeden vizuální celek. */
+.year-band--other-earth .year-band__label {
+  color: var(--other-earth-current);
+}
+
+.year-band__earth {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--other-earth-current);
+  white-space: nowrap;
+}
+
+.connector-line {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+
+.connector-line--done {
+  stroke: var(--done-dim);
+}
+
+/* Either end "glued onto" the axis from outside Sacred Timeline (see
+   movie.otherEarth in data.js) - the class is still added (see
+   drawConnectors() in app.js) and still read for the seam/solid decision
+   right below, but deliberately carries NO color override of its own
+   anymore: every connector on the page, otherEarth or not, Marvel or Star
+   Wars, reads the exact same --line stroke from the plain .connector-line
+   rule above. An earlier pass gave every otherEarth-touching segment its
+   own universal rust-orange (--other-earth-dim) regardless of which
+   specific Earth was involved - already a deliberate step back from an
+   even earlier per-universe-colored attempt, reasoning that a connector
+   LINE is a relationship between two cards, not a place to repeat either
+   endpoint's own color. On request, this stepped back a second time: even
+   ONE non-default connector color read as inconsistent with the rest of
+   the page's own single "default line color" rule, so this now carries
+   NO color signal at all - only the CARD/year-band still show which
+   Earth (and via --other-earth-current's own per-universe overrides,
+   which SPECIFIC Earth) a title belongs to; the connector's only
+   remaining signal is solid vs. dashed, immediately below.
+     Dashed ONLY when connector-line--other-earth-seam is also present -
+   see drawConnectors()'s own comment for when that's added: a segment
+   between two DIFFERENT realities (Sacred Timeline <-> foreign, or two
+   different foreign Earths) is a seam/stitch, dashed so it reads as NOT a
+   normal continuous thread of causality; a segment between two cards in
+   the SAME foreign universe (e.g. two consecutive Earth-10005 films) is
+   real, ordinary continuity within that story, just not Sacred Timeline's
+   own - solid, same as any other connector. */
+.connector-line--other-earth-seam {
+  stroke-dasharray: 5 4;
+}
+
+/* -- Era divider -------------------------------------------------------- */
+.era-block {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  /* fixed height turns this into the reference frame for the zig-zag rows:
+     row-0 cards stay top-aligned (default), row-1 cards anchor to the
+     bottom (see .card--row-1) so a tall one grows upward instead of
+     spilling past the bottom edge */
+  height: var(--track-h);
+  gap: 66px; /* a bit more breathing room between cards within an era, still compact */
+  /* side padding gives the era title a little extra room - helps narrow,
+     single-card eras the most (e.g. The High Republic) */
+  padding: 0 14px;
+}
+
+.era-block__label {
+  position: absolute;
+  /* Sits at the very TOP of the reserved header space (y=0), above
+     .year-band-layer (see its own comment) - the main axis / era
+     structure is the "roof" over everything below it, the year-band's
+     specific per-card dating sits underneath, closer to the cards it
+     describes. era-block__label is positioned relative to .era-block
+     itself, whose own top edge already starts BELOW the full reserved
+     header (--era-label-h + --year-band-h, see .timeline-track's
+     padding-top) - so the offset needed to land back at y=0 is the FULL
+     reserved height, not just --era-label-h. */
+  top: calc(-1 * (var(--era-label-h) + var(--year-band-h)));
+  /* centered on the era-block's own midpoint rather than stretched
+     left:0/right:0 to it - normally that's the same width (100%) as the
+     era-block, exactly like before, but --era-title-min-w puts a floor
+     under it so a narrow, single-card era (The High Republic) still gets
+     a title bar with real flanking lines instead of two barely-there
+     slivers - it just overflows evenly past the card on both sides, the
+     same safe "measure and correct" overflow as .era-block__desc below */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  min-width: var(--era-title-min-w);
+  height: var(--era-label-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 10px;
+}
+
+/* Název éry je záhlaví celé časové osy - tady je vidět, že osa je hlavní
+   nosná věc webu, ne jen popisek. Větší, akcentová barva + jemná záře
+   (stejné pojetí jako "Watch Order" ve jméně webu), ale pořád jen text -
+   plakáty filmů/seriálů zůstávají barevně/velikostně nejvýraznější prvek. */
+.era-block__title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 14px var(--accent-glow);
+  white-space: nowrap;
+}
+
+/* Fade over a FIXED distance (140px) from the outer edge, not a plain
+   0%/100% gradient across the whole flex:1 length - a 0%/100% fade means
+   a long era (Release Order's single 9000px+ flat era, say) reads as
+   solid only right around the title, with most of its actual length
+   nearly invisible (barely-there transparent-to-dim blend stretched over
+   thousands of px). Solid for almost its whole length, fading only near
+   the true outer edge, keeps the axis reading as one strong, continuous
+   line regardless of how long the era it belongs to is. */
+.era-block__title::before,
+.era-block__title::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent 0%, var(--accent-dim) 140px, var(--accent-dim) 100%);
+}
+
+.era-block__title::after {
+  background: linear-gradient(90deg, var(--accent-dim) 0%, var(--accent-dim) calc(100% - 140px), transparent 100%);
+}
+
+/* Doprovodný text éry (jen u chronologického řazení) – záměrně drobný a
+   tlumený, ať nepřebíjí plakáty, které jsou hlavní obsah. Vždy jen jeden
+   řádek - žádné zalamování - a smí se v klidu roztáhnout přes okraj svého
+   (třeba jednokartového) era-blocku, ať se nemačká: .era-block__label nic
+   neořezává a sousední éry mají kolem sebe dost mezery (viz --era-gap /
+   --era-gap-extra), takže přetečení nikomu nepřekáží. */
+.era-block__desc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  line-height: 1.35;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  text-transform: none;
+  text-align: center;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* Éra oddělená od té předchozí velkým skokem v čase (viz gapBefore v
+   data.js) - přitažena o kus dál navíc k běžné mezeře, ať je prázdný
+   časový úsek opticky znát, ne jen "další éra hned vedle". Žádná dělící
+   čárka - jen ta zvětšená mezera samotná. */
+.era-block--gap-before {
+  margin-left: var(--era-gap-extra);
+}
+
+/* Same idea, one card instead of a whole era (see era.cardGapBefore in
+   data.js and the comment on --card-gap-extra above) - a big in-universe
+   jump mid-era, with no era boundary available to carry the coarser
+   .era-block--gap-before treatment. */
+.card--gap-before {
+  margin-left: var(--card-gap-extra);
+}
+
+/* -- Movie card ----------------------------------------------------------- */
+.card {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 var(--card-w);
+  width: var(--card-w);
+}
+
+/* Čtyřstupňová hierarchie velikostí (na požadavek uživatele) - každý
+   stupeň dolů je o 15 % menší než ten nad ním, seriál zůstává neškálovaný
+   základ (posterH, viz sizeTimelineToViewport() v app.js):
+     badge (Avengers/Epizoda I-IX) > film > seriál (=1) > short (<20 min)
+   --movie-card-w/--badge-card-w/--short-card-w se dopočítávají ze STEJNÉ
+   posterH jako seriálová karta (odvozeno, ne nezávisle řešeno) - všechny
+   čtyři tak pořád rostou/zmenšují se pospolu podle výšky okna. Skutečná
+   VÝŠKA dlaždice už dnes nezávisí na žádné z těchto proměnných (viz
+   .card__poster-wrap níže - aspect-ratio: 1/1 ji odvozuje ze šířky), takže
+   tu zbyla jen šířka karty samotné. */
+.card--movie {
+  flex: 0 0 var(--movie-card-w);
+  width: var(--movie-card-w);
+}
+
+/* Avengers filmy (Marvel) / Epizody I-IX (Star Wars) - movie.badge v
+   data.js, viz isBadgeTier v buildCard() - nejvýraznější položky na ose,
+   proto největší dlaždice ze všech čtyř stupňů. Vyšší specificita (dvě
+   třídy) než .card--movie samotné. */
+.card--movie.card--badge-tier {
+  flex: 0 0 var(--badge-card-w);
+  width: var(--badge-card-w);
+}
+
+/* Krátký bonusový film (Marvel One-Shot apod., viz isShort v app.js'
+   buildCard()) - opačný konec hierarchie - ať na ose vizuálně nepůsobí
+   stejně důležitě jako skutečný celovečerní film. Vyšší specificita (dvě
+   třídy) než .card--movie samotné, takže pořadí v souboru není podstatné,
+   ale drží se hned vedle pro čitelnost. */
+.card--movie.card--short {
+  flex: 0 0 var(--short-card-w);
+  width: var(--short-card-w);
+}
+
+/* Bottom row anchors to the era-block's bottom edge instead of the top.
+   A normal card just sits there like before (visually identical zig-zag
+   offset); a tall merged-series card grows UPWARD from that fixed bottom
+   instead of overflowing past it - it can freely reach into the top row's
+   vertical space since no other card occupies that column. */
+.card--row-1 {
+  align-self: flex-end;
+}
+
+/* An EXTREMELY long merged show (see .card--overflow, set in app.js) can't
+   be helped by the trick above anymore - even the biggest poster leaves no
+   room for it in two rows. So it flips back to top-aligned, just like a
+   row-0 card: it never clips at the top, and the excess simply extends
+   past the usual bottom line - reachable through .timeline-scroll's
+   vertical scroll fallback (see .has-overflow) instead of being hidden. */
+.card--row-1.card--overflow {
+  align-self: flex-start;
+}
+
+/* Seriály jsou od filmů odlišené odlišným badge + lištou se sériemi místo
+   jednoho tlačítka přes celý plakát, a taky užší šířkou dlaždice (viz
+   čtyřstupňová hierarchie nad .card--movie výše - seriál je jejím
+   neškálovaným základem, takže je užší než film i badge stupeň, ale širší
+   než short). Výška dlaždice (filmové i seriálové) je dnes vždy čtverec
+   odvozený z její vlastní šířky, ne z poměru stran nějakého obrázku - viz
+   .card__poster-wrap níže. */
+.card--series .card__poster-wrap {
+  cursor: default;
+}
+
+/* Ohraničení je barevné i pro Sacred Timeline (--accent-dim - franšízová
+   barva, stejná rodina jako otherEarth karty dostávají svou vlastní barvu
+   níže) - uživatelský požadavek "udělej to ve stylu cizích vesmírů i pro
+   Sacred Timeline": PŘEDTÍM mělo Sacred Timeline neutrální šedé
+   --border a jen otherEarth karty (viz .card--other-earth níže) měly
+   ohraničení podle univerza - teď ho mají VŠECHNY karty, jen jinou barvou
+   podle toho, kam patří. */
+.card__frame {
+  border: 1px solid var(--accent-dim);
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+
+/* A title "glued onto" the main chronological axis from somewhere else
+   entirely - not Earth-616/Sacred Timeline (see movie.otherEarth in
+   data.js, e.g. The Fantastic Four: First Steps' Earth-828). Still a
+   normal card in the normal sequence (same connector line, same era,
+   same click-to-watch) - "glued on", not floating apart from the axis -
+   but the border + .card__meta tint/divider (that Earth's own color - see
+   --other-earth-current's own comment near :root) make it unmistakable
+   at a glance that it doesn't actually belong on this timeline, only
+   sits near it. The poster itself stays untouched (only .card__meta is
+   tinted) - posters are this app's most valuable visual real estate,
+   dimming/tinting the artwork itself would cost more than the
+   distinction is worth. See .year-band--foreign below for the matching
+   axis-label treatment shown directly above this same card.
+     .card__meta itself (below, further down the file) already reads
+   --tile-color(-dim) generically for this tint/divider - a Sacred Timeline
+   card gets exactly the same treatment via the SAME rule, just with
+   --tile-color defaulting to --accent instead of being overridden here -
+   so this rule only needs to override the FRAME's border-color, not
+   .card__meta's background/border-top separately the way it used to (nor
+   does any [data-other-earth-label="..."] .card__meta override - see
+   .card__meta's own comment for why that's no longer needed either). */
+.card--other-earth .card__frame {
+  border-color: var(--other-earth-current-dim);
+}
+
+.card__origin-earth {
+  margin: 3px 0 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--other-earth-current);
+  text-align: center;
+}
+
+/* Zvednutí (translateY) I ztučnění ohraničení (box-shadow prstenec níže)
+   se ukazují jen tam, kde je celá karta klikací (film) - na kartu seriálu
+   kliknout nejde (klika se na jednotlivé řádky sérií), takže by ohraničení
+   CELÉ karty naznačovalo akci, která tam neexistuje (uživatelský
+   požadavek - "seriál jako takový" se hoverem nemá orámovat vůbec). Najetí
+   na seriálovou kartu místo toho "probudí" (zvýrazní stejnou tlustší
+   linkou) jednotlivé .season-row uvnitř - TY se kliknout dají - viz
+   .card--series:hover .season-row níže, stejná barevná logika (--tile-
+   color), jen aplikovaná na řádky sérií místo na celý rámeček karty.
+     Hover NEPŘEBARVUJE ohraničení na pevnou franšízovou barvu (uživatelský
+   požadavek - dřív se vždycky vynutilo --accent-dim, takže cizí univerzum
+   na hoveru viditelně "přeblikávalo" na akcentovou barvu aktuální franšízy
+   místo své vlastní) - jen ho ZTUČNÍ, tou barvou, kterou karta UŽ MÁ.
+   Ztučnění je box-shadow prstenec (0 0 0 1px), ne skutečně širší border -
+   stejná technika jako .is-watched níže (1px border + 1px prstenec =
+   vizuálně ~2px, beze změny box modelu, takže hover nezpůsobí žádný
+   1px posun/reflow) - jen se tu skládá NAD existující border-color, místo
+   aby ji nahrazovala.
+     Tři pravidla, každé o krok specifičtější (víc tříd = vyšší specificita,
+   viz Gotcha o specificitě jinde v tomhle souboru) - karta, která splňuje
+   víc z nich najednou (zhlédnutá karta z cizího Earth), tak automaticky
+   dostane tu SPRÁVNOU barvu (zelená vyhrává), bez nutnosti řešit pořadí
+   zápisu v souboru. */
+.card:not(.card--series):hover .card__frame {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 1px var(--accent), 0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+
+.card--other-earth:not(.card--series):hover .card__frame {
+  box-shadow: 0 0 0 1px var(--other-earth-current), 0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+
+.card.is-watched:not(.card--series):hover .card__frame {
+  box-shadow: 0 0 0 1px var(--done), 0 14px 28px -14px var(--done-glow);
+}
+
+.card.is-watched .card__frame {
+  border-color: var(--done);
+  box-shadow: 0 0 0 1px var(--done), 0 14px 28px -14px var(--done-glow);
+}
+
+/* Celý plakát je klikací tlačítko: najetí myší odhalí overlay s akcí
+   "označit jako zhlédnuté", klik přepne stav. Zhlédnutý film se v klidovém
+   stavu pozná jen podle zeleného rámečku karty (viz .card.is-watched výše) -
+   žádná ikona ani ztmavení přes plakát. */
+.card__poster-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* --poster-h níže je jen odhad použitý pro výpočet místa na ose (viz
+     sizeTimelineToViewport v app.js) - v praxi ho vždycky přepisuje
+     .card--tile níže (aspect-ratio: 1/1, min-height: 0 !important), protože
+     každá karta dnes je dlaždice; zůstává tu jen jako fallback minimum pro
+     případ, že by se .card--tile z markupu někdy vynechala. */
+  min-height: var(--poster-h);
+  background: #000;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card__poster-wrap:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* VELKÁ ZMĚNA: žádná skutečná plakátová grafika nikde na webu - natrvalo,
+   ne za přepínačem (žádný `poster` obrázek/cesta se v data.js ani nikde
+   jinde v kódu už nevyskytuje). Dlaždice místo obrázku je natažená na
+   čtverec (aspect-ratio 1/1) místo dřívějšího poměru ~2:3 reálného plakátu -
+   width pořád přichází ze čtyřstupňové hierarchie výše (.card--movie/
+   .card--badge-tier/.card--short/.card--series), výšku teď 1:1 odvozuje
+   přímo z ní. `!important` přebíjí --poster-h/--movie-poster-h/
+   --short-poster-h/--badge-poster-h (JS tahle čísla pořád počítá jako
+   rozpočet pro sizeTimelineToViewport(), jen se dnes nikde jinde nečtou). */
+.card--tile .card__poster-wrap {
+  aspect-ratio: 1 / 1;
+  min-height: 0 !important;
+}
+
+/* Barva IKONY vychází z barvy DANÉHO "Earth", ne jen z aktuální franšízy -
+   přepíše --tile-color pro kartu z jiného Earth (movie.otherEarth/
+   season.otherEarth v buildCard()/buildSeriesCard()) na --other-earth-
+   current - STEJNOU proměnnou, kterou už dřív četl border/tint karty (viz
+   komentář u --other-earth-current v :root výše) - takže dvě karty z
+   RŮZNÝCH Earth dostanou viditelně jinou barvu ikony automaticky, beze
+   změny v JS. Pozadí (--tile-bg) je od tohohle záměrně odpojené (viz jeho
+   vlastní komentář v :root výše) - je to teď jednotná --surface pro
+   VŠECHNY karty bez ohledu na univerzum, takže se tu vůbec nepředeklarovává;
+   jediné dva odvozené tokeny, které tu musí být znovu, se stejným vzorcem
+   jako v :root, jsou --tile-icon-color(-strong) - viz GOTCHA v komentáři
+   nad --tile-color tamtéž pro proč: `var()` uvnitř custom property se
+   substituuje podle místa DEKLARACE, ne podle elementu čtení, takže by
+   jinak dál četly --tile-color z :root (--accent), i když se sama
+   --tile-color tady správně přepsala. */
+.card--other-earth {
+  --tile-color: var(--other-earth-current);
+  --tile-color-dim: var(--other-earth-current-dim);
+  --tile-icon-color: color-mix(in srgb, var(--tile-color) 24%, var(--bg-elevated));
+  --tile-icon-color-strong: color-mix(in srgb, var(--tile-color) 34%, var(--bg-elevated));
+}
+
+/* Pozadí dlaždice je JEDNOTNÉ pro každou kartu (--tile-bg = --surface,
+   viz jeho vlastní komentář v :root) - ladí s --surface pod ním
+   (.card__frame) i s celkovým tmavým laděním stránky, bez ohledu na to,
+   které univerzum karta patří. Ikona uvnitř zůstává jediný nositel barvy
+   podle --tile-color (favicon.svg-styl - stejný --bg-elevated základ +
+   akcentní pás, viz jeho vlastní komentář v CLAUDE.md) - dvě karty z
+   RŮZNÝCH Earth se tak pozná pořád na první pohled, jen výhradně podle
+   ikony, ne podle pozadí za ní. */
+.card__poster-placeholder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  background: var(--tile-bg);
+  text-align: center;
+  overflow: hidden;
+}
+
+.card__poster-placeholder-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 68%;
+  height: 68%;
+  transform: translate(-50%, -50%);
+  color: var(--tile-icon-color);
+}
+
+/* Nadpis má nést hlavní váhu dlaždice bez toho, aby přes ni ležel vlastní
+   neprůhledný podklad (chip) - ten byl vyzkoušený a zamítnutý jako špatný
+   nápad (moc "nalepený" kus navíc přes ikonu/pozadí). Čitelnost teď zase
+   stojí na kombinaci tučného řezu (800 - jediné místo na stránce, které
+   tuhle váhu potřebuje, viz komentář u fontu v index.html) a stínu (dvě
+   vrstvy - těsná ostrá pro hranu písmen, širší měkká pro celkový odstup od
+   pozadí pod ním) plus toho, že --tile-bg (viz :root výše) je dost tmavá
+   sama o sobě (--surface), aby stín stačil. Obě vrstvy zesíleny
+   (uživatelský požadavek - "ať nápis víc vynikne") oproti první verzi -
+   pořád ne tak silné, aby to četlo jako vlastní podklad/chip (viz výš, proč
+   byl zamítnutý), jen o dost výraznější odstup od podkladu než čistě
+   kosmetický nádech. */
+.card__poster-placeholder-title {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* Velikost titulku stoupá se stupněm čtyřstupňové hierarchie STEJNÝM
+   poměrem jako fyzická velikost dlaždice samotné (SHORT_POSTER_SCALE =
+   0.85 a jeho odvozeniny, app.js) - jinak by na fyzicky VĚTŠÍ dlaždici
+   (movie/badge) stejně velký text vypadal relativně ke čtverci MENŠÍ/méně
+   důležitě, přesně opačně, než hierarchie chce sdělit. Pořadí těchhle tří
+   pravidel dole záleží - .card--short a .card--badge-tier musí přijít AŽ
+   PO .card--movie (stejná specificita jedné třídy, vyhrává poslední v
+   pořadí zápisu), protože karta v obou případech nese OBOJÍ třídu zároveň
+   (.card--movie + jeden z těchhle dvou modifikátorů, viz buildCard() v
+   app.js). */
+.card--movie .card__poster-placeholder-title {
+  font-size: 23px;
+}
+
+/* SHORT dostává i o dost lehčí řez (600 místo základních 800) -
+   uživatelský požadavek, ať je na první pohled jasné, že jde o nejmíň
+   důležitý stupeň hierarchie, ne jen o fyzicky menší dlaždici se stejně
+   "hlasitým" textem. Velikost (14px, dál zmenšeno z původních 17px, další
+   uživatelský požadavek) cílí na to, aby se "Marvel One-Shot:" (nejdelší
+   opakující se prefix v týhle dlaždici - viz tileTitleHtml()'s zalomení za
+   dvojtečkou, app.js) vešlo na jeden řádek už při normální velikosti
+   dlaždice - na hodně úzkém plátně se o zbytek stejně postará
+   fitTilePlaceholderTitles() (app.js), stejný "shrink pak grow" mechanismus
+   jako u každé jiné dlaždice. */
+.card--short .card__poster-placeholder-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* O kousek větší než jen "23px * 1.384" by z čistého poměru vyšlo
+   (uživatelský požadavek - "trochu zvětši názvy u hlavních typů") -
+   Avengers/Epizody I-IX jsou nejdůležitější položky na celé ose, tenhle
+   krok navíc je záměrná výjimka z jinak přísně dodržovaného poměru výš.
+   fitTilePlaceholderTitles() (app.js) se o zbytek postará stejně jako u
+   každého jiného tieru - viz jeho vlastní komentář: dlouhý název nejdřív
+   zvýší dlaždici, teprve pak zmenší font, napříč VŠEMI tiery stejně. */
+.card--badge-tier .card__poster-placeholder-title {
+  font-size: 32px;
+}
+
+/* .card--badge-tier (Avengers/Epizody I-IX) dostává o něco výraznější
+   sytost IKONY než běžný film/seriál - je to nejdůležitější stupeň
+   hierarchie, stejná "největší = nejvýraznější" logika jako u
+   .card__badge--episode níže (plná barva místo obrysu). Pozadí dlaždice
+   samotné se mezi stupni NELIŠÍ (--tile-bg je jednotné --surface pro
+   všechny, viz jeho komentář v :root) - jen ikona nese tenhle rozdíl. */
+.card--badge-tier .card__poster-placeholder-icon {
+  color: var(--tile-icon-color-strong);
+}
+
+/* Badge je schválně výraznější než zbytek drobného textu na kartě – je to
+   první věc, podle které se pozná, na co se vlastně díváš. Epizody ságy
+   jsou nejdůležitější položky na ose, proto mají místo neutrálního "FILM"
+   svoje číslo a barvy naopak (plný akcentní podklad), ať jsou na první
+   pohled nejvýraznější ze všech badgí. */
+.card__badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(5, 7, 13, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(3px);
+}
+
+/* Dlaždice (žádná skutečná grafika, viz posterPlaceholderHtml() v app.js)
+   nemá přes co badge "MOVIE"/"SERIES"/"AVENGERS" apod. přelepit - badge se
+   proto (na žádost) přesouvá dolů do popiskové části pod dlaždicí, nad
+   řádek roku/délky (film) nebo nad seznam řad (seriál) - viz
+   buildCard()/buildSeriesCard() (app.js), kde badgeHtml vždycky dostane
+   tuhle třídu.
+     Tahle třída mění layout (pozice, zarovnání, velikost, odsazení) STEJNĚ
+   jako dřív, ale teď navíc (na žádost) i pozadí - obyčejné typové
+   zařazení ("MOVIE"/"SERIES"/...) má tady dole jen ohraničení, žádnou
+   plnou černou plochu, ať prosvítá skutečné pozadí té části karty pod ním
+   (--surface, .card__meta). GOTCHA - MUSÍ být deklarovaná PŘED
+   .card__badge--episode níže (stejná specificita jedné třídy, vyhrává
+   poslední v pořadí zápisu): "AVENGERS"/"EPISODE I" i tady dole zůstávají
+   plně vyplněná pilulka (viz --episode níže), protože jeho vlastní
+   `background` je zapsaný AŽ PO tomhle - kdyby byl řád obrácený, tahle
+   průhlednost by mu tu plnou barvu přebila. .card__badge--series pod ní
+   žádné vlastní pozadí nenastavuje, takže průhlednost odsud klidně
+   zdědí. */
+.card__badge--meta {
+  position: static;
+  display: inline-block;
+  margin: 0 0 5px;
+  font-size: 10px;
+  padding: 3px 8px;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+/* .card__badge--series dřív mělo vlastní modravý akcent (border-color +
+   color) odlišný od filmového badge - na žádost zrušeno: "MOVIE" i
+   "SERIES" mají mít stejnou barvu ohraničení, tu filmovou (bílá
+   translucentní z .card__badge/--meta výš) - třída zůstává v JS
+   (buildSeriesCard()) jako pojmenovaný hák pro budoucí odlišení, kdyby ho
+   ho někdo zase chtěl, momentálně ale úmyslně nic nepřepisuje. */
+
+/* Invertované, plné barvy – nejvýraznější badge na ose. Spouští se prostě
+   tím, že film má vyplněné movie.badge (viz app.js) - u SW jsou to epizody
+   I-IX (badge = pořadové číslo), u Marvelu stejným mechanismem "Avengers"
+   filmy (badge = "Avengers" místo neutrálního "Movie") - stejný vizuální
+   jazyk pro "tohle je klíčová položka série", jen jiný text. Zůstává plně
+   vyplněný i v .card__badge--meta kontextu (viz jeho GOTCHA komentář výš) -
+   je to výjimka z "jen ohraničení" pravidla, ne obyčejné typové
+   zařazení. */
+.card__badge--episode {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Rok výroby žije pod názvem (ne přes plakát) – jednotné se seriálem, kde
+   je rok u každé řady dole taky. */
+.card__year {
+  margin: 2px 0 0;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* Řádky se sériemi – žijí pod názvem, ne přes plakát. Sbalená řada je vždy
+   přesně dva řádky vysoká (viz .season-row__line2 níže) - normální
+   rozložení karty se tedy nikdy nemění tím, že něco je nebo není rozbalené;
+   jen ta časová osa smí scrollovat, a to do stran. */
+.season-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+  /* strop pro MAX_VISIBLE_SEASON_ROWS řad (4 × 44px řádek + 3 × 5px mezera,
+     viz SEASON_ROW_H/SEASON_ROW_GAP v app.js) - pojistka pro případ, že by
+     JS widenSeriesCard() z nějakého důvodu neproběhl; v běžném provozu ho
+     pro seriál s víc sériemi (Klonové války, 7) přebije .card--series-wide
+     níže, který místo scrollu přidá další sloupec. */
+  max-height: 192px;
+  overflow-y: auto;
+  padding-right: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.season-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.season-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+/* Karta s víc než MAX_VISIBLE_SEASON_ROWS sériemi (viz widenSeriesCard v
+   app.js, které nastaví --season-columns a rozšíří celou kartu) - seznam
+   sérií přejde na sloupcovou mřížku (grid-auto-flow:column tedy plní
+   nejdřív celý 1. sloupec shora dolů, pak 2. atd. - přesně "5., 6., 7.
+   série do druhého sloupce") místo svislého scrollu. Barevná dlaždice se
+   teď roztáhne přes celou (teď širší) kartu spolu s ním - "čtverec není
+   dogmatický" (uživatelský požadavek) - místo aby zůstala v malém čtverci
+   osaměle uprostřed - viz .card--series-wide .card__poster-wrap níže. */
+.card--series-wide .season-list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(4, auto);
+  grid-template-columns: repeat(var(--season-columns), 1fr);
+  column-gap: 10px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+/* Dřív tu byla explicitní "width: calc(var(--card-w) - 2px); margin: 0
+   auto" - vynucovalo to normální, úzkou šířku i na rozšířené kartě, jen
+   vycentrovanou uprostřed navíc volného místa. Teď se místo toho žádná
+   šířka nepředepisuje vůbec - .card__poster-wrap's vlastní základní
+   pravidlo (width: 100%) tak samo roztáhne dlaždici přes celou (širší)
+   .card__frame content-box, přesně jak "čtverec není dogmatický" žádá.
+     Výška zůstává STEJNÁ jako u normální, nerozšířené série - var(--card-w)
+   je číslo, ze kterého .card--tile's aspect-ratio: 1/1 jinak odvozuje
+   výšku==šířku u NEROZŠÍŘENÉ karty; tady, když šířka už není var(--card-w)
+   ale 100 % širší karty, dává tenhle explicitní height stejné číslo
+   znovu, takže roste jen ŠÍŘKA, ne výška - výškový rozpočet, se kterým
+   počítá sizeTimelineToViewport()/lastPosterH v app.js, zůstává
+   nedotčený. Jakmile je i height explicitní (ne auto), aspect-ratio z
+   .card--tile už nemá co dopočítávat (obě strany jsou už zadané) - není
+   proto potřeba ho tady ničím přebíjet. fitTilePlaceholderTitles() (app.js)
+   může tuhle výšku ještě o kousek zvýšit inline stylem, pokud se ani do
+   týhle šířky dlouhý název nevejde - viz jeho vlastní komentář. */
+.card--series-wide .card__poster-wrap {
+  height: var(--card-w);
+}
+
+.card--series-wide .card__title {
+  padding: 0 8px;
+}
+
+/* Neviditelný "držák místa" v .season-list, dokud je jeho řádek pryč (viz
+   .season-row.is-flying níže) - ať se sbalením/rozbalením nikdy nehýbou
+   ostatní řady ani nemění výška karty. */
+.season-row-placeholder {
+  flex-shrink: 0;
+}
+
+/* Řádek je obálka (div), ne tlačítko - sbalený obsahuje hlavičku (1. řádek,
+   klik = rozbalit) a druhý řádek se souhrnem. Zhlédnuto pozná podle
+   zeleného pozadí/rámečku (stejná logika jako karta filmu) - odvozeno od
+   toho, jestli jsou zaškrtnuté VŠECHNY epizody, ne od kliknutí na řádek. */
+.season-row {
+  /* flex-shrink:0 matters here - .season-row is (while collapsed) a flex
+     item inside the scrollable .season-list, and because it has
+     overflow:hidden (for the rounded corners), its automatic min-height is
+     0 instead of its content size (a documented flexbox gotcha), so
+     without this it gets silently squashed to fit instead of the list
+     actually overflowing and scrolling like it's supposed to. */
+  flex-shrink: 0;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elevated);
+  overflow: hidden;
+  /* GOTCHA - ztlušťování na hover NESMÍ jít přes border-width. Zkoušeno
+     naživo: měnit border-width přímo (1.5px -> 2.5px na hover) VYPADALO
+     bezpečné kvůli globálnímu * { box-sizing: border-box } (řádek 206), ale
+     border-box chrání jen elementy s explicitní width/height - .season-row
+     nemá žádnou explicitní výšku (roste podle obsahu .season-row__header),
+     takže tlustší border její celkovou výšku i tak reálně zvětšil o
+     ~1px/řádek. Při hoveru na CELOU kartu (probouzí se najednou VŠECHNY
+     řádky) se to sečetlo přes víc řádků a celá karta seriálu viditelně
+     "vyrostla na výšku" (uživatelský nález) - přesně to, co
+     sizeTimelineToViewport()/capSeasonListHeights() v app.js mají za úkol
+     nedopustit. Outline (níže) layout nikdy neovlivňuje, ať je jeho šířka
+     jakákoli - proto se tlustší linka na hover dělá jím (barva/průhlednost
+     se mění, ne šířka), ne přes border. outline-offset: -2px ho zasune
+     dovnitř přes tenký 1.5px border, ať spolu na hover splynou v jednu
+     souvislou silnější linku, ne dvě různobarevné vedle sebe (viz komentář
+     u .card--series:hover .season-row níže). */
+  outline: 2.5px solid transparent;
+  outline-offset: -2.5px;
+  transition: border-color 0.2s ease, outline-color 0.2s ease, background 0.2s ease;
+}
+
+/* -- sbalené: celý řádek (obě linky) je JEDNO tlačítko - klikací je tedy
+   celá karta série, ne jen horní řádek s názvem (viz .season-row__top a
+   .season-row__line2 jako jeho vnitřní obsah). */
+.season-row__header {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 4px 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.2s ease, transform 0.15s ease;
+}
+
+/* -- sbalené: 1. řádek, název + rozbalovací šipka ------------------------- */
+.season-row__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Karta seriálu využívá naplno celou dostupnou šířku - žádné umělé
+   zužování, ať se i delší název série vejde na jeden řádek. */
+.season-row__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.season-row__chevron {
+  flex: none;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* -- sbalené: 2. řádek, souhrn (rok · počet dílů · stopáž) ---------------- */
+.season-row__line2 {
+  margin-top: 1px;
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+/* min-width: 0 - bez něj by flex položka nikdy nezmenšila pod svou
+   obsahovou šířku, takže by overflow/ellipsis níže nikdy nezasáhlo (řádek
+   má pevnou výšku 44px, viz SEASON_ROW_H v app.js, takže text nemůže
+   zalomit na druhý řádek - musí se místo toho useknout). S přidanou
+   stopáží (viz formatRuntime v app.js) se tenhle řádek u užší karty
+   seriálu snadno nevejde celý - stejné ošetření jako u .season-row__name
+   výš. */
+.season-row__meta {
+  min-width: 0;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Zatemnění za rozbalenou sérií - position:fixed přes celou obrazovku,
+   z-index nad úplně vším normálním (karty, hlavička...) ale pod tou
+   rozbalenou řadou samotnou (.season-row.is-flying, o kousek níž).
+   Kliknutí kamkoli na tohle zavře rozbalenou řadu a NIC jiného - jelikož
+   je nahoře, žádný klik ani hover se přes něj nedostane k tomu, co je pod
+   ním, takže se logicky nic jiného nemůže ani podbarvit tou oranžovou
+   linkou při najetí myší. Vytváří/maže se v JS (expandSeasonRow /
+   collapseExpandedSeason), ne tady - proto tu není potřeba [hidden]. */
+.season-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  background: rgba(5, 7, 13, 0.5);
+  cursor: default;
+}
+
+/* -- rozbalené: řádek se dočasně přemístí přímo do .timeline-track a
+   "roztáhne" se do jednoho širšího (a u delší série i vyššího, viz
+   .episode-strip - zalamuje se přes víc řádků) pruhu - checkbox nalevo,
+   seznam epizod napravo - viz expandSeasonRow() v app.js pro to PROČ
+   (karta seriálu má overflow:hidden kvůli zaobleným rohům, takže cokoliv
+   uvnitř karty nemůže přetéct přes její okraj - to samé s .season-list
+   kvůli jeho vlastnímu svislému scrollbaru výše). Je to POŘÁD tentýž DOM
+   prvek, jen dočasně jinde a jinak veliký - ne nový/druhý obdélník vedle. */
+.season-row.is-flying {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: max-content;
+  padding: 5px 9px;
+  border-color: var(--accent-dim);
+  box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.7);
+}
+
+.season-row__bulk {
+  appearance: none;
+  flex: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.season-row__bulk:focus-visible,
+.episode-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Stejný vizuální jazyk jako .card__hover-icon (kroužek po najetí na
+   plakát filmu) - jen zmenšený, ať se vejde do výšky řádku. */
+.hover-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(2px);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-check svg {
+  width: 13px;
+  height: 13px;
+}
+
+.season-row__bulk.is-watched .hover-check {
+  background: var(--done);
+  border-color: var(--done);
+  color: #06281c;
+  box-shadow: 0 0 12px var(--done-glow);
+}
+
+/* Seznam epizod - "Episode 1", "Episode 2", ... jsou zástupné popisky (data
+   nemají reálné názvy jednotlivých dílů, viz buildEpisodePillsHtml v JS),
+   pokud show nemá vlastní kurátorské názvy (episodeTitles v datech). Teď
+   už rozbalená řada plave nad zatemněným pozadím (viz .season-backdrop),
+   takže si klidně může vzít víc místa - zalamuje se přes víc řádků místo
+   vodorovného scrollu, ať je vidět víc epizod najednou. Jen pro opravdu
+   dlouhou sérii (22 dílů) je tu ještě svislý scroll jako pojistka, ať
+   seznam neroste bez konce. */
+.episode-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px;
+  max-width: min(70vw, 620px);
+  max-height: 172px;
+  overflow-y: auto;
+  padding: 1px 6px 1px 1px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.episode-strip::-webkit-scrollbar {
+  width: 6px;
+}
+
+.episode-strip::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.episode-pill {
+  appearance: none;
+  flex: none;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.episode-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.episode-pill.is-watched {
+  border-color: var(--done);
+  background: rgba(52, 211, 153, 0.16);
+  color: var(--done);
+}
+
+.episode-pill.is-watched:hover {
+  border-color: var(--done);
+}
+
+/* Hover kdekoli na kartě = "probuzení" všech (sbalených) řádků, tlustší
+   barevnou linkou stejně jako se zvýrazňují filmové karty (uživatelský
+   požadavek) - ale NE orámováním celé karty seriálu samotné, na kterou
+   kliknout nejde (viz komentář nad .card:not(.card--series):hover
+   .card__frame výš) - ohraničí se místo toho jednotlivé .season-row, ty
+   klikací jsou. --tile-color(-dim) místo natvrdo psaného --accent(-dim) -
+   karta z cizího Earth tak probudí své řady svou VLASTNÍ barvou, ne
+   akcentovou barvou aktuální franšízy (stejná "barva, kterou karta UŽ MÁ"
+   logika jako u .card__frame hoveru výš).
+     "Tlustší" je tu outline-color na .season-row (viz jeho vlastní GOTCHA
+   komentář výš pro proč zrovna outline, ne border-width ani box-shadow) -
+   border-color se mění SOUČASNĚ na tu samou barvu, ať --border (klidová
+   šedá) na hover úplně zmizí a nezůstane vykukovat jako tenký odlišný
+   proužek pod/vedle outline. Ne u zhlédnutých, tam má i po najetí myší
+   zůstat zelená (viz níže). */
+.card--series:hover .season-row:not(.is-watched):not(.is-flying) {
+  border-color: var(--tile-color-dim);
+  outline-color: var(--tile-color-dim);
+}
+
+/* Přímý hover / focus nad konkrétní hlavičkou = zřetelné zvýraznění – opět
+   --tile-color (plná, ne tlumená) místo natvrdo psaného --accent (stejný
+   důvod jako výš), stejná outline technika jako "probouzecí" pravidlo výš,
+   a kromě zhlédnutých řádků, ty zůstávají zelené.
+     GOTCHA - specificita: bez toho úvodního ".card--series " by tohle
+   pravidlo (specificita 4 - .season-row + :not() + :has(), :has() nese
+   specificitu SVÉHO argumentu, tady 2) prohrálo proti "probouzecímu"
+   pravidlu výš (.card--series:hover .season-row:not():not(), specificita
+   5) - obě nastavují border-color/outline-color na TÉŽE řadě (najetí na
+   hlavičku řady je zároveň i najetí na kartu), takže by "tlumenější"
+   probouzecí ohraničení přebilo tohle "silnější" i při přímém hoveru na
+   konkrétní řadu (přesně tohle se stalo, než byl tenhle prefix přidán -
+   ověřeno naživo přes getComputedStyle). ".card--series" navíc je
+   redundantní pro VÝBĚR (.season-row stejně existuje jen uvnitř karty
+   seriálu), slouží čistě k navýšení specificity na 5, aby tohle vyhrálo
+   bez ohledu na pořadí zápisu v souboru. */
+.season-row:not(.is-watched) .season-row__header:hover,
+.season-row:not(.is-watched) .season-row__header:focus-visible {
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.card--series .season-row:not(.is-watched):has(.season-row__header:hover),
+.card--series .season-row:not(.is-watched):has(.season-row__header:focus-visible) {
+  border-color: var(--tile-color);
+  outline-color: var(--tile-color);
+  background: var(--surface-hover);
+}
+
+.season-row__header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.season-row.is-watched {
+  border-color: var(--done);
+  background: rgba(52, 211, 153, 0.16);
+}
+
+.season-row.is-watched .season-row__name,
+.season-row.is-watched .season-row__chevron {
+  color: var(--done);
+}
+
+.season-row.is-watched .season-row__meta {
+  color: var(--done);
+  opacity: 0.8;
+}
+
+/* Pojistka: i po najetí myší zůstává rámeček zhlédnuté řady zelený, nikdy
+   ne oranžový */
+.season-row.is-watched:hover {
+  border-color: var(--done);
+  background: rgba(52, 211, 153, 0.22);
+}
+
+.card__hover-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(5, 7, 13, 0.6);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* .card:hover (celá karta), ne jen .card__poster-wrap:hover - uživatelský
+   požadavek: kroužek se má ukázat i najetím do spodní (popiskové) části
+   karty, ne jen přímo na dlaždici, ať je jasné, že celá karta patří k
+   týhle akci. Skutečný KLIK ale pořád funguje jen na .card__poster-wrap
+   samotném (jediný <button>, viz buildCard() v app.js) - .card__hover-
+   overlay má navíc `pointer-events: none` výš, takže tahle širší hover
+   plocha nijak nerozšiřuje, KDE se dá kliknout, jen kde se kroužek ukáže.
+   .card__poster-wrap:focus-visible zůstává zvlášť (klávesnicové focusnutí
+   je vždycky přímo na tom jednom tlačítku, ne na celé kartě). */
+.card:hover .card__hover-overlay,
+.card__poster-wrap:focus-visible .card__hover-overlay {
+  opacity: 1;
+}
+
+.card__hover-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.card.is-watched .card__hover-icon {
+  background: var(--done);
+  border-color: var(--done);
+  color: #06281c;
+  box-shadow: 0 0 20px var(--done-glow);
+}
+
+/* Dělicí linka + jemný barevný nádech pod dlaždicí, GENERICKY přes
+   --tile-color(-dim) - stejné pravidlo pro úplně KAŽDOU kartu, ne jen pro
+   otherEarth (uživatelský požadavek: "stylizace všech buněk má být stejná,
+   liší se opravdu jen barva"). Sacred Timeline dřív tohle nemělo vůbec
+   (žádná linka, žádný nádech) a jen otherEarth karty ho dostávaly přes
+   samostatné .card--other-earth/[data-other-earth-label] přepisy s
+   natvrdo napsanými rgba() hodnotami (color-mix() uvnitř vlastní custom
+   property v tu dobu ještě nebyl použitý zdejší vzorec) - teď čte přímo
+   --tile-color/--tile-color-dim (:root výše), které se samy správně mění
+   podle univerza (accent pro Sacred Timeline, other-earth-current pro
+   cizí Earth, včetně specifických [data-other-earth-label] přepisů - viz
+   --other-earth-current's vlastní komentář u :root) - žádné samostatné
+   .card__meta přepisy tedy vůbec nepotřeba, ani pro Sacred Timeline, ani
+   pro jednotlivá cizí univerza. color-mix(... , transparent) místo
+   literálních rgba() navíc obchází Gotchu "nejde použít var() uvnitř
+   rgba() alfa zápisu", kterou tenhle kód dřív musel řešit ručním
+   udržováním rgba() duplikátů v synchronizaci. */
+.card__meta {
+  box-sizing: border-box;
+  padding: 9px 11px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tile-color) 10%, transparent),
+    color-mix(in srgb, var(--tile-color) 4%, transparent)
+  );
+  border-top: 1px solid var(--tile-color-dim);
+  /* .card__title/.card__year už mají vlastní text-align: center - tohle je
+     jen navíc pro .card__badge--meta (inline-block, žádné vlastní
+     zarovnání), ať badge vystředěný nad rokem/seznamem řad sedí stejně
+     jako zbytek popisku, viz badge's own comment above. */
+  text-align: center;
+}
+
+/* Normally wraps to 2 lines, same as a season-list title - but NOT hard
+   clamped there anymore (no -webkit-line-clamp/overflow:hidden): a movie
+   card's own height was never actually fixed anywhere (.card__meta has no
+   set height, sizeTimelineToViewport()'s MOVIE_META_H is just a poster-
+   size-solve BUDGET, not an enforced cap - see the long comment on that
+   function), so a title that genuinely needs a 3rd/4th line (the longest
+   Marvel One-Shot title, "...A Funny Thing Happened on the Way to Thor's
+   Hammer", is the case that prompted this - it doesn't fit 2 lines even at
+   a normal movie card's width, let alone a .card--short one) is free to
+   just grow the card a little taller instead of losing words to an
+   ellipsis. Safe by the same reasoning `metaH` already relies on
+   elsewhere in this file: `sizeTimelineToViewport()`'s solve is bounded by
+   the tallest SERIES card on the axis (`metaH`, render() in app.js), which
+   is routinely much taller than two-and-a-bit lines of movie title text -
+   a long title growing a movie card by one extra line has never come
+   close to that ceiling in practice (verified with a full Playwright pass
+   after this was un-clamped, same "diff: scrollHeight - clientHeight,
+   exact, no tolerance" check every layout change here needs). */
+.card__title {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+
+/* -------------------------------------------------------------------- */
+/*  Footer                                                               */
+/* -------------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 7px 32px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 11px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer p + p {
+  margin-top: 2px;
+}
+
+/* Sits ABOVE the credit line and reads slightly brighter/larger than it
+   (--text-dim vs. the credit line's own --text-faint/11px) - not meant to
+   grab attention (no color, no weight, no border), just to register as
+   the more prominent of the footer's two lines so a user's eye actually
+   catches it exists, rather than blending into "the same dim copyright
+   line every site has" the way the credit line itself is allowed to. */
+/* margin set via the compound ".site-footer .site-footer__disclaimer"
+   selector, not the bare class alone - needs to out-specificity ".site-footer
+   p"'s own "margin: 0" above (one class + one element = higher specificity
+   than one class by itself), which was otherwise silently cancelling the
+   auto side-margins back to 0 and leaving this max-width box glued to the
+   left padding edge instead of centered - caught only by measuring its real
+   getBoundingClientRect, not visible from the CSS alone. */
+/* No max-width here on purpose - a first pass capped this at 720px to keep
+   the line short/readable, but that forced the full disclaimer text onto
+   THREE lines even on an ordinary desktop window, when it only actually
+   needs two (or even one, on a wide monitor). Letting it use the footer's
+   real full width (same as the credit line below it, which has no cap
+   either) is most of what keeps it to at most two lines - verified by
+   counting real line-box getClientRects(), not guessed from character
+   count. */
+/* font-size is a single fluid `clamp()`, not a fixed 12px + a breakpoint
+   override - a fixed size held two lines down to about 900px of viewport
+   width, then tipped into three well before the existing 720px mobile
+   breakpoint kicked in to shrink it back down (that gap was the first fix
+   attempt's bug: a breakpoint-scoped override belongs on the SAME compound
+   ".site-footer .site-footer__disclaimer" selector as this rule, a bare
+   ".site-footer__disclaimer" inside the media query loses on specificity
+   to this rule regardless of the query - hit this exact trap once already
+   on the margin, see above, then hit its sibling here). `clamp()` shrinks
+   continuously with viewport width instead of stepping at one breakpoint,
+   holding the two-line budget from a wide monitor down to roughly 680px -
+   below that, no amount of shrinking (checked down to 7px, well past
+   legible) fits this much text into two lines on a genuinely narrow phone,
+   so the floor here (10px) accepts three lines there rather than going
+   illegibly small chasing a target that isn't reachable. */
+.site-footer .site-footer__disclaimer {
+  font-size: clamp(10px, 1.375vw, 12px);
+  color: var(--text-dim);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Requested wrap point: whenever the disclaimer breaks to a second line,
+   it should break right before "belong to their respective owners...", not
+   wherever the browser's own line-fill algorithm happens to land - which,
+   depending on viewport width, could split anywhere in that closing
+   sentence instead. white-space: nowrap makes this whole tail an atomic
+   unit the line-wrapping algorithm can't break INSIDE - it either fits at
+   the end of line 1 (same as a one-line disclaimer on a wide screen,
+   nothing changes) or, once it doesn't, the ENTIRE span moves to line 2
+   as one piece, landing exactly on the requested phrase - no JS/manual
+   <br> needed, this is the CSS text-wrap algorithm doing the same job it
+   already does at the level of individual words, just for this one phrase
+   instead of one word at a time. */
+.site-footer__disclaimer-tail {
+  white-space: nowrap;
+}
+
+/* Below ~540px of viewport width, the tail phrase no longer fits on a
+   single line even by itself, at even the clamp()'d font-size floor - kept
+   as one unbreakable unit past that point it would run past the footer's
+   own edge instead of wrapping (body's overflow:hidden then clips it
+   rather than showing a scrollbar, silently cutting the sentence off).
+   Reverting to normal wrapping here trades the requested exact break point
+   for actually-readable text - checked empirically (real overflow starts
+   at 520px), not guessed from character count. */
+@media (max-width: 540px) {
+  .site-footer__disclaimer-tail {
+    white-space: normal;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/*  Responsive                                                           */
+/* -------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .site-header__inner {
+    padding: 10px 20px;
+  }
+
+  /* long-form explainer, not worth the vertical space on a narrow/mobile
+     screen - the order-switch pills alone still make the choice clear */
+  .order-switch__desc {
+    display: none;
+  }
+
+  .progress {
+    width: 130px;
+  }
+
+  .timeline-scroll {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .site-footer {
+    padding: 6px 20px;
+  }
+}
+
+/* Nízké okno (na výšku) - ne mobil na šířku, ale třeba zmenšené okno
+   prohlížeče na monitoru. Ustoupí nepodstatné texty, ať zbyde místo na
+   samotnou osu a karty se nemusí zmenšovat pod čitelnou hranici. */
+@media (max-height: 480px) {
+  .order-switch__desc {
+    display: none;
+  }
+}

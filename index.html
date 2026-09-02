@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Star Wars – Watch Order</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- wght@800 added for .card__poster-placeholder-title (css/style.css) -
+       every other --font-display use tops out at 700 -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <div class="brand">
+        <h1 class="brand__title">Watch Order</h1>
+        <div class="franchise-select-wrap" id="franchiseSelectWrap">
+          <button
+            type="button"
+            class="franchise-select"
+            id="franchiseSelectBtn"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="franchiseMenu"
+          >
+            <span id="franchiseSelectLabel"></span>
+            <span class="franchise-select__chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="franchise-menu" id="franchiseMenu" role="listbox" aria-label="Franchise" hidden>
+            <!-- options are generated from FRANCHISES in js/app.js -->
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="order-controls">
+          <div class="order-switch" role="tablist" aria-label="Movie ordering mode">
+            <!-- buttons are generated from ORDERINGS in js/app.js -->
+          </div>
+
+          <div class="story-line-select-wrap" id="storyLineSelectWrap">
+            <button
+              type="button"
+              class="story-line-select"
+              id="storyLineSelectBtn"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="storyLineMenu"
+            >
+              <span id="storyLineSelectLabel"></span>
+              <span class="story-line-select__chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="story-line-menu" id="storyLineMenu" role="listbox" aria-label="Story line" hidden>
+              <!-- options ("All" + STORY_LINES) are generated in js/app.js -->
+            </div>
+          </div>
+
+          <div class="multiverse-select-wrap" id="multiverseSelectWrap">
+            <button
+              type="button"
+              class="multiverse-select"
+              id="multiverseSelectBtn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="multiverseMenu"
+            >
+              <span id="multiverseSelectLabel"></span>
+              <span class="multiverse-select__chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="multiverse-menu" id="multiverseMenu" role="group" aria-label="Multiverse" hidden>
+              <!-- checkboxes ("Earth-616 (Sacred Timeline)", EARTH_BUCKETS) are generated in js/app.js -->
+            </div>
+          </div>
+
+          <label class="header-toggle" id="coreMcuWrap" data-active="false">
+            <input type="checkbox" id="coreMcuCheckbox" />
+            <span>Core MCU</span>
+          </label>
+
+          <label class="header-toggle" id="doomsdayWatchlistWrap" data-active="false">
+            <input type="checkbox" id="doomsdayWatchlistCheckbox" />
+            <span>Watchlist for Doomsday</span>
+          </label>
+        </div>
+
+        <p class="order-switch__desc" id="orderingDescription" aria-live="polite"></p>
+      </div>
+
+      <div class="progress-group">
+        <div class="progress" aria-live="polite">
+          <div class="progress__track">
+            <div class="progress__fill" id="progressFill"></div>
+          </div>
+          <p class="progress__label">
+            Watched <span id="progressCount">0</span> / <span id="progressTotal">0</span>
+          </p>
+        </div>
+
+        <div class="progress" aria-live="polite">
+          <div class="progress__track">
+            <div class="progress__fill" id="progressRuntimeFill"></div>
+          </div>
+          <p class="progress__label">
+            Watched <span id="progressRuntimeWatched">0m</span> / <span id="progressRuntimeTotal">0m</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="timeline-section">
+    <div class="timeline-scroll-wrap">
+      <div class="scroll-hint scroll-hint--left" aria-hidden="true">‹</div>
+      <div class="scroll-hint scroll-hint--right" aria-hidden="true">›</div>
+
+      <div class="timeline-scroll" id="timelineScroll">
+        <div class="timeline-track" id="timelineTrack">
+          <!-- eras, posters and SVG connectors are generated in js/app.js -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="site-footer__disclaimer">
+      <!-- "poster imagery (displayed as low-resolution thumbnails)," used to
+           sit here, between "character names," and "and related trademarks" -
+           dropped once real poster art was removed from the page entirely
+           (no more poster images anywhere in the app); nothing left to
+           disclaim a license for. -->
+      This website is an unofficial, non-commercial fan project. All movie
+      titles, character names, and related trademarks
+      <span class="site-footer__disclaimer-tail">belong to their respective
+      owners and are used here for informational and illustrative
+      purposes.</span>
+    </p>
+    <p>Created by Pavel Krupař with Claude Code</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

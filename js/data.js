@@ -3361,7 +3361,7 @@ const ORDERINGS_TBBT = [
   {
     id: "recommended",
     label: "Recommended",
-    description: "The whole Big Bang Theory universe in one watch order - every season by real release date, with The Big Bang Theory Season 11-12 and Young Sheldon Season 1-2 interleaved so both shows land in step with each other.",
+    description: "My recommended order, which roughly follows release dates and seamlessly connects all the crossovers and twists.",
     eras: [
       {
         // ONE flat era, same "no title bar needed for a single-era mode"

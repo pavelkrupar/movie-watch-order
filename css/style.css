@@ -282,6 +282,24 @@
   --accent-ink: #2b0a0c;
 }
 
+/* TBBT magenta/růžová - nová, nikde jinde v paletě nepoužitá barva (SW má
+   žlutou, Marvel červenou, --other-earth rodina obsazuje fialovou/modrou/
+   oranžovou/bílou) - zvolena schválně dost daleko od zelené (--done), aby
+   se s "zhlédnuto" nemohla nikde splést. Tahle franšíza nemá žádný
+   otherEarth obsah, takže --other-earth(-current) tokeny tu nikdy nepřijdou
+   ke slovu - jen --accent* níže.
+     Rozjasněno/zesyceno z první verze (#e0499f, kontrast cca 5.4:1 proti
+   --bg) na tenhle jasnější odstín (kontrast cca 7.2:1) na uživatelský
+   požadavek "více kontrastní" - furt čitelně růžová/magenta (ne zesvětlená
+   až do ružová-bílá), jen výrazně líp čitelná na tmavém pozadí, blíž
+   kontrastu, jaký má SW vlastní žlutá (--accent výchozí, cca 13:1). */
+:root[data-franchise="tbbt"] {
+  --accent: #ff5cbf;
+  --accent-dim: #8f346b;
+  --accent-glow: rgba(255, 92, 191, 0.35);
+  --accent-ink: #2b0a1f;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1357,6 +1375,21 @@ body {
    proto největší dlaždice ze všech čtyř stupňů. Vyšší specificita (dvě
    třídy) než .card--movie samotné. */
 .card--movie.card--badge-tier {
+  flex: 0 0 var(--badge-card-w);
+  width: var(--badge-card-w);
+}
+
+/* Same badge tier, extended to a whole SHOW (series.badge in data.js -
+   today: TBBT's own "tbbt" entry, see buildSeriesCard()'s own isBadgeTier
+   comment) instead of just a single movie - a key show should stand out
+   exactly like a key movie already does, so it reuses the exact same
+   --badge-card-w this franchise's own posterH already derives, not a
+   separate size. Only affects a NORMAL single-column series card's own
+   width - a merged card wide enough to need widenSeriesCard()'s own
+   multi-column layout (--card--series-wide) already sets its own inline
+   width there, wider than --badge-card-w to begin with, so this rule
+   simply never has anything left to override on that kind of card. */
+.card--series.card--badge-tier {
   flex: 0 0 var(--badge-card-w);
   width: var(--badge-card-w);
 }

@@ -1583,6 +1583,22 @@
     // there's nothing else here that needed splitting between the two.
     const otherEarth = seasons[0].otherEarth;
 
+    // Same badge-tier mechanism as buildCard()'s isBadgeTier (Avengers/
+    // Episode I-IX - see its own comment) extended to a whole SHOW rather
+    // than one movie - series.badge (data.js, today: only TBBT's own
+    // "tbbt" entry) is the series-level equivalent of movie.badge. A
+    // merged card's seasons always share one seriesId/show, so checking
+    // just the first one's own series record speaks for the whole card,
+    // same reasoning as otherEarth right above. Drives the same
+    // .card--badge-tier class (bigger tile, bigger placeholder title,
+    // stronger icon color - see that class's own CSS comments, none of
+    // which are movie-specific despite living right under .card--movie's
+    // own badge-tier width rule) plus the same filled-pill badge treatment
+    // (card__badge--episode below) - the whole point is that a key SHOW
+    // should stand out exactly the way a key MOVIE already does, not a
+    // parallel-but-different visual language.
+    const isBadgeTier = !!series.badge;
+
     // Is this card taller than the normal two-row budget even at the
     // current (possibly max-sized) poster? Only matters for row-1: a
     // row-0 card already anchors to the top by default and simply grows
@@ -1596,7 +1612,7 @@
     const overflows = row === 1 && naturalH > lastTrackH + 1;
 
     const card = document.createElement("article");
-    card.className = `card card--series card--row-${row}${overflows ? " card--overflow" : ""}${isWatched ? " is-watched" : ""}${otherEarth ? " card--other-earth" : ""} card--tile`;
+    card.className = `card card--series card--row-${row}${overflows ? " card--overflow" : ""}${isWatched ? " is-watched" : ""}${otherEarth ? " card--other-earth" : ""}${isBadgeTier ? " card--badge-tier" : ""} card--tile`;
     card.dataset.movieId = seasons.map((s) => s.id).join(",");
     // See the matching comment in buildCard() - which SPECIFIC Earth, not
     // just "some foreign Earth", also driving the tile's own color now.
@@ -1604,13 +1620,18 @@
 
     const rowsHtml = seasons.map((s) => buildSeasonRowHtml(series, s)).join("");
     const posterHtml = posterPlaceholderHtml(series.title);
-    // "(Animated)" suffix - see the matching comment in buildCard().
-    // series.animated (data.js) flags the whole SHOW, not a per-season
-    // thing - every season of an animated show is animated.
-    const badgeText = `Series${series.animated ? " (Animated)" : ""}`;
-    // See the matching comment in buildCard() - same move down into the
-    // caption, right above the season list this time.
-    const badgeHtml = `<span class="card__badge card__badge--series card__badge--meta">${escapeHtml(badgeText)}</span>`;
+    // series.badge (e.g. "TBBT") replaces the neutral "Series" text the
+    // same way movie.badge replaces "Movie" in buildCard() - see its own
+    // comment above. "(Animated)" suffix - see the matching comment in
+    // buildCard(). series.animated (data.js) flags the whole SHOW, not a
+    // per-season thing - every season of an animated show is animated.
+    const badgeText = (series.badge || "Series") + (series.animated ? " (Animated)" : "");
+    // card__badge--episode (see its own CSS comment - the filled-pill,
+    // "this is a key item" treatment, not literally episode-specific)
+    // applies here on series.badge same as it does on movie.badge in
+    // buildCard() - same visual language for "this show is as important
+    // as this franchise's key movies", not a separate one.
+    const badgeHtml = `<span class="card__badge${series.badge ? " card__badge--episode" : ""} card__badge--series card__badge--meta">${escapeHtml(badgeText)}</span>`;
 
     card.innerHTML = `
       <div class="card__frame">

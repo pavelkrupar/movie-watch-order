@@ -1,20 +1,24 @@
 /**
  * Data layer.
  * -----------------------------------------------------------------------
- * Two franchises today, Star Wars and Marvel - each one a fully separate
- * MOVIES/SERIES/SEASONS/ORDERINGS(/STORY_LINES) dataset, suffixed
- * _STARWARS / _MARVEL below. app.js never reads those suffixed names
- * directly - it reads the bare, unsuffixed MOVIES/SERIES/SEASONS/
- * ORDERINGS/STORY_LINES identifiers everywhere (rendering, watched-state
- * counting, runtime totals, persistence validation, all of it), declared
- * `let` at the very end of this file and pointed at Star Wars's own data
- * by default. Picking a franchise in the header (switchFranchise() in
- * app.js) just reassigns those five bindings to the other franchise's
- * dataset (FRANCHISE_DATA, also at the end of this file) and re-renders -
- * every function elsewhere in app.js is automatically "about" whichever
- * franchise is active without needing to know that franchise switching
- * exists at all. A third franchise later is "one more dataset + one more
- * FRANCHISE_DATA/FRANCHISES entry", not new plumbing.
+ * Three franchises today, Star Wars, Marvel and The Big Bang Theory - each
+ * one a fully separate MOVIES/SERIES/SEASONS/ORDERINGS(/STORY_LINES)
+ * dataset, suffixed _STARWARS / _MARVEL / _TBBT below. app.js never reads
+ * those suffixed names directly - it reads the bare, unsuffixed MOVIES/
+ * SERIES/SEASONS/ORDERINGS/STORY_LINES identifiers everywhere (rendering,
+ * watched-state counting, runtime totals, persistence validation, all of
+ * it), declared `let` at the very end of this file and pointed at Star
+ * Wars's own data by default. Picking a franchise in the header
+ * (switchFranchise() in app.js) just reassigns those five bindings to the
+ * other franchise's dataset (FRANCHISE_DATA, also at the end of this file)
+ * and re-renders - every function elsewhere in app.js is automatically
+ * "about" whichever franchise is active without needing to know that
+ * franchise switching exists at all. This is why adding TBBT as a third
+ * franchise was "one more dataset + one more FRANCHISE_DATA/FRANCHISES
+ * entry", not new plumbing - see FRANCHISE_DATA's own comment for what
+ * TBBT deliberately leaves empty (storyLines/doomsdayWatchlist/
+ * coreMcuExclude - all Star-Wars/Marvel-specific mechanisms with no
+ * equivalent here).
  *
  * MOVIES  – dictionary of movies (key = id). One "watched" toggle per movie.
  *
@@ -57,6 +61,7 @@
 const FRANCHISES = [
   { id: "starwars", label: "Star Wars" },
   { id: "marvel", label: "Marvel" },
+  { id: "tbbt", label: "The Big Bang Theory" },
 ];
 
 // The "Multiverse" checkbox filter's own buckets (see
@@ -2752,6 +2757,739 @@ const DOOMSDAY_WATCHLIST_MARVEL = [
 // its own story is SET, so none of them need listing here; only the
 // production-company exception does.
 const CORE_MCU_EXCLUDE_MARVEL = ["agentcarter-s1", "agentcarter-s2"];
+
+// -----------------------------------------------------------------------
+// The Big Bang Theory - third franchise, and the simplest of the three:
+// no movies at all (MOVIES_TBBT is deliberately {}), no otherEarth content
+// (so Multiverse/Core MCU/Watchlist for Doomsday all hide automatically,
+// same "empty array/no otherEarth field anywhere" mechanism Star Wars
+// already exercises for the same three controls), and exactly ONE
+// ordering ("Recommended") rather than a Chronological/Release Order
+// pair - there's no separate in-universe timeline distinct from real
+// release order here the way Star Wars/Marvel have, so a second ordering
+// would just be a duplicate of the first. This also means STORY_LINES_TBBT
+// doesn't exist as a const at all (not even an empty array assigned to a
+// name) - FRANCHISE_DATA.tbbt.storyLines is just a literal [] inline,
+// there being nothing else in this franchise that would ever produce one.
+//   Three shows share one universe: The Big Bang Theory (2007-2019, 12
+// seasons), its prequel Young Sheldon (2017-2024, 7 seasons), and Young
+// Sheldon's own sequel/spin-off Georgie & Mandy's First Marriage
+// (2024-present). Every season is real Earth-normal continuity - there's
+// no foreign universe to glue onto this axis the way Marvel's otherEarth
+// system exists for, which is exactly why this franchise needs none of
+// that machinery.
+//   Season/episode counts and every real-world air date below (including
+// the per-episode titles on tbbt-s11/tbbt-s12/ys-s1/ys-s2, the four
+// seasons the interleave below actually slices into) were verified
+// against Wikipedia's own season/episode-list pages, not typed from
+// memory - see CLAUDE.md's "never invent episode data" rule. No
+// episodeRuntimes/totalRuntimeMin anywhere yet, same deliberate
+// first-pass simplification Marvel's own dataset documents for itself -
+// seasonTotalRuntimeMin()/seasonMetaLineText() already degrade
+// gracefully with no runtime data at all, so every card here just shows
+// "year · episode count", no runtime.
+const MOVIES_TBBT = {};
+
+const SERIES_TBBT = {
+  // badge: "TBBT" - the series-level equivalent of movie.badge (Avengers/
+  // Episode I-IX in the other two franchises, see buildSeriesCard()'s own
+  // isBadgeTier comment in app.js) - flags this show as the franchise's
+  // own centerpiece, on explicit user request ("tento seriál je klíčový a
+  // měl by vyniknout stejně jako vynikají ty nejdůležitější filmy v jiných
+  // universech"). Every card that carries a "tbbt" season (the merged
+  // S1-S11a run and each of the S11b/S12a/S12b/S12c interleave blocks -
+  // see ORDERINGS_TBBT) picks this up automatically, since they all share
+  // this one seriesId - Young Sheldon/Georgie & Mandy/Stuart cards are
+  // untouched, having their own different seriesId. Replaces the neutral
+  // "Series" badge text with "TBBT" specifically, same mechanism as
+  // movie.badge replacing "Movie" with "Avengers"/"Episode N".
+  tbbt: { id: "tbbt", title: "The Big Bang Theory", badge: "TBBT" },
+  youngsheldon: { id: "youngsheldon", title: "Young Sheldon" },
+  georgieandmandy: { id: "georgieandmandy", title: "Georgie & Mandy's First Marriage" },
+  // The franchise's second direct spin-off (after Young Sheldon) - HBO
+  // Max, premiered July 23, 2026, Kevin Sussman reprising Stuart Bloom.
+  // Its own premise sends Stuart bouncing across alternate universes after
+  // he breaks a device Sheldon/Leonard/Howard built, but Stuart himself -
+  // and the show's own "home" reality - is still Sacred Timeline, same
+  // continuity as the other three shows in this dataset; the multiverse
+  // stuff is this season's plot, not a different Earth for the whole show
+  // to live on. Deliberately NOT modeled with an otherEarth flag the way
+  // Marvel's own foreign-Earth titles are - this franchise has no such
+  // mechanism at all (see FRANCHISE_DATA.tbbt's own comment), and adding
+  // one just for this one show's premise would be exactly the kind of
+  // machinery TBBT's dataset is deliberately simpler than Marvel's without.
+  stuart: { id: "stuart", title: "Stuart Fails to Save the Universe" },
+};
+
+// year = the season's real premiere year (drives "Recommended"'s own
+// release-date sort, same convention SEASONS_STARWARS/SEASONS_MARVEL use).
+const SEASONS_TBBT = {
+  // episodeTitles on tbbt-s1..s10 (added after the franchise's own initial
+  // pass, which deliberately left these as plain counts) verified against
+  // Wikipedia's own per-season episode-list pages, same sourcing standard
+  // as tbbt-s11/tbbt-s12/ys-s1/ys-s2 above.
+  "tbbt-s1": {
+    id: "tbbt-s1", seriesId: "tbbt", number: 1, label: "Season 1", episodes: 17, year: 2007,
+    episodeTitles: [
+      "Pilot", "The Big Bran Hypothesis", "The Fuzzy Boots Corollary", "The Luminous Fish Effect",
+      "The Hamburger Postulate", "The Middle-earth Paradigm", "The Dumpling Paradox", "The Grasshopper Experiment",
+      "The Cooper-Hofstadter Polarization", "The Loobenfeld Decay", "The Pancake Batter Anomaly", "The Jerusalem Duality",
+      "The Bat Jar Conjecture", "The Nerdvana Annihilation", "The Pork Chop Indeterminacy", "The Peanut Reaction",
+      "The Tangerine Factor",
+    ],
+    episodeRuntimes: [23, 21, 22, 21, 20, 21, 21, 20, 19, 21, 22, 20, 22, 20, 22, 20, 20],
+  },
+  "tbbt-s2": {
+    id: "tbbt-s2", seriesId: "tbbt", number: 2, label: "Season 2", episodes: 23, year: 2008,
+    episodeTitles: [
+      "The Bad Fish Paradigm", "The Codpiece Topology", "The Barbarian Sublimation", "The Griffin Equivalency",
+      "The Euclid Alternative", "The Cooper–Nowitzki Theorem", "The Panty Piñata Polarization", "The Lizard–Spock Expansion",
+      "The White Asparagus Triangulation", "The Vartabedian Conundrum", "The Bath Item Gift Hypothesis", "The Killer Robot Instability",
+      "The Friendship Algorithm", "The Financial Permeability", "The Maternal Capacitance", "The Cushion Saturation",
+      "The Terminator Decoupling", "The Work Song Nanocluster", "The Dead Hooker Juxtaposition", "The Hofstadter Isotope",
+      "The Vegas Renormalization", "The Classified Materials Turbulence", "The Monopolar Expedition",
+    ],
+    episodeRuntimes: [22, 21, 21, 21, 20, 21, 21, 20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 20, 20, 20, 22, 19, 21],
+  },
+  "tbbt-s3": {
+    id: "tbbt-s3", seriesId: "tbbt", number: 3, label: "Season 3", episodes: 23, year: 2009,
+    episodeTitles: [
+      "The Electric Can Opener Fluctuation", "The Jiminy Conjecture", "The Gothowitz Deviation", "The Pirate Solution",
+      "The Creepy Candy Coating Corollary", "The Cornhusker Vortex", "The Guitarist Amplification", "The Adhesive Duck Deficiency",
+      "The Vengeance Formulation", "The Gorilla Experiment", "The Maternal Congruence", "The Psychic Vortex",
+      "The Bozeman Reaction", "The Einstein Approximation", "The Large Hadron Collision", "The Excelsior Acquisition",
+      "The Precious Fragmentation", "The Pants Alternative", "The Wheaton Recurrence", "The Spaghetti Catalyst",
+      "The Plimpton Stimulation", "The Staircase Implementation", "The Lunar Excitation",
+    ],
+    episodeRuntimes: [22, 21, 20, 21, 21, 20, 19, 21, 19, 21, 20, 19, 20, 19, 21, 21, 20, 21, 21, 20, 21, 20, 20],
+  },
+  "tbbt-s4": {
+    id: "tbbt-s4", seriesId: "tbbt", number: 4, label: "Season 4", episodes: 24, year: 2010,
+    episodeTitles: [
+      "The Robotic Manipulation", "The Cruciferous Vegetable Amplification", "The Zazzy Substitution", "The Hot Troll Deviation",
+      "The Desperation Emanation", "The Irish Pub Formulation", "The Apology Insufficiency", "The 21-Second Excitation",
+      "The Boyfriend Complexity", "The Alien Parasite Hypothesis", "The Justice League Recombination", "The Bus Pants Utilization",
+      "The Love Car Displacement", "The Thespian Catalyst", "The Benefactor Factor", "The Cohabitation Formulation",
+      "The Toast Derivation", "The Prestidigitation Approximation", "The Zarnecki Incursion", "The Herb Garden Germination",
+      "The Agreement Dissection", "The Wildebeest Implementation", "The Engagement Reaction", "The Roommate Transmogrification",
+    ],
+    episodeRuntimes: [21, 21, 21, 20, 21, 22, 21, 19, 21, 20, 20, 21, 21, 21, 20, 20, 21, 21, 21, 21, 21, 21, 20, 21],
+  },
+  "tbbt-s5": {
+    id: "tbbt-s5", seriesId: "tbbt", number: 5, label: "Season 5", episodes: 24, year: 2011,
+    episodeTitles: [
+      "The Skank Reflex Analysis", "The Infestation Hypothesis", "The Pulled Groin Extrapolation", "The Wiggly Finger Catalyst",
+      "The Russian Rocket Reaction", "The Rhinitis Revelation", "The Good Guy Fluctuation", "The Isolation Permutation",
+      "The Ornithophobia Diffusion", "The Flaming Spittoon Acquisition", "The Speckerman Recurrence", "The Shiny Trinket Maneuver",
+      "The Recombination Hypothesis", "The Beta Test Initiation", "The Friendship Contraction", "The Vacation Solution",
+      "The Rothman Disintegration", "The Werewolf Transformation", "The Weekend Vortex", "The Transporter Malfunction",
+      "The Hawking Excitation", "The Stag Convergence", "The Launch Acceleration", "The Countdown Reflection",
+    ],
+    episodeRuntimes: [21, 20, 20, 20, 21, 21, 20, 21, 21, 21, 20, 21, 21, 20, 20, 21, 21, 21, 20, 21, 19, 21, 21, 20],
+  },
+  "tbbt-s6": {
+    id: "tbbt-s6", seriesId: "tbbt", number: 6, label: "Season 6", episodes: 24, year: 2012,
+    episodeTitles: [
+      "The Date Night Variable", "The Decoupling Fluctuation", "The Higgs Boson Observation", "The Re-Entry Minimization",
+      "The Holographic Excitation", "The Extract Obliteration", "The Habitation Configuration", "The 43 Peculiarity",
+      "The Parking Spot Escalation", "The Fish Guts Displacement", "The Santa Simulation", "The Egg Salad Equivalency",
+      "The Bakersfield Expedition", "The Cooper/Kripke Inversion", "The Spoiler Alert Segmentation", "The Tangible Affection Proof",
+      "The Monster Isolation", "The Contractual Obligation Implementation", "The Closet Reconfiguration", "The Tenure Turbulence",
+      "The Closure Alternative", "The Proton Resurgence", "The Love Spell Potential", "The Bon Voyage Reaction",
+    ],
+    episodeRuntimes: [21, 21, 19, 21, 21, 21, 21, 21, 20, 21, 21, 21, 21, 20, 21, 21, 19, 20, 20, 19, 20, 21, 21, 20],
+  },
+  "tbbt-s7": {
+    id: "tbbt-s7", seriesId: "tbbt", number: 7, label: "Season 7", episodes: 24, year: 2013,
+    episodeTitles: [
+      "The Hofstadter Insufficiency", "The Deception Verification", "The Scavenger Vortex", "The Raiders Minimization",
+      "The Workplace Proximity", "The Romance Resonance", "The Proton Displacement", "The Itchy Brain Simulation",
+      "The Thanksgiving Decoupling", "The Discovery Dissipation", "The Cooper Extraction", "The Hesitation Ramification",
+      "The Occupation Recalibration", "The Convention Conundrum", "The Locomotive Manipulation", "The Table Polarization",
+      "The Friendship Turbulence", "The Mommy Observation", "The Indecision Amalgamation", "The Relationship Diremption",
+      "The Anything Can Happen Recurrence", "The Proton Transmogrification", "The Gorilla Dissolution", "The Status Quo Combustion",
+    ],
+    episodeRuntimes: [21, 21, 21, 21, 19, 21, 20, 20, 19, 19, 21, 21, 20, 21, 20, 20, 19, 21, 19, 21, 19, 21, 19, 21],
+  },
+  "tbbt-s8": {
+    id: "tbbt-s8", seriesId: "tbbt", number: 8, label: "Season 8", episodes: 24, year: 2014,
+    episodeTitles: [
+      "The Locomotion Interruption", "The Junior Professor Solution", "The First Pitch Insufficiency", "The Hook-Up Reverberation",
+      "The Focus Attenuation", "The Expedition Approximation", "The Misinterpretation Agitation", "The Prom Equivalency",
+      "The Septum Deviation", "The Champagne Reflection", "The Clean Room Infiltration", "The Space Probe Disintegration",
+      "The Anxiety Optimization", "The Troll Manifestation", "The Comic Book Store Regeneration", "The Intimacy Acceleration",
+      "The Colonization Application", "The Leftover Thermalization", "The Skywalker Incursion", "The Fortification Implementation",
+      "The Communication Deterioration", "The Graduation Transmission", "The Maternal Combustion", "The Commitment Determination",
+    ],
+    episodeRuntimes: [21, 20, 19, 19, 19, 21, 20, 20, 20, 19, 19, 20, 20, 21, 20, 20, 20, 19, 21, 20, 19, 19, 19, 20],
+  },
+  "tbbt-s9": {
+    id: "tbbt-s9", seriesId: "tbbt", number: 9, label: "Season 9", episodes: 24, year: 2015,
+    episodeTitles: [
+      "The Matrimonial Momentum", "The Separation Oscillation", "The Bachelor Party Corrosion", "The 2003 Approximation",
+      "The Perspiration Implementation", "The Helium Insufficiency", "The Spock Resonance", "The Mystery Date Observation",
+      "The Platonic Permutation", "The Earworm Reverberation", "The Opening Night Excitation", "The Sales Call Sublimation",
+      "The Empathy Optimization", "The Meemaw Materialization", "The Valentino Submergence", "The Positive Negative Reaction",
+      "The Celebration Experimentation", "The Application Deterioration", "The Solder Excursion Diversion", "The Big Bear Precipitation",
+      "The Viewing Party Combustion", "The Fermentation Bifurcation", "The Line Substitution Solution", "The Convergence Convergence",
+    ],
+    episodeRuntimes: [19, 19, 19, 19, 19, 19, 19, 18, 21, 21, 21, 18, 19, 19, 20, 19, 19, 18, 21, 19, 18, 20, 18, 20],
+  },
+  "tbbt-s10": {
+    id: "tbbt-s10", seriesId: "tbbt", number: 10, label: "Season 10", episodes: 24, year: 2016,
+    episodeTitles: [
+      "The Conjugal Conjecture", "The Military Miniaturization", "The Dependence Transcendence", "The Cohabitation Experimentation",
+      "The Hot Tub Contamination", "The Fetal Kick Catalyst", "The Veracity Elasticity", "The Brain Bowl Incubation",
+      "The Geology Elevation", "The Property Division Collision", "The Birthday Synchronicity", "The Holiday Summation",
+      "The Romance Recalibration", "The Emotion Detection Automation", "The Locomotion Reverberation", "The Allowance Evaporation",
+      "The Comic-Con Conundrum", "The Escape Hatch Identification", "The Collaboration Fluctuation", "The Recollection Dissipation",
+      "The Separation Agitation", "The Cognition Regeneration", "The Gyroscopic Collapse", "The Long Distance Dissonance",
+    ],
+    episodeRuntimes: [22, 19, 20, 20, 20, 18, 21, 19, 19, 20, 20, 21, 19, 19, 20, 18, 19, 20, 18, 19, 20, 20, 19, 19],
+  },
+
+  // tbbt-s11/tbbt-s12 (whole) exist only so the slices below have a real
+  // season to point sliceOf/episodeOffset at (realEpisodeNumber()/
+  // seasonTotalRuntimeMin() in app.js both resolve through SEASONS[the
+  // real id]) - same "full record + slice records" shape as Star Wars'
+  // own cw-s7/cw-s7-early/cw-s7-finale (see the comment there). Neither
+  // whole season is ever referenced directly by ORDERINGS_TBBT's own
+  // itemIds - only their four slices below are.
+  "tbbt-s11": {
+    id: "tbbt-s11",
+    seriesId: "tbbt",
+    number: 11,
+    label: "Season 11",
+    episodes: 24,
+    year: 2017,
+    episodeTitles: [
+      "The Proposal Proposal", "The Retraction Reaction", "The Relaxation Integration", "The Explosion Implosion",
+      "The Collaboration Contamination", "The Proton Regeneration", "The Geology Methodology", "The Tesla Recoil",
+      "The Bitcoin Entanglement", "The Confidence Erosion", "The Celebration Reverberation", "The Matrimonial Metric",
+      "The Solo Oscillation", "The Separation Triangulation", "The Novelization Correlation", "The Neonatal Nomenclature",
+      "The Athenaeum Allocation", "The Gates Excitation", "The Tenant Disassociation", "The Reclusive Potential",
+      "The Comet Polarization", "The Monetary Insufficiency", "The Sibling Realignment", "The Bow Tie Asymmetry",
+    ],
+    episodeRuntimes: [21, 21, 20, 21, 19, 21, 20, 19, 19, 21, 20, 20, 21, 19, 21, 19, 20, 20, 21, 21, 20, 19, 20, 22],
+  },
+  "tbbt-s12": {
+    id: "tbbt-s12",
+    seriesId: "tbbt",
+    number: 12,
+    label: "Season 12",
+    episodes: 24,
+    year: 2018,
+    episodeTitles: [
+      "The Conjugal Configuration", "The Wedding Gift Wormhole", "The Procreation Calculation", "The Tam Turbulence",
+      "The Planetarium Collision", "The Imitation Perturbation", "The Grant Allocation Derivation", "The Consummation Deviation",
+      "The Citation Negation", "The VCR Illumination", "The Paintball Scattering", "The Propagation Proposition",
+      "The Confirmation Polarization", "The Meteorite Manifestation", "The Donation Oscillation", "The D&D Vortex",
+      "The Conference Valuation", "The Laureate Accumulation", "The Inspiration Deprivation", "The Decision Reverberation",
+      "The Plagiarism Schism", "The Maternal Conclusion", "The Change Constant", "The Stockholm Syndrome",
+    ],
+    // Episodes 23/24 (the one-hour series finale) per-episode runtimes are
+    // from Wikipedia's own infobox for each episode (30/23) rather than
+    // TMDB's season page, which lists them as one merged 42-minute block -
+    // this dataset needs a real number PER episode (seasonTotalRuntimeMin()
+    // sums by real episode index), and the finale genuinely does have two
+    // distinct, separately-reported runtimes despite airing back-to-back.
+    episodeRuntimes: [20, 21, 20, 19, 19, 20, 20, 22, 21, 21, 20, 20, 21, 20, 22, 21, 20, 22, 21, 20, 20, 21, 30, 23],
+  },
+
+  // The interleave below (see ORDERINGS_TBBT's own comment for the full
+  // picture) splits TBBT S11/S12 and Young Sheldon S1/S2 into ten
+  // alternating blocks by explicit user-supplied episode ranges - every
+  // split here is a plain contiguous run, so episodeOffset (not
+  // episodeNumbers) is the right field, exactly like cw-s7-early/-finale.
+  "tbbt-s11a": {
+    id: "tbbt-s11a",
+    seriesId: "tbbt",
+    number: 11,
+    label: "Season 11",
+    episodes: 11,
+    year: 2017,
+    sliceOf: "tbbt-s11",
+    episodeOffset: 0,
+    episodeTitles: [
+      "The Proposal Proposal", "The Retraction Reaction", "The Relaxation Integration", "The Explosion Implosion",
+      "The Collaboration Contamination", "The Proton Regeneration", "The Geology Methodology", "The Tesla Recoil",
+      "The Bitcoin Entanglement", "The Confidence Erosion", "The Celebration Reverberation",
+    ],
+  },
+  "tbbt-s11b": {
+    id: "tbbt-s11b",
+    seriesId: "tbbt",
+    number: 11,
+    label: "Season 11",
+    episodes: 13,
+    year: 2018,
+    sliceOf: "tbbt-s11",
+    episodeOffset: 11,
+    episodeTitles: [
+      "The Matrimonial Metric", "The Solo Oscillation", "The Separation Triangulation", "The Novelization Correlation",
+      "The Neonatal Nomenclature", "The Athenaeum Allocation", "The Gates Excitation", "The Tenant Disassociation",
+      "The Reclusive Potential", "The Comet Polarization", "The Monetary Insufficiency", "The Sibling Realignment",
+      "The Bow Tie Asymmetry",
+    ],
+  },
+  "tbbt-s12a": {
+    id: "tbbt-s12a",
+    seriesId: "tbbt",
+    number: 12,
+    label: "Season 12",
+    episodes: 10,
+    year: 2018,
+    sliceOf: "tbbt-s12",
+    episodeOffset: 0,
+    episodeTitles: [
+      "The Conjugal Configuration", "The Wedding Gift Wormhole", "The Procreation Calculation", "The Tam Turbulence",
+      "The Planetarium Collision", "The Imitation Perturbation", "The Grant Allocation Derivation", "The Consummation Deviation",
+      "The Citation Negation", "The VCR Illumination",
+    ],
+  },
+  "tbbt-s12b": {
+    id: "tbbt-s12b",
+    seriesId: "tbbt",
+    number: 12,
+    label: "Season 12",
+    episodes: 12,
+    year: 2019,
+    sliceOf: "tbbt-s12",
+    episodeOffset: 10,
+    episodeTitles: [
+      "The Paintball Scattering", "The Propagation Proposition", "The Confirmation Polarization", "The Meteorite Manifestation",
+      "The Donation Oscillation", "The D&D Vortex", "The Conference Valuation", "The Laureate Accumulation",
+      "The Inspiration Deprivation", "The Decision Reverberation", "The Plagiarism Schism", "The Maternal Conclusion",
+    ],
+  },
+  "tbbt-s12c": {
+    id: "tbbt-s12c",
+    seriesId: "tbbt",
+    number: 12,
+    label: "Season 12",
+    episodes: 2,
+    year: 2019,
+    sliceOf: "tbbt-s12",
+    episodeOffset: 22,
+    episodeTitles: ["The Change Constant", "The Stockholm Syndrome"],
+  },
+
+  "ys-s1": {
+    id: "ys-s1",
+    seriesId: "youngsheldon",
+    number: 1,
+    label: "Season 1",
+    episodes: 22,
+    year: 2017,
+    episodeTitles: [
+      "Pilot", "Rockets, Communists, and the Dewey Decimal System", "Poker, Faith, and Eggs",
+      "A Therapist, a Comic Book, and a Breakfast Sausage", "A Solar Calculator, a Game Ball, and a Cheerleader's Bosom",
+      "A Patch, a Modem, and a Zantac®", "A Brisket, Voodoo, and Cannonball Run",
+      "Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair", "Spock, Kirk, and Testicular Hernia",
+      "An Eagle Feather, a String Bean, and an Eskimo", "Demons, Sunday School, and Prime Numbers",
+      "A Computer, a Plastic Pony, and a Case of Beer", "A Sneeze, Detention, and Sissy Spacek",
+      "Potato Salad, a Broomstick, and Dad's Whiskey", "Dolomite, Apple Slices, and a Mystery Woman",
+      "Killer Asteroids, Oklahoma, and a Frizzy Hair Machine", "Jiu-Jitsu, Bubble Wrap, and Yoo-Hoo",
+      "A Mother, A Child, and a Blue Man's Backside", "Gluons, Guacamole, and the Color Purple",
+      "A Dog, A Squirrel, and a Fish Named Fish", "Summer Sausage, a Pocket Poncho, and Tony Danza",
+      "Vanilla Ice Cream, Gentleman Callers, and a Dinette Set",
+    ],
+    episodeRuntimes: [21, 19, 21, 20, 20, 19, 19, 19, 20, 19, 19, 20, 21, 22, 19, 21, 21, 20, 21, 21, 20, 20],
+  },
+  "ys-s2": {
+    id: "ys-s2",
+    seriesId: "youngsheldon",
+    number: 2,
+    label: "Season 2",
+    episodes: 22,
+    year: 2018,
+    episodeTitles: [
+      "A High-Pitched Buzz and Training Wheels", "A Rival Prodigy and Sir Isaac Neutron",
+      "A Crisis of Faith and Octopus Aliens", "A Financial Secret and Fish Sauce",
+      "A Research Study and Czechoslovakian Wedding Pastries", "Seven Deadly Sins and a Small Carl Sagan",
+      "Carbon Dating and a Stuffed Raccoon", "An 8-Bit Princess and a Flat Tire Genius",
+      "Family Dynamics and a Red Fiero", "A Stunted Childhood and a Can of Fancy Mixed Nuts",
+      "A Race of Superhumans and a Letter to Alf", "A Tummy Ache and a Whale of a Metaphor",
+      "A Nuclear Reactor and a Boy Called Lovey", "David, Goliath, and a Yoo-hoo from the Back",
+      "A Math Emergency and Perky Palms", "A Loaf of Bread and a Grand Old Flag",
+      "Albert Einstein and the Story of Another Mary", "A Perfect Score and a Bunsen Burner Marshmallow",
+      "A Political Campaign and a Candy Land Cheater", "A Proposal and a Popsicle Stick Cross",
+      "A Broken Heart and a Crock Monster", "A Swedish Science Thing and the Equation for Toast",
+    ],
+    episodeRuntimes: [20, 19, 20, 20, 18, 19, 19, 20, 21, 19, 20, 18, 20, 19, 20, 18, 21, 18, 20, 21, 21, 19],
+  },
+  "ys-s1a": {
+    id: "ys-s1a",
+    seriesId: "youngsheldon",
+    number: 1,
+    label: "Season 1",
+    episodes: 9,
+    year: 2017,
+    sliceOf: "ys-s1",
+    episodeOffset: 0,
+    episodeTitles: [
+      "Pilot", "Rockets, Communists, and the Dewey Decimal System", "Poker, Faith, and Eggs",
+      "A Therapist, a Comic Book, and a Breakfast Sausage", "A Solar Calculator, a Game Ball, and a Cheerleader's Bosom",
+      "A Patch, a Modem, and a Zantac®", "A Brisket, Voodoo, and Cannonball Run",
+      "Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair", "Spock, Kirk, and Testicular Hernia",
+    ],
+  },
+  "ys-s1b": {
+    id: "ys-s1b",
+    seriesId: "youngsheldon",
+    number: 1,
+    label: "Season 1",
+    episodes: 13,
+    year: 2018,
+    sliceOf: "ys-s1",
+    episodeOffset: 9,
+    episodeTitles: [
+      "An Eagle Feather, a String Bean, and an Eskimo", "Demons, Sunday School, and Prime Numbers",
+      "A Computer, a Plastic Pony, and a Case of Beer", "A Sneeze, Detention, and Sissy Spacek",
+      "Potato Salad, a Broomstick, and Dad's Whiskey", "Dolomite, Apple Slices, and a Mystery Woman",
+      "Killer Asteroids, Oklahoma, and a Frizzy Hair Machine", "Jiu-Jitsu, Bubble Wrap, and Yoo-Hoo",
+      "A Mother, A Child, and a Blue Man's Backside", "Gluons, Guacamole, and the Color Purple",
+      "A Dog, A Squirrel, and a Fish Named Fish", "Summer Sausage, a Pocket Poncho, and Tony Danza",
+      "Vanilla Ice Cream, Gentleman Callers, and a Dinette Set",
+    ],
+  },
+  "ys-s2a": {
+    id: "ys-s2a",
+    seriesId: "youngsheldon",
+    number: 2,
+    label: "Season 2",
+    episodes: 10,
+    year: 2018,
+    sliceOf: "ys-s2",
+    episodeOffset: 0,
+    episodeTitles: [
+      "A High-Pitched Buzz and Training Wheels", "A Rival Prodigy and Sir Isaac Neutron",
+      "A Crisis of Faith and Octopus Aliens", "A Financial Secret and Fish Sauce",
+      "A Research Study and Czechoslovakian Wedding Pastries", "Seven Deadly Sins and a Small Carl Sagan",
+      "Carbon Dating and a Stuffed Raccoon", "An 8-Bit Princess and a Flat Tire Genius",
+      "Family Dynamics and a Red Fiero", "A Stunted Childhood and a Can of Fancy Mixed Nuts",
+    ],
+  },
+  "ys-s2b": {
+    id: "ys-s2b",
+    seriesId: "youngsheldon",
+    number: 2,
+    label: "Season 2",
+    episodes: 11,
+    year: 2019,
+    sliceOf: "ys-s2",
+    episodeOffset: 10,
+    episodeTitles: [
+      "A Race of Superhumans and a Letter to Alf", "A Tummy Ache and a Whale of a Metaphor",
+      "A Nuclear Reactor and a Boy Called Lovey", "David, Goliath, and a Yoo-hoo from the Back",
+      "A Math Emergency and Perky Palms", "A Loaf of Bread and a Grand Old Flag",
+      "Albert Einstein and the Story of Another Mary", "A Perfect Score and a Bunsen Burner Marshmallow",
+      "A Political Campaign and a Candy Land Cheater", "A Proposal and a Popsicle Stick Cross",
+      "A Broken Heart and a Crock Monster",
+    ],
+  },
+  "ys-s2c": {
+    id: "ys-s2c",
+    seriesId: "youngsheldon",
+    number: 2,
+    label: "Season 2",
+    episodes: 1,
+    year: 2019,
+    sliceOf: "ys-s2",
+    episodeOffset: 21,
+    episodeTitles: ["A Swedish Science Thing and the Equation for Toast"],
+  },
+
+  // episodeRuntimes on ys-s3..s7/gm-s1..s2/tbbt-s1..s10 above (added after
+  // this franchise's own initial pass, which deliberately left every
+  // season with no runtime data at all, same simplification Marvel's own
+  // dataset still carries) verified against TMDB's season pages, per
+  // CLAUDE.md's own sourcing rule for this field. episodeTitles added in
+  // the same pass, from that same TMDB fetch (both fields came off the
+  // same season pages).
+  "ys-s3": {
+    id: "ys-s3", seriesId: "youngsheldon", number: 3, label: "Season 3", episodes: 21, year: 2019,
+    episodeTitles: [
+      "Quirky Eggheads and Texas Snow Globes", "A Broom Closet and Satan's Monopoly Board",
+      "An Entrepreneurialist and a Swat on the Bottom", "Hobbitses, Physicses and a Ball with Zip",
+      "A Pineapple and the Bosom of Male Friendship", "A Parasol and a Hell of an Arm",
+      "Pongo Pygmaeus and a Culture that Encourages Spitting", "The Sin of Greed and a Chimichanga from Chi-chi's",
+      "A Party Invitation, Football Grapes and an Earth Chicken", "Teenager Soup and a Little Ball of Fib",
+      "A Live Chicken, a Fried Chicken and Holy Matrimony", "Body Glitter and a Mall Safety Kit",
+      "Contracts, Rules and a Little Bit of Pig Brains", "A Slump, a Cross and Roadside Gravel",
+      "A Boyfriend's Ex-Wife and a Good Luck Head Rub", "Pasadena",
+      "An Academic Crime and a More Romantic Taco Bell", "A Couple Bruised Ribs and a Cereal Box Ghost Detector",
+      "A House for Sale and Serious Woman Stuff", "A Baby Tooth and the Egyptian God of Knowledge",
+      "A Secret Letter and a Lowly Disc of Processed Meat",
+    ],
+    episodeRuntimes: [19, 19, 19, 19, 20, 18, 20, 21, 20, 19, 20, 18, 20, 18, 18, 20, 20, 20, 20, 19, 20],
+  },
+  "ys-s4": {
+    id: "ys-s4", seriesId: "youngsheldon", number: 4, label: "Season 4", episodes: 18, year: 2020,
+    episodeTitles: [
+      "Graduation", "A Docent, A Little Lady and a Bouncer Named Dalton", "Training Wheels and an Unleashed Chicken",
+      "Bible Camp and a Chariot of Love", "A Musty Crypt and a Stick to Pee On",
+      "Freshman Orientation and the Inventor of The Zipper", "A Philosophy Class and Worms That Can Chase You",
+      "An Existential Crisis and a Bear That Makes Bubbles", "Crappy Frozen Ice Cream and an Organ Grinder's Monkey",
+      "Cowboy Aerobics and 473 Grease-Free Bolts", "A Pager, a Club and a Cranky Bag of Wrinkles",
+      "A Box of Treasure and the Meemaw of Science", "The Geezer Bus and a New Model for Education",
+      "Mitch's Son and the Unconditional Approval of a Government Agency", "A Virus, Heartbreak and a World of Possibilities",
+      "A Second Prodigy and the Hottest Tips for Pouty Lips", "A Black Hole", "The Wild and Woolly World of Nonlinear Dynamics",
+    ],
+    episodeRuntimes: [19, 18, 19, 18, 19, 19, 18, 18, 19, 18, 19, 19, 18, 19, 18, 18, 18, 18],
+  },
+  "ys-s5": {
+    id: "ys-s5", seriesId: "youngsheldon", number: 5, label: "Season 5", episodes: 22, year: 2021,
+    episodeTitles: [
+      "One Bad Night and Chaos of Selfish Desires", "Snoopin' Around and the Wonder Twins of Atheism",
+      "Potential Energy and Hooch on a Park Bench", "Pish Posh and a Secret Back Room",
+      "Stuffed Animals and a Sweet Southern Syzygy", "Money Laundering and a Cascade of Hormones",
+      "An Introduction to Engineering and a Glob of Hair Gel", "The Grand Chancellor and a Den of Sin",
+      "The Yips and an Oddly Hypnotic Bohemian", "An Expensive Glitch and a Goof-Off Room",
+      "A Lock-In, a Weather Girl and a Disgusting Habit", "A Pink Cadillac and a Glorious Tribal Dance",
+      "A Lot of Band-Aids and the Cooper Surrender", "A Free Scratcher and Feminine Wiles",
+      "A Lobster, an Armadillo and a Way Bigger Number", "A Suitcase Full of Cash and a Yellow Clown Car",
+      "A Solo Peanut, a Social Butterfly and the Truth", "Babies, Lies and a Resplendent Cannoli",
+      "A God-Fearin' Baptist and a Hot Trophy Husband", "Uncle Sheldon and a Hormonal Firecracker",
+      "White Trash, Holy Rollers and Punching People", "Clogged Pore, a Little Spanish and the Future",
+    ],
+    episodeRuntimes: [21, 19, 20, 19, 20, 20, 20, 20, 19, 19, 20, 19, 18, 20, 20, 18, 19, 18, 21, 19, 19, 20],
+  },
+  "ys-s6": {
+    id: "ys-s6", seriesId: "youngsheldon", number: 6, label: "Season 6", episodes: 22, year: 2022,
+    episodeTitles: [
+      "Four Hundred Cartons of Undeclared Cigarettes and a Niblingo", "Future Worf and the Margarita of the South Pacific",
+      "Passion's Harvest and a Sheldocracy", "Blonde Ambition and the Concept of Zero",
+      "A Resident Advisor and the Word 'Sketchy'", "An Ugly Car, an Affair and Some Kickass Football",
+      "A Tougher Nut and a Note on File", "Legalese and a Whole Hoo-Ha",
+      "College Dropouts and the Medford Miracle", "Pancake Sunday and Textbook Flirting",
+      "Ruthless, Toothless and a Week of Bed Rest", "A Baby Shower and a Testosterone-Rich Banter",
+      "A Frat Party, a Sleepover and the Mother of All Blisters", "A Launch Party and a Whole Human Being",
+      "Teen Angst and a Smart-Boy Walk of Shame", "A Stolen Truck and Going on the Lam",
+      "A German Folk Song and an Actual Adult", "Little Green Men and a Fella's Marriage Proposal",
+      "A New Weather Girl and a Stay-at-Home Coddler", "German for Beginners and a Crazy Old Man with a Bat",
+      "A Romantic Getaway and a Germanic Meat-Based Diet", "A Tornado, a 10-Hour Flight and a Darn Fine Ring",
+    ],
+    episodeRuntimes: [20, 20, 20, 18, 19, 20, 18, 21, 21, 18, 21, 19, 19, 21, 20, 19, 19, 18, 20, 19, 20, 20],
+  },
+  "ys-s7": {
+    id: "ys-s7", seriesId: "youngsheldon", number: 7, label: "Season 7", episodes: 14, year: 2024,
+    episodeTitles: [
+      "A Wiener Schnitzel and Underwear in a Tree", "A Roulette Wheel and a Piano Playing Dog",
+      "A Strudel and a Hot American Boy Toy", "Ants on a Log and a Cheating Winker",
+      "A Frankenstein's Monster and a Crazy Church Guy", "Baptists, Catholics and an Attempted Drowning",
+      "A Proper Wedding and Skeletons in the Closet", "An Ankle Monitor and a Big Plastic Crap House",
+      "A Fancy Article and a Scholarship for a Baby", "Community Service and the Key to a Happy Marriage",
+      "A Little Snip and Teaching Old Dogs", "A New Home and a Traditional Texas Torture",
+      "Funeral (1)", "Memoir (2)",
+    ],
+    episodeRuntimes: [21, 19, 20, 20, 20, 21, 21, 19, 20, 22, 19, 20, 22, 22],
+  },
+
+  "gm-s1": {
+    id: "gm-s1", seriesId: "georgieandmandy", number: 1, label: "Season 1", episodes: 22, year: 2024,
+    episodeTitles: [
+      "The 6:10 to Lubbock", "Some New York Nonsense", "Secrets, Lies and a Chunk of Change", "Todd's Mom",
+      "Thanksgiving", "A Regular Samaritan", "An Old Mustang", "Diet Crap",
+      "A Tire Convention and the Moral High Ground", "A House Divided", "Working for the Enemy", "Typhoid Georgie",
+      "McAllister Auto Loves the Ladies", "A Sportsbook and a Breakup", "Goddess of the Music Store", "Baby Fight",
+      "Two Idiots on a Dirt Bike", "TV Money", "Snitch v. Deadbeat", "Ladies Love Brunch",
+      "Guilt Boots", "Big Decisions",
+    ],
+    episodeRuntimes: [21, 18, 18, 18, 18, 19, 19, 19, 20, 19, 20, 18, 21, 19, 18, 20, 18, 19, 18, 18, 20, 21],
+  },
+  "gm-s2": {
+    id: "gm-s2", seriesId: "georgieandmandy", number: 2, label: "Season 2", episodes: 22, year: 2025,
+    episodeTitles: [
+      "A Tie Breaker and a Huge Mistake", "Fan Mail and Old-Timey Organ Music", "A Will and a Dead Man's Wife",
+      "Dirty Hands and a Barbed-Wire Fence", "A Pregnancy Test and an Old Man's Prostate",
+      "Heartbreak and the Refuge of the Downtrodden", "A Bus Bench and Faith Out the Wazoo",
+      "Bitin', Spankin' and a Load of Yankee Psychobabble", "Payback and a Partial Shebang",
+      "Miami Beach and a Magical Family Christmas", "A New Hobby, a Pervert and a Part-Time Job",
+      "The G Word and a Blaspheming Bimbo", "A Big Birthday and Tequila Shots", "Three Angry Women and a Prophylactic",
+      "A Stuffed Monkey and an Ex-Girlfriend", "Alpha Males and the Power of Prayer",
+      "A Country Club, a Yokel and a New Boss", "A New Scoreboard and a Horse's You-Know-What",
+      "A Little Schmoozin' and a Nose for the News", "Splurges and Secrets",
+      "Funky Chili and Friends Who Take Their Clothes Off", "A New Beau and Someone Else's Mom's House",
+    ],
+    episodeRuntimes: [19, 18, 19, 21, 19, 18, 20, 19, 19, 18, 18, 18, 20, 18, 19, 20, 19, 19, 19, 19, 19, 20],
+  },
+
+  // 10 episodes, confirmed as the season's full order (episodes 9-10
+  // scheduled Sept 17/24, 2026 - still ahead of "today" as this was
+  // written, but a real, announced, already-titled order, not a guess at
+  // where the season will end up). Titles verified against TVmaze/
+  // epguides (Wikipedia's own article didn't carry a per-episode table
+  // yet at the time this was added). Season 2 was renewed in August 2026
+  // but has no announced premiere date or episode order yet, so it isn't
+  // in this dataset - same "only add what's real and dated" rule as
+  // everywhere else in this file.
+  "stuart-s1": {
+    id: "stuart-s1",
+    seriesId: "stuart",
+    number: 1,
+    label: "Season 1",
+    episodes: 10,
+    year: 2026,
+    episodeTitles: [
+      "Spoiler: Gary Dies",
+      "Spoiler: Zack's in This One",
+      "Spoiler: Bert Is Magic",
+      "Spoiler: Stuart Makes a Wallet",
+      "Spoiler: Bert Gets Married",
+      "Spoiler: Corn Is Delicious",
+      "Spoiler: Dexys Midnight Runners Get a Royalty Payment",
+      "Spoiler: We're as Confused as You Are",
+      "Spoiler: We Couldn't Get Green Lantern",
+      "Spoiler: Filmed Before a Live Studio Audience",
+    ],
+    // No episodeRuntimes here, unlike every other full season in this
+    // file (added in the same pass that added theirs) - TMDB has real
+    // per-episode runtimes for E1-8 (already aired as of "today", Sept 16,
+    // 2026) but not for E9/E10 (airing Sept 17/24, still ahead of today),
+    // and seasonTotalRuntimeMin() needs a real number for every episode
+    // the array claims to cover - a partial array would either throw off
+    // realEpisodeNumber() indexing or silently sum to NaN once it hit an
+    // unset slot (see Gotcha #8's own "silent NaN" failure mode). Same
+    // "can't verify a season before it's finished airing" case CLAUDE.md
+    // already documents for Maul - Shadow Lord - fill this in once E9/E10
+    // have real runtimes to look up.
+  },
+};
+
+const ORDERINGS_TBBT = [
+  {
+    id: "recommended",
+    label: "Recommended",
+    description: "The whole Big Bang Theory universe in one watch order - every season by real release date, with The Big Bang Theory Season 11-12 and Young Sheldon Season 1-2 interleaved so both shows land in step with each other.",
+    eras: [
+      {
+        // ONE flat era, same "no title bar needed for a single-era mode"
+        // trick Star Wars' own Release Order and Marvel's own
+        // Chronological both use (see either one's comment) for a flat
+        // era with no natural named eras of its own - overridden here by
+        // explicit user request for an actual title ("THE BIG BANG THEORY
+        // UNIVERSE" - text-transform: uppercase on .era-block__title, css,
+        // renders the caps, so the value below stays plain title case like
+        // every other era label in this file).
+        //   `.era-block__label` (css) is always centered on its OWN
+        // era-block's full width (left: 50%), same as every other era
+        // title in this app - Release Order's/Marvel Chronological's own
+        // `label: ""` exists specifically to dodge that on a track long
+        // enough that the centered title would land far outside the
+        // initial viewport (9000px+ there). This era is much shorter
+        // (12 cards) but still long enough that the title is NOT visible
+        // at the initial scroll position (scrollLeft 0) at normal viewport
+        // widths - confirmed with a Playwright screenshot: only its very
+        // first/last couple of letters peek in at either edge from the
+        // start or end of the scroll range. It IS fully, cleanly visible
+        // once scrolled to roughly the timeline's own horizontal midpoint
+        // (confirmed with another screenshot there) - accepted as-is, on
+        // explicit user request for this exact title on the main
+        // timeline, not something to "fix" by reverting to label: "".
+        id: "all",
+        label: "The Big Bang Theory Universe",
+        // TBBT S1-10 sort by plain release year, same as everything else
+        // here. groupEraItems() (app.js) merges any run of consecutive
+        // same-seriesId seasons regardless of whether a season is whole or
+        // a slice - the exact same rule that merges Star Wars' own
+        // cw-s1..cw-s6 PLUS cw-s7-early into one poster (see that
+        // comment) - so tbbt-s10 flows straight into tbbt-s11a (below)
+        // with nothing breaking the chain, merging THAT into the same
+        // 11-season card too. A merged card this size is new territory for
+        // this app (Star Wars' own largest merge, Clone Wars, tops out at
+        // 7), but widenSeriesCard() already lays a season list out in
+        // extra COLUMNS once it passes MAX_VISIBLE_SEASON_ROWS, with no
+        // hardcoded ceiling on how many - see its own comment in app.js -
+        // so this needed no code changes.
+        //   TBBT S11/S12 and Young Sheldon S1/S2 do NOT simply follow each
+        // other by release year the way every other pair of seasons here
+        // does - despite the two shows having literally co-aired on the
+        // same Thursday nights (verified against Wikipedia's own episode
+        // air-date tables: several episodes of each landed on the exact
+        // same date), a strict date sort would interleave them almost
+        // week-by-week, which is NOT the order requested. Instead, by
+        // explicit user request, the two seasons of each show are split
+        // into ten alternating blocks (see the tbbt-s11a/-s11b/-s12a/-s12b/
+        // -s12c and ys-s1a/-s1b/-s2a/-s2b/-s2c slices above for the exact
+        // episode ranges) and placed in this fixed sequence - a deliberate
+        // positioning override, same category of exception as Marvel's own
+        // xmendofp "rewrite" cluster or its Netflix Defenders Saga corner
+        // (see either one's own comment in this file): the underlying
+        // reason differs (there: preserving a rewritten timeline / grouping
+        // thematically-linked shows; here: keeping the two shows' own
+        // "current point in the story" roughly synced rather than either
+        // one running ahead of the other) but the shape - a hand-picked
+        // sequence overriding the axis's own general sort rule - is the
+        // same.
+        //   Two more same-seriesId mergers happen at the tail ends of this
+        // interleave, same "nothing interrupts the chain" rule as the
+        // tbbt-s10/tbbt-s11a merge above: ys-s2c (block 10, Young Sheldon's
+        // last single episode of the interleave) flows straight into
+        // ys-s3..ys-s7 (the rest of the show, once it's done co-airing
+        // with TBBT) as ONE card, and gm-s1/gm-s2 merge into their own
+        // card same as any other two-season show here. stuart-s1 (Stuart
+        // Fails to Save the Universe, 2026) closes out the sequence as its
+        // own card - different seriesId from gm-s2 right before it, so no
+        // merge there. Post-merge this era renders exactly 12 cards, not
+        // the 14 raw entries in itemIds above minus the merges within
+        // tbbt-s1..s10/ys-s3..s7/gm-s1..s2 alone would suggest - counted by
+        // hand (and confirmed with a Playwright pass counting real
+        // rendered `.card`/`.year-band` elements, see CLAUDE.md's Gotcha
+        // #11 for why "count the raw itemIds" alone is exactly the wrong
+        // way to derive this number) before writing yearBands below, so
+        // its spans (nine entries, three of them span: 2 - see their own
+        // comment below) still add up to 12, matching what actually
+        // renders, not a guess from the list above.
+        itemIds: [
+          "tbbt-s1", "tbbt-s2", "tbbt-s3", "tbbt-s4", "tbbt-s5", "tbbt-s6", "tbbt-s7", "tbbt-s8", "tbbt-s9", "tbbt-s10",
+          "tbbt-s11a", "ys-s1a", "tbbt-s11b", "ys-s1b",
+          "tbbt-s12a", "ys-s2a", "tbbt-s12b", "ys-s2b", "tbbt-s12c", "ys-s2c",
+          "ys-s3", "ys-s4", "ys-s5", "ys-s6", "ys-s7",
+          "gm-s1", "gm-s2",
+          "stuart-s1",
+        ],
+        // Each label is the real release-date range the CARD(s) it sits
+        // over actually cover (sourced from Wikipedia's own episode
+        // air-date tables, not invented). Where two ADJACENT cards happen
+        // to share the exact same label text (the TBBT/Young Sheldon
+        // interleave's own three "same quarter, different show" pairs),
+        // this is now ONE band with span: 2 - the label prints once and
+        // its reach-indicator line (.year-band__span) stretches across
+        // both cards, same real multi-card span mechanism Marvel's own
+        // yearBands already use (e.g. the "Spring 2010" band spanning
+        // ironman2+hulk) - on explicit user request, replacing an earlier
+        // pass that gave each of these its own one-off span:1 band with
+        // duplicate text (the right call ONLY for two bands that happen to
+        // read the same but are conceptually distinct, e.g. two different
+        // otherEarth titles - Gotcha #11/#12's "don't merge by text alone"
+        // warning - not for genuinely one shared dating printed twice).
+        yearBands: [
+          // tbbt-s1..s10 + tbbt-s11a merged (see the itemIds comment
+          // above) - "Fall 2017" is this card's own LATER end (tbbt-s11a
+          // covers TBBT S11's first 11 episodes, Sep-Dec 2017), not its
+          // 2007 start alone, so the label spells out the full real range
+          // this one card actually covers rather than just its start year.
+          { label: "2007 – Fall 2017", span: 1 },
+          { label: "Fall 2017", span: 1 },
+          // tbbt-s11b + ys-s1b (blocks 3+4) - both real Jan-May 2018
+          { label: "Winter–Spring 2018", span: 2 },
+          // tbbt-s12a + ys-s2a (blocks 5+6) - both real Sep-Dec 2018
+          { label: "Fall 2018", span: 2 },
+          // tbbt-s12b + ys-s2b (blocks 7+8) - both real Jan-May 2019
+          { label: "Winter–Spring 2019", span: 2 },
+          { label: "May 2019", span: 1 },
+          // ys-s2c + ys-s3..s7 merged
+          { label: "May 2019 – 2024", span: 1 },
+          // gm-s1 + gm-s2 merged
+          { label: "2024–2026", span: 1 },
+          { label: "2026", span: 1 },
+        ],
+      },
+    ],
+  },
+];
+
 const FRANCHISE_DATA = {
   starwars: {
     movies: MOVIES_STARWARS,
@@ -2786,6 +3524,25 @@ const FRANCHISE_DATA = {
     storyLines: [],
     doomsdayWatchlist: DOOMSDAY_WATCHLIST_MARVEL,
     coreMcuExclude: CORE_MCU_EXCLUDE_MARVEL,
+  },
+  tbbt: {
+    movies: MOVIES_TBBT,
+    series: SERIES_TBBT,
+    seasons: SEASONS_TBBT,
+    orderings: ORDERINGS_TBBT,
+    // No story lines, no Doomsday watchlist, no Core MCU exclusions - all
+    // three mechanisms are specific to how Star Wars/Marvel are each
+    // organized (a personal-arc story mode; a real-world marketing
+    // watchlist; a production-company carve-out) with no equivalent
+    // concept in this franchise. Same empty-array "hide the whole
+    // control" pattern as Star Wars'/Marvel's own unused fields above -
+    // populateStoryLineMenu()/populateDoomsdayWatchlistToggle() hide on
+    // an empty array directly, populateCoreMcuToggle()/
+    // populateMultiverseMenu() hide because this dataset has no
+    // otherEarth field anywhere in it either.
+    storyLines: [],
+    doomsdayWatchlist: [],
+    coreMcuExclude: [],
   },
 };
 

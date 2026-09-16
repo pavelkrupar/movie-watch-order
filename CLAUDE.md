@@ -844,6 +844,108 @@ filter already worked - functionally - under Release Order from the start;
 a user request asked for the visible categorization to match the
 already-working filter under both orderings.)
 
+**A third franchise: The Big Bang Theory - deliberately simpler than
+either of the other two.** `MOVIES_TBBT` is `{}` (no movies at all - three
+live-action sitcoms, nothing else), and `FRANCHISE_DATA.tbbt` sets
+`storyLines`/`doomsdayWatchlist`/`coreMcuExclude` all to `[]` - none of
+those mechanisms has an equivalent concept here, and the same
+empty-array/no-otherEarth-field checks that already hide Multiverse/Core
+MCU/Doomsday/Storylines for Star Wars hide all four for this franchise
+too, automatically. `ORDERINGS_TBBT` has exactly ONE ordering
+("Recommended", one flat era) instead of a Chronological/Release Order
+pair, since there's no in-universe timeline distinct from real release
+order for a franchise with zero speculative-fiction/time-travel content.
+Own accent color (`:root[data-franchise="tbbt"]` in style.css - a
+magenta/pink, chosen to sit far from every hue already in use, SW's gold
+and Marvel's red included, and far from `--done`'s green above all;
+brightened once already, on request, from an initial `#e0499f` - contrast
+~5.4:1 against `--bg` - to `#ff5cbf` - ~7.2:1 - still readably the same
+hue family, just far more legible on the dark background).
+  Unlike Release Order/Marvel Chronological's own flat eras, this one's
+`label` is NOT `""` - it's a real title, "The Big Bang Theory Universe"
+(rendered upper case by `.era-block__title`'s own `text-transform`), added
+on explicit request to appear on the main timeline itself. Same caveat as
+the empty-label eras were dodging in the first place: `.era-block__label`
+always centers on its own era-block's FULL width, so the title is not
+visible at the initial scroll position at normal viewport widths (only its
+first/last couple of letters peek in from either edge) - it only becomes
+fully visible once scrolled to roughly the timeline's own horizontal
+midpoint. Deliberately kept anyway (explicit user request for this exact
+title, confirmed both ways with Playwright screenshots) rather than
+reverted back to `label: ""` - see `ORDERINGS_TBBT`'s own comment in
+data.js for the full reasoning.
+  Four shows, one shared continuity, no otherEarth split needed anywhere:
+The Big Bang Theory (2007-2019, 12 seasons, every season's episodeTitles
+verified against Wikipedia), its prequel Young Sheldon (2017-2024, 7
+seasons), Young Sheldon's own sequel Georgie & Mandy's First Marriage
+(2024-present), and its second direct spin-off Stuart Fails to Save the
+Universe (`stuart`/`stuart-s1` in `SERIES_TBBT`/`SEASONS_TBBT` - HBO Max,
+2026-, Kevin Sussman reprising Stuart Bloom). Despite that show's own
+premise being built entirely around multiverse-hopping (Stuart breaks a
+device and has to fix a "multiverse Armageddon"), it's deliberately NOT
+modeled with an `otherEarth` flag - Stuart himself, and the show's own
+home reality, are still Sacred Timeline; the multiverse content is this
+season's plot, not a different Earth for the whole show to live on, and
+giving TBBT its own Marvel-style otherEarth machinery for one show's
+premise would undercut the whole point of this franchise being simpler
+than Marvel's. Only Season 1 (10 episodes, all already titled/announced)
+is in the dataset - Season 2 was renewed but has no announced episode
+order yet, so per this file's own "only add what's real and dated" rule
+it isn't here either.
+  **The Big Bang Theory show itself is this franchise's own badge tier**
+(user request: "tento seriál je klíčový a měl by vyniknout stejně jako
+vynikají ty nejdůležitější filmy v jiných universech") - `series.badge`
+(data.js, today: only `SERIES_TBBT.tbbt`) is the series-level equivalent
+of `movie.badge` (Avengers/Episode I-IX in the other two franchises).
+`buildSeriesCard()`'s own `isBadgeTier` check (mirroring `buildCard()`'s)
+adds the exact same `.card--badge-tier` class - bigger tile
+(`.card--series.card--badge-tier`, new CSS rule sitting right next to the
+pre-existing `.card--movie.card--badge-tier` one, both reading the same
+`--badge-card-w`), bigger placeholder title, stronger icon color - and the
+badge text becomes `series.badge` ("TBBT") instead of the neutral
+"Series", filled-pill styled via the same `card__badge--episode` class
+`movie.badge` already triggers (the class name predates this generic
+reuse - see its own CSS comment). Every card built from a "tbbt" season
+(the merged S1-S11a run and each of the S11b/S12a/S12b/S12c interleave
+blocks) picks this up automatically, purely from sharing that one
+seriesId - Young Sheldon/Georgie & Mandy/Stuart cards are untouched.
+  **Every full season in this franchise now carries real `episodeRuntimes`**
+(user request: "doplň délku jednotlivých sérií stejně jako je to u Star
+Wars"), verified against TMDB's own season pages same as Star Wars' own
+data - TBBT all 12 seasons, Young Sheldon all 7, Georgie & Mandy both.
+TBBT S12's finale (episodes 23/24, aired as one hour block) needed real
+per-episode numbers from Wikipedia's own infobox (30/23) instead of
+TMDB's own merged 42-minute listing, since `seasonTotalRuntimeMin()` sums
+by real per-episode index, not by broadcast block. `stuart-s1` is the one
+exception - deliberately left WITHOUT `episodeRuntimes` since 2 of its 10
+episodes hadn't aired yet (and so had no confirmed runtime anywhere) as of
+when this was added, same "can't verify before it airs" situation as Maul
+- Shadow Lord's own `totalRuntimeMin` fallback, except here even that
+fallback isn't meaningful with 8 of 10 already confirmed - fill in once
+the season finishes airing. The season/slice interleave (`tbbt-s11a` etc.)
+never needed their OWN runtime arrays - `seasonTotalRuntimeMin()` already
+resolves a slice's episodes through its real parent season's array via
+`realEpisodeNumber()`, so adding the array once to `tbbt-s11`/`tbbt-s12`/
+`ys-s1`/`ys-s2` covers every slice of them for free.
+  The one real complexity is TBBT S11-12/Young Sheldon S1-2, split into
+ten alternating episode-range slices by explicit user request
+(`tbbt-s11a`/`-s11b` etc. in `SEASONS_TBBT`, using `sliceOf`/
+`episodeOffset` exactly like Star Wars' own cw-s7-early/-finale) so the
+two shows land in the watch order roughly in step with each other rather
+than strictly by release date (which - despite the two shows having
+literally co-aired on the same Thursday nights, confirmed against
+Wikipedia's own episode air-date tables - would interleave them almost
+week-by-week). Same category of deliberate positioning override as
+Marvel's own xmendofp "rewrite" cluster/Netflix Defenders Saga corner. See
+`ORDERINGS_TBBT`'s own comment in data.js for the exact block boundaries
+and, importantly, for which season/slice boundaries end up MERGING into
+one card via `groupEraItems()`'s ordinary same-seriesId-run rule
+(tbbt-s10 flows straight into the first block with nothing between them,
+same as Clone Wars' own cw-s6/cw-s7-early merge) - this is what actually
+determines how many yearBands entries are needed (12, not the 14 a naive
+read of the raw itemIds list would suggest - exactly the kind of miscount
+Gotcha #11 warns about).
+
 **Marvel One-Shots and the classic Netflix "Defenders Saga" shows - real
 Earth-616 content positioned by user request, not by strict date.**
 Twelve titles added in one pass, none of them `otherEarth` (all genuinely
@@ -1625,3 +1727,48 @@ with a title's own "importance", biggest to smallest:
   the `MAX_VISIBLE_SEASON_ROWS` row cap, etc.), say so explicitly in a
   comment on both sides pointing at each other, since nothing enforces it
   automatically - see Gotcha #6 for what happens when that's neglected.
+
+## Commit messages
+
+Follow [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
+(user-requested) for every commit from here on:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+- `type` is one of `feat` (a user-visible capability - a new franchise, a
+  new filter, a new piece of data users can now see/toggle), `fix` (a bug
+  fix), `refactor` (no behavior change), `style` (CSS/visual-only tweak
+  with no new capability - a color retune, a sizing tier applied to
+  something that already existed), `docs` (CLAUDE.md-only changes), or
+  `chore` (anything else - tooling, repo housekeeping; rare here, no
+  build/test tooling exists to have chores about).
+- `scope` is optional and, in this repo, is naturally a franchise id
+  (`tbbt`, `marvel`, `starwars`) or an app-wide area (`app`, `css`) when
+  the change is narrow enough to name one - omit it for anything that
+  touches a franchise's data AND its own new rendering behavior together
+  (most feature work here does both, per this project's own "add a
+  franchise" pattern - see FRANCHISE_DATA's own comment in data.js).
+- `description`: imperative mood ("add", not "added"/"adds"), no
+  capitalized first letter forced, no trailing period, ideally under ~72
+  characters so it reads cleanly in `git log --oneline`.
+- `body`: free text, blank line after the subject, wrapped like normal
+  prose - explain *why*, same spirit as this file's own comment style,
+  not a mechanical list of every file touched (`git diff --stat` already
+  says that).
+- A breaking change (rare here - no consumers of this app depend on any
+  API) would use `!` right after the type/scope (`feat(tbbt)!: ...`) or a
+  `BREAKING CHANGE:` footer - not expected to come up in practice, but
+  documented since the spec requires it be one of these two forms, not
+  invented ad hoc.
+- Multiple unrelated changes landing together (a session that touched two
+  different franchises, say) still get ONE commit if the user asks for one
+  commit - Conventional Commits governs the MESSAGE's format, not how many
+  commits a session's work gets split into (that's governed by the git
+  workflow guidance elsewhere in this environment, e.g. "only commit when
+  the user asks").

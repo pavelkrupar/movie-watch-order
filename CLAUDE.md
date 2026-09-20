@@ -946,6 +946,109 @@ determines how many yearBands entries are needed (12, not the 14 a naive
 read of the raw itemIds list would suggest - exactly the kind of miscount
 Gotcha #11 warns about).
 
+**A fourth franchise: The Lord of the Rings - simple like TBBT, but with
+a real Chronological/Release Order pair.** `FRANCHISE_DATA.lotr` sets
+`storyLines`/`doomsdayWatchlist`/`coreMcuExclude` all to `[]`, same "no
+equivalent concept" reasoning as TBBT, and there's no `otherEarth` content
+either - but unlike TBBT (one flat "Recommended" ordering, since its four
+shows were always going to be watched close to release order anyway),
+LOTR gets the full two-ordering treatment (user request: "vytvoř dva
+způsoby řazení jako je obvyklé u ostatních universů") because its content
+genuinely does diverge: The Hobbit trilogy is a PREQUEL (in-universe TA
+2941, released 2012-2014) to the LOTR trilogy (TA 3018-3019, released
+2001-2003), and The Rings of Power TV show is set thousands of years
+earlier still (the Second Age) despite being the most recently released
+(2022-). Seven films total (`MOVIES_LOTR`) plus one TV show
+(`SEASONS_LOTR`, `ringsofpower` in `SERIES_LOTR`) - real theatrical
+(non-extended-edition) runtimes verified via Wikipedia, The Rings of
+Power's own episodeTitles/episodeRuntimes verified via TMDB, same
+sourcing standard as every other curated show in this file. The show is
+deliberately only TWO seasons in this dataset, not three - Season 3 has a
+real, confirmed Nov 11, 2026 premiere/8-episode order, and an earlier
+pass DID include it (same "real and dated, even not yet aired" standard
+TBBT's own `stuart-s1` established), but it was removed again on explicit
+user request ("ještě nevznikla" - it doesn't exist yet): this franchise
+draws that line stricter than TBBT does, so don't re-add `rop-s3` just
+because it has a real date - wait until it's actually aired. The seventh
+film, the standalone animated prequel `warofrohirrim` (2024, Warner
+Bros/New Line, `animated: true`), was added in a follow-up pass - set TA
+2758-2759 per Tolkien's own Appendix A (Helm Hammerhand's death, the Long
+Winter), NOT the "183 years before the trilogy" framing the film's own
+marketing uses (that would land closer to TA 2836) - book-sourced dating
+wins over marketing copy here, same preference this file gives sourced
+dates everywhere else.
+  **The LOTR trilogy (not The Hobbit, not the standalone prequel) is this
+franchise's own badge tier** (user request: "za zvýrazněné tituly...
+považuj díly Pána prstenů 1-3") - `movie.badge: "LOTR"` on `lotr1`/
+`lotr2`/`lotr3` needed zero app.js changes, since `isBadgeTier` in
+`buildCard()` was already driven purely by `!!movie.badge` for any
+franchise - same mechanism Star Wars' Episode I-IX and Marvel's Avengers
+already use, not a new one. The badge text itself went through one
+revision: first shipped as a per-movie "Part I"/"Part II"/"Part III"
+(mirroring Star Wars' own per-episode numbering), then changed to a
+single uniform "LOTR" across all three on explicit request - closer in
+spirit to Marvel's own "Avengers" (one shared label for the family) than
+Star Wars' own per-item numbering. The Hobbit trilogy and
+`warofrohirrim` deliberately get no badge (plain movie tier) - prequel
+content sitting at a lower visual weight than the main saga, same shape
+as Star Wars' own prequels-vs-numbered-saga distinction.
+  Own accent color (`:root[data-franchise="lotr"]` in style.css - an
+indigo/periwinkle, brightened once already on request from an initial
+`#8b85e6` - contrast ~6.3:1 against `--bg` - to `#9791ea` - ~7.25:1, on
+par with TBBT's own post-brightening contrast) - chosen specifically NOT
+green (the obvious Shire/Middle-earth association), since green is
+permanently reserved for `--done`, and deliberately sitting between the
+`--other-earth` family's own blue (Earth-828, a purer cobalt) and purple
+(Others) rather than reusing either.
+  **Chronological has two named eras, "The Second Age" and "The Third
+Age"**, `gapBefore: true` on the latter (the real in-universe gap between
+the Second Age and Helm Hammerhand's own war) - same mechanism as Star
+Wars' own big era jumps. A SECOND, smaller jump falls INSIDE "The Third
+Age" era itself - `warofrohirrim` (TA 2758-2759) to `hobbit1` (TA 2941) is
+~180 years, with no era boundary of its own to hang gapBefore off of, so
+`era.cardGapBefore: ["hobbit1"]` handles it instead, the exact same
+per-card mechanism `ORDERINGS_MARVEL`'s own flat Chronological era uses
+for its mid-era jumps (see that file's comment on `era.cardGapBefore`) -
+this is the first time a franchise with NAMED eras also needed the
+per-card version, not just the flat-single-era ones. The Second Age era's
+`rop-s1`/`rop-s2` share one seriesId and sit consecutively, so
+`groupEraItems()` merges both into ONE card, same as Marvel's Loki - a
+single `"Second Age"` yearBands label covers the whole merged card,
+deliberately with NO specific year attached: Amazon's own show
+compresses/rearranges the book's several-thousand-year Second Age for
+drama, and there's no single official year "Season 1 happens in" the way
+there's a real, book-sourced Third Age year for the Hobbit/LOTR films
+(`TA 2941`/`TA 3018–3019`) - stating one would present a fan estimate as
+sourced fact, the same restraint this file already applies to Loki's own
+undated "OUTSIDE TIME" band.
+  Release Order is the usual single flat era (`label: ""`) sorted by real
+release year - `warofrohirrim`'s real Dec 2024 release date sorts it right
+after `rop-s2` (Aug-Oct 2024), as the sequence's own last item. Both
+orderings render 8 cards.
+  **"Extended versions" header checkbox** (user request) - a single
+`.header-toggle` checkbox, visually identical to Marvel's own Core
+MCU/Doomsday toggles but a plain DISPLAY preference, not a filter: no
+itemIds/eras/card visibility ever changes, only which of a movie's two
+runtimes (`movie.runtimeMin`, real theatrical, vs. the new
+`movie.extendedRuntimeMin`, real extended-edition, both verified via
+Wikipedia) gets shown. `movieDisplayRuntimeMin()` (app.js) is the ONE
+place that picks between them based on `state.extendedVersions` -
+`buildCard()`'s own meta line and both `getTotalRuntimeMin()`/
+`getWatchedRuntimeMin()` all call it instead of reading `runtimeMin`
+directly, so a card and the header's own runtime progress bar never
+disagree about which cut is being counted. `isShort`'s own tier check in
+`buildCard()` deliberately keeps reading `movie.runtimeMin` directly
+(unaffected by the toggle) - which size tier a title belongs to shouldn't
+flip depending on a display preference. Only the LOTR trilogy and The
+Hobbit trilogy have `extendedRuntimeMin` set - `warofrohirrim` (no
+extended cut exists) and every movie in every other franchise fall back
+to the plain theatrical number automatically, same "degrade gracefully
+when the richer data isn't there" pattern `seasonTotalRuntimeMin()` uses
+for a season with no `episodeRuntimes`. `populateExtendedVersionsToggle()`
+hides the whole control (same pattern as Core MCU/Doomsday) whenever the
+active franchise has no `extendedRuntimeMin` content anywhere in its
+`MOVIES` at all - every franchise but LOTR today.
+
 **Marvel One-Shots and the classic Netflix "Defenders Saga" shows - real
 Earth-616 content positioned by user request, not by strict date.**
 Twelve titles added in one pass, none of them `otherEarth` (all genuinely
@@ -1727,6 +1830,22 @@ with a title's own "importance", biggest to smallest:
   the `MAX_VISIBLE_SEASON_ROWS` row cap, etc.), say so explicitly in a
   comment on both sides pointing at each other, since nothing enforces it
   automatically - see Gotcha #6 for what happens when that's neglected.
+- Every `movie.title`/`series.title` string (user-requested, applied
+  across all four franchises in one pass) uses a non-breaking space
+  (` `, NOT the literal two characters `\`+`u00A0` - an actual U+00A0
+  character in the string) instead of a regular space immediately after
+  any whole-word "to", "of", or "the" (case-insensitive - covers a
+  sentence-leading "The" too), e.g. `"The Lord of the Rings"`.
+  This needs no CSS or app.js changes to take effect - the browser already
+  treats U+00A0 as unbreakable for line-wrapping purposes, and the tile
+  title's own real-measurement sizing (`minWidthForTwoLineTitle()`,
+  `fitTilePlaceholderTitles()` - see the "Measure the real thing" section
+  above) already measures whatever the browser actually renders, wrap
+  points included, so it adapts automatically to the new unbreakable
+  chunks instead of needing to know about them. Apply this same
+  transformation to any NEW movie/series title added later - a title
+  added without it will still render fine, just without the same
+  protection against an awkward mid-phrase line break.
 
 ## Commit messages
 

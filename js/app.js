@@ -62,6 +62,11 @@
   // "mutually exclusive right now" isn't the same thing as "one value",
   // each toggle still owns and persists its own on/off state.
   const CORE_MCU_STORAGE_KEY = "sw-watch-order:coreMcu";
+  // whether the "Extended versions" toggle was last on (LOTR only today -
+  // see buildExtendedVersionsToggle()) - a plain display preference, not
+  // a filter like the three keys above, but persisted the same way for
+  // the same reason: it shouldn't reset just because the page reloaded.
+  const EXTENDED_VERSIONS_STORAGE_KEY = "sw-watch-order:extendedVersions";
   // shared checkmark glyph - the season bulk-check and every episode row
   // use this same small square checkbox look
   const CHECK_SVG =
@@ -227,6 +232,8 @@
     coreMcuCheckbox: document.getElementById("coreMcuCheckbox"),
     doomsdayWatchlistWrap: document.getElementById("doomsdayWatchlistWrap"),
     doomsdayWatchlistCheckbox: document.getElementById("doomsdayWatchlistCheckbox"),
+    extendedVersionsWrap: document.getElementById("extendedVersionsWrap"),
+    extendedVersionsCheckbox: document.getElementById("extendedVersionsCheckbox"),
     scroll: document.getElementById("timelineScroll"),
     track: document.getElementById("timelineTrack"),
     progressFill: document.getElementById("progressFill"),
@@ -275,6 +282,12 @@
     // comment) - only one of the two can be true at a time, enforced in
     // each toggle's own `change` handler, not here.
     coreMcu: loadCoreMcu(),
+    // Whether the "Extended versions" toggle is on - a plain display
+    // preference (see movieDisplayRuntimeMin()), not a filter like the
+    // three booleans above it, so it never touches itemIds/eras/render()'s
+    // own eraGroups mapping the way those do - only what runtime number a
+    // card/progress total shows.
+    extendedVersions: loadExtendedVersions(),
     watched: loadWatched(),
   };
 
@@ -287,6 +300,7 @@
     buildMultiverseSelect();
     buildCoreMcuToggle();
     buildDoomsdayWatchlistToggle();
+    buildExtendedVersionsToggle();
     render(); // render() figures out --era-label-h and card sizing from the active ordering
 
     window.addEventListener(
@@ -721,12 +735,19 @@
     // with no otherEarth content to filter by at all.
     state.coreMcu = false;
     saveCoreMcu(false);
+    // Same reasoning again - a franchise's own extended-edition runtimes
+    // (or lack of them) are meaningless outside it, so the toggle doesn't
+    // carry over either, even though it isn't a filter like the three
+    // booleans above.
+    state.extendedVersions = false;
+    saveExtendedVersions(false);
     updateFranchiseSelectUI();
     buildOrderSwitch(); // rebuilds the pills from the new ORDERINGS, and syncs their active state + the description text
     populateStoryLineMenu(); // rebuilds the dropdown's options from the new STORY_LINES (and hides it entirely if there are none)
     populateMultiverseMenu(); // rebuilds the checkboxes (and hides the whole control if the new franchise has no otherEarth content at all)
     populateCoreMcuToggle(); // hides the whole control if the new franchise has no otherEarth content at all
     populateDoomsdayWatchlistToggle(); // hides the whole control if the new franchise has no doomsdayWatchlist at all
+    populateExtendedVersionsToggle(); // hides the whole control if the new franchise has no extendedRuntimeMin content at all
     render();
   }
 
@@ -1181,6 +1202,58 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /*  Extended versions (LOTR only) - a single checkbox, same visual      */
+  /*  .header-toggle treatment as Core MCU/Doomsday above, but a plain    */
+  /*  DISPLAY preference, not a filter: nothing about which cards render  */
+  /*  or how they're grouped changes while this is on, only what runtime  */
+  /*  number a movie card (and the header's own runtime progress bar)     */
+  /*  shows - see movieDisplayRuntimeMin() below, the one place that      */
+  /*  reads this flag. Not mutually exclusive with anything, since it     */
+  /*  doesn't touch itemIds/eras the way Core MCU/Doomsday do.            */
+  /* ---------------------------------------------------------------- */
+  function buildExtendedVersionsToggle() {
+    populateExtendedVersionsToggle();
+
+    els.extendedVersionsCheckbox.addEventListener("change", () => {
+      state.extendedVersions = els.extendedVersionsCheckbox.checked;
+      saveExtendedVersions(state.extendedVersions);
+      updateExtendedVersionsUI();
+      render();
+    });
+  }
+
+  // Rebuilds this control's visibility - called once from
+  // buildExtendedVersionsToggle() above and again from switchFranchise()
+  // whenever the active franchise changes. Same hide-when-the-active-
+  // franchise-has-none-of-this-content approach as populateCoreMcuToggle()
+  // above, checking movie.extendedRuntimeMin instead of otherEarth - LOTR
+  // has it (the LOTR + Hobbit trilogies), Star Wars/Marvel/TBBT don't.
+  function populateExtendedVersionsToggle() {
+    const hasExtendedContent = Object.values(MOVIES).some((m) => m.extendedRuntimeMin != null);
+    els.extendedVersionsWrap.style.display = hasExtendedContent ? "" : "none";
+    updateExtendedVersionsUI();
+  }
+
+  function updateExtendedVersionsUI() {
+    els.extendedVersionsCheckbox.checked = state.extendedVersions;
+    els.extendedVersionsWrap.setAttribute("data-active", String(state.extendedVersions));
+  }
+
+  // The one place that decides whether a movie's THEATRICAL or EXTENDED
+  // runtime is the one to show - buildCard()'s own meta line and both
+  // getTotalRuntimeMin()/getWatchedRuntimeMin() all call this instead of
+  // reading movie.runtimeMin directly, so the card and the header's
+  // runtime progress bar always agree. Falls back to the plain theatrical
+  // runtimeMin whenever a movie has no extendedRuntimeMin of its own (The
+  // War of the Rohirrim, or any movie in a franchise where the toggle is
+  // hidden entirely) - never NaN, never missing, same "degrade gracefully
+  // when the richer data isn't there" pattern seasonTotalRuntimeMin() uses
+  // for a season with no episodeRuntimes.
+  function movieDisplayRuntimeMin(movie) {
+    return state.extendedVersions && movie.extendedRuntimeMin != null ? movie.extendedRuntimeMin : movie.runtimeMin;
+  }
+
+  /* ---------------------------------------------------------------- */
   /*  Timeline rendering                                                 */
   /* ---------------------------------------------------------------- */
   function render() {
@@ -1490,7 +1563,7 @@
         </button>
         <div class="card__meta">
           ${badgeHtml}
-          <p class="card__year">${otherEarth && isChronological ? otherEarth.year : movie.year} · ${formatRuntime(movie.runtimeMin)}</p>
+          <p class="card__year">${otherEarth && isChronological ? otherEarth.year : movie.year} · ${formatRuntime(movieDisplayRuntimeMin(movie))}</p>
           ${otherEarth ? `<p class="card__origin-earth">${escapeHtml(otherEarthDisplayText(otherEarth.label, otherEarth.variant))}</p>` : ""}
         </div>
       </div>
@@ -2423,7 +2496,7 @@
   // silently drops a show - seasonTotalRuntimeMin() returning null is
   // just defensive, same as the `|| 0` on a card's own runtime line.
   function getTotalRuntimeMin() {
-    const moviesTotal = Object.values(MOVIES).reduce((sum, m) => sum + m.runtimeMin, 0);
+    const moviesTotal = Object.values(MOVIES).reduce((sum, m) => sum + movieDisplayRuntimeMin(m), 0);
     const seasonsTotal = Object.values(SEASONS)
       .filter((s) => !s.sliceOf)
       .reduce((sum, s) => sum + (seasonTotalRuntimeMin(s) || 0), 0);
@@ -2444,7 +2517,7 @@
   function getWatchedRuntimeMin() {
     let total = 0;
     Object.values(MOVIES).forEach((m) => {
-      if (state.watched.has(m.id)) total += m.runtimeMin;
+      if (state.watched.has(m.id)) total += movieDisplayRuntimeMin(m);
     });
     Object.values(SEASONS)
       .filter((s) => !s.sliceOf)
@@ -2766,6 +2839,22 @@
   function saveCoreMcu(value) {
     try {
       localStorage.setItem(CORE_MCU_STORAGE_KEY, String(value));
+    } catch {
+      /* localStorage unavailable (private mode etc.) - fail silently */
+    }
+  }
+
+  function loadExtendedVersions() {
+    try {
+      return localStorage.getItem(EXTENDED_VERSIONS_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  function saveExtendedVersions(value) {
+    try {
+      localStorage.setItem(EXTENDED_VERSIONS_STORAGE_KEY, String(value));
     } catch {
       /* localStorage unavailable (private mode etc.) - fail silently */
     }

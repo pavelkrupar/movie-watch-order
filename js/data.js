@@ -1,24 +1,25 @@
 /**
  * Data layer.
  * -----------------------------------------------------------------------
- * Three franchises today, Star Wars, Marvel and The Big Bang Theory - each
- * one a fully separate MOVIES/SERIES/SEASONS/ORDERINGS(/STORY_LINES)
- * dataset, suffixed _STARWARS / _MARVEL / _TBBT below. app.js never reads
- * those suffixed names directly - it reads the bare, unsuffixed MOVIES/
- * SERIES/SEASONS/ORDERINGS/STORY_LINES identifiers everywhere (rendering,
- * watched-state counting, runtime totals, persistence validation, all of
- * it), declared `let` at the very end of this file and pointed at Star
- * Wars's own data by default. Picking a franchise in the header
- * (switchFranchise() in app.js) just reassigns those five bindings to the
- * other franchise's dataset (FRANCHISE_DATA, also at the end of this file)
- * and re-renders - every function elsewhere in app.js is automatically
- * "about" whichever franchise is active without needing to know that
- * franchise switching exists at all. This is why adding TBBT as a third
- * franchise was "one more dataset + one more FRANCHISE_DATA/FRANCHISES
- * entry", not new plumbing - see FRANCHISE_DATA's own comment for what
- * TBBT deliberately leaves empty (storyLines/doomsdayWatchlist/
- * coreMcuExclude - all Star-Wars/Marvel-specific mechanisms with no
- * equivalent here).
+ * Four franchises today, Star Wars, Marvel, The Big Bang Theory and The
+ * Lord of the Rings - each one a fully separate MOVIES/SERIES/SEASONS/
+ * ORDERINGS(/STORY_LINES) dataset, suffixed _STARWARS / _MARVEL / _TBBT /
+ * _LOTR below. app.js never reads those suffixed names directly - it
+ * reads the bare, unsuffixed MOVIES/SERIES/SEASONS/ORDERINGS/STORY_LINES
+ * identifiers everywhere (rendering, watched-state counting, runtime
+ * totals, persistence validation, all of it), declared `let` at the very
+ * end of this file and pointed at Star Wars's own data by default.
+ * Picking a franchise in the header (switchFranchise() in app.js) just
+ * reassigns those five bindings to the other franchise's dataset
+ * (FRANCHISE_DATA, also at the end of this file) and re-renders - every
+ * function elsewhere in app.js is automatically "about" whichever
+ * franchise is active without needing to know that franchise switching
+ * exists at all. This is why adding TBBT as a third franchise, and LOTR as
+ * a fourth, was each just "one more dataset + one more FRANCHISE_DATA/
+ * FRANCHISES entry", not new plumbing - see FRANCHISE_DATA's own comment
+ * for what TBBT/LOTR both deliberately leave empty (storyLines/
+ * doomsdayWatchlist/coreMcuExclude - all Star-Wars/Marvel-specific
+ * mechanisms with no equivalent in either newer franchise).
  *
  * MOVIES  – dictionary of movies (key = id). One "watched" toggle per movie.
  *
@@ -62,6 +63,7 @@ const FRANCHISES = [
   { id: "starwars", label: "Star Wars" },
   { id: "marvel", label: "Marvel" },
   { id: "tbbt", label: "The Big Bang Theory" },
+  { id: "lotr", label: "The Lord of the Rings" },
 ];
 
 // The "Multiverse" checkbox filter's own buckets (see
@@ -117,7 +119,7 @@ const EARTH_BUCKETS = [
 const MOVIES_STARWARS = {
   ep1: {
     id: "ep1",
-    title: "Star Wars: The Phantom Menace",
+    title: "Star Wars: The Phantom Menace",
     badge: "Episode I",
     year: 1999,
     runtimeMin: 133,
@@ -125,7 +127,7 @@ const MOVIES_STARWARS = {
   },
   ep2: {
     id: "ep2",
-    title: "Star Wars: Attack of the Clones",
+    title: "Star Wars: Attack of the Clones",
     badge: "Episode II",
     year: 2002,
     runtimeMin: 142,
@@ -133,7 +135,7 @@ const MOVIES_STARWARS = {
   },
   ep3: {
     id: "ep3",
-    title: "Star Wars: Revenge of the Sith",
+    title: "Star Wars: Revenge of the Sith",
     badge: "Episode III",
     year: 2005,
     runtimeMin: 140,
@@ -163,7 +165,7 @@ const MOVIES_STARWARS = {
   },
   ep5: {
     id: "ep5",
-    title: "Star Wars: The Empire Strikes Back",
+    title: "Star Wars: The Empire Strikes Back",
     badge: "Episode V",
     year: 1980,
     runtimeMin: 124,
@@ -171,7 +173,7 @@ const MOVIES_STARWARS = {
   },
   ep6: {
     id: "ep6",
-    title: "Star Wars: Return of the Jedi",
+    title: "Star Wars: Return of the Jedi",
     badge: "Episode VI",
     year: 1983,
     runtimeMin: 132,
@@ -179,7 +181,7 @@ const MOVIES_STARWARS = {
   },
   ep7: {
     id: "ep7",
-    title: "Star Wars: The Force Awakens",
+    title: "Star Wars: The Force Awakens",
     badge: "Episode VII",
     year: 2015,
     runtimeMin: 138,
@@ -187,7 +189,7 @@ const MOVIES_STARWARS = {
   },
   ep8: {
     id: "ep8",
-    title: "Star Wars: The Last Jedi",
+    title: "Star Wars: The Last Jedi",
     badge: "Episode VIII",
     year: 2017,
     runtimeMin: 152,
@@ -195,7 +197,7 @@ const MOVIES_STARWARS = {
   },
   ep9: {
     id: "ep9",
-    title: "Star Wars: The Rise of Skywalker",
+    title: "Star Wars: The Rise of Skywalker",
     badge: "Episode IX",
     year: 2019,
     runtimeMin: 142,
@@ -208,7 +210,7 @@ const MOVIES_STARWARS = {
   // show real poster art - see that flag's own comment in CLAUDE.md.
   clonewarsMovie: {
     id: "clonewarsMovie",
-    title: "Star Wars: The Clone Wars",
+    title: "Star Wars: The Clone Wars",
     year: 2008,
     runtimeMin: 98,
     type: "film",
@@ -216,7 +218,7 @@ const MOVIES_STARWARS = {
   },
   mandoGrogu: {
     id: "mandoGrogu",
-    title: "The Mandalorian and Grogu",
+    title: "The Mandalorian and Grogu",
     year: 2026,
     runtimeMin: 132,
     type: "film",
@@ -231,20 +233,20 @@ const MOVIES_STARWARS = {
 // boolean-absent-means-false field in this file.
 const SERIES_STARWARS = {
   kenobi: { id: "kenobi", title: "Star Wars: Obi-Wan Kenobi" },
-  clonewars: { id: "clonewars", title: "Star Wars: The Clone Wars", animated: true },
+  clonewars: { id: "clonewars", title: "Star Wars: The Clone Wars", animated: true },
   rebels: { id: "rebels", title: "Star Wars Rebels", animated: true },
-  badbatch: { id: "badbatch", title: "Star Wars: The Bad Batch", animated: true },
-  mandalorian: { id: "mandalorian", title: "The Mandalorian" },
-  bobafett: { id: "bobafett", title: "The Book of Boba Fett" },
+  badbatch: { id: "badbatch", title: "Star Wars: The Bad Batch", animated: true },
+  mandalorian: { id: "mandalorian", title: "The Mandalorian" },
+  bobafett: { id: "bobafett", title: "The Book of Boba Fett" },
   andor: { id: "andor", title: "Andor: A Star Wars Story" },
   ahsoka: { id: "ahsoka", title: "Star Wars: Ahsoka" },
-  acolyte: { id: "acolyte", title: "Star Wars: The Acolyte" },
-  talesEmpire: { id: "talesEmpire", title: "Star Wars: Tales of the Empire", animated: true },
+  acolyte: { id: "acolyte", title: "Star Wars: The Acolyte" },
+  talesEmpire: { id: "talesEmpire", title: "Star Wars: Tales of the Empire", animated: true },
   skeletonCrew: { id: "skeletonCrew", title: "Star Wars: Skeleton Crew" },
   maul: { id: "maul", title: "Star Wars: Maul – Shadow Lord", animated: true },
   resistance: { id: "resistance", title: "Star Wars Resistance", animated: true },
-  talesJedi: { id: "talesJedi", title: "Star Wars: Tales of the Jedi", animated: true },
-  talesUnderworld: { id: "talesUnderworld", title: "Star Wars: Tales of the Underworld", animated: true },
+  talesJedi: { id: "talesJedi", title: "Star Wars: Tales of the Jedi", animated: true },
+  talesUnderworld: { id: "talesUnderworld", title: "Star Wars: Tales of the Underworld", animated: true },
   youngJedi: { id: "youngJedi", title: "Star Wars: Young Jedi Adventures", animated: true },
 };
 
@@ -1640,10 +1642,10 @@ const MOVIES_MARVEL = {
   spidermanraimi1: { id: "spidermanraimi1", title: "Spider-Man", year: 2002, runtimeMin: 121, type: "film", otherEarth: { label: "Earth-96283", year: "cca 2002" } },
   xmen2: { id: "xmen2", title: "X2: X-Men United", year: 2003, runtimeMin: 133, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2003", variant: "Original" } },
   spidermanraimi2: { id: "spidermanraimi2", title: "Spider-Man 2", year: 2004, runtimeMin: 127, type: "film", otherEarth: { label: "Earth-96283", year: "cca 2004" } },
-  xmen3: { id: "xmen3", title: "X-Men: The Last Stand", year: 2006, runtimeMin: 104, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2006", variant: "Original" } },
+  xmen3: { id: "xmen3", title: "X-Men: The Last Stand", year: 2006, runtimeMin: 104, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2006", variant: "Original" } },
   spidermanraimi3: { id: "spidermanraimi3", title: "Spider-Man 3", year: 2007, runtimeMin: 139, type: "film", otherEarth: { label: "Earth-96283", year: "cca 2007" } },
   ironman1: { id: "ironman1", title: "Iron Man", year: 2008, runtimeMin: 126, type: "film" },
-  hulk: { id: "hulk", title: "The Incredible Hulk", year: 2008, runtimeMin: 112, type: "film" },
+  hulk: { id: "hulk", title: "The Incredible Hulk", year: 2008, runtimeMin: 112, type: "film" },
   // otherEarth.variant: "Original" - the SAME pre-reboot Earth-10005 branch
   // as xmen1/xmen2/xmen3 below (a prequel to that trilogy, not a separate
   // thing), distinct from the "Rewrite" branch xmendofp spins off further
@@ -1658,31 +1660,31 @@ const MOVIES_MARVEL = {
   xmenoriginswolverine: { id: "xmenoriginswolverine", title: "X-Men Origins: Wolverine", year: 2009, runtimeMin: 107, type: "film", otherEarth: { label: "Earth-10005", year: "1979", variant: "Original" } },
   ironman2: { id: "ironman2", title: "Iron Man 2", year: 2010, runtimeMin: 124, type: "film" },
   thor1: { id: "thor1", title: "Thor", year: 2011, runtimeMin: 115, type: "film" },
-  cap1: { id: "cap1", title: "Captain America: The First Avenger", year: 2011, runtimeMin: 124, type: "film" },
+  cap1: { id: "cap1", title: "Captain America: The First Avenger", year: 2011, runtimeMin: 124, type: "film" },
   // 1962 period piece (Cuban Missile Crisis) - a real in-universe date far
   // from its 2011 release, same reasoning as fantasticfour1's own 1964 -
   // see the otherEarth comment above xmen1 for the whole Earth-10005
   // cluster this belongs to.
   xmenfirstclass: { id: "xmenfirstclass", title: "X-Men: First Class", year: 2011, runtimeMin: 132, type: "film", otherEarth: { label: "Earth-10005", year: "1962" } },
-  avengers1: { id: "avengers1", title: "The Avengers", year: 2012, runtimeMin: 143, type: "film", badge: "Avengers" },
+  avengers1: { id: "avengers1", title: "The Avengers", year: 2012, runtimeMin: 143, type: "film", badge: "Avengers" },
   // otherEarth: Earth-120703 - Andrew Garfield's own separate Spider-Man
   // continuity, distinct from both the 616 Tom Holland version and the
   // earlier Raimi-era Earth-96283 above - a THIRD pre-MCU Spider-Man
   // universe, same "Sony owns the character, no crossover ties" situation.
   // No specific in-universe date confirmed, so "cca" from release.
-  amazingspiderman1: { id: "amazingspiderman1", title: "The Amazing Spider-Man", year: 2012, runtimeMin: 136, type: "film", otherEarth: { label: "Earth-120703", year: "cca 2012" } },
+  amazingspiderman1: { id: "amazingspiderman1", title: "The Amazing Spider-Man", year: 2012, runtimeMin: 136, type: "film", otherEarth: { label: "Earth-120703", year: "cca 2012" } },
   ironman3: { id: "ironman3", title: "Iron Man 3", year: 2013, runtimeMin: 130, type: "film" },
-  thor2: { id: "thor2", title: "Thor: The Dark World", year: 2013, runtimeMin: 112, type: "film" },
+  thor2: { id: "thor2", title: "Thor: The Dark World", year: 2013, runtimeMin: 112, type: "film" },
   // Contemporary-set (some years after The Last Stand), no specific
   // in-universe year confirmed beyond that - "cca" from its own release
   // year, same reasoning as the original trilogy above. variant:
   // "Original" - same untouched pre-xmendofp branch as xmen1/xmen2/xmen3/
   // xmenoriginswolverine, not the "Rewrite" branch further down this file.
-  xmenwolverine: { id: "xmenwolverine", title: "The Wolverine", year: 2013, runtimeMin: 126, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2013", variant: "Original" } },
-  cap2: { id: "cap2", title: "Captain America: The Winter Soldier", year: 2014, runtimeMin: 136, type: "film" },
+  xmenwolverine: { id: "xmenwolverine", title: "The Wolverine", year: 2013, runtimeMin: 126, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2013", variant: "Original" } },
+  cap2: { id: "cap2", title: "Captain America: The Winter Soldier", year: 2014, runtimeMin: 136, type: "film" },
   // otherEarth: Earth-120703, same as amazingspiderman1 above.
-  amazingspiderman2: { id: "amazingspiderman2", title: "The Amazing Spider-Man 2", year: 2014, runtimeMin: 142, type: "film", otherEarth: { label: "Earth-120703", year: "cca 2014" } },
-  gotg1: { id: "gotg1", title: "Guardians of the Galaxy", year: 2014, runtimeMin: 121, type: "film" },
+  amazingspiderman2: { id: "amazingspiderman2", title: "The Amazing Spider-Man 2", year: 2014, runtimeMin: 142, type: "film", otherEarth: { label: "Earth-120703", year: "cca 2014" } },
+  gotg1: { id: "gotg1", title: "Guardians of the Galaxy", year: 2014, runtimeMin: 121, type: "film" },
   // Positioned on the Chronological axis at 2023, NOT 1973, even though the
   // bulk of the film's runtime (Wolverine's consciousness sent back) plays
   // out in 1973 - a deliberate reversal of an earlier pass, which placed it
@@ -1702,8 +1704,8 @@ const MOVIES_MARVEL = {
   // one cluster is a deliberate, documented exception to this whole
   // franchise's "always fully interleave, never group as an island"
   // principle everywhere else.
-  xmendofp: { id: "xmendofp", title: "X-Men: Days of Future Past", year: 2014, runtimeMin: 131, type: "film", otherEarth: { label: "Earth-10005", year: "2023" } },
-  avengers2: { id: "avengers2", title: "Avengers: Age of Ultron", year: 2015, runtimeMin: 141, type: "film", badge: "Avengers" },
+  xmendofp: { id: "xmendofp", title: "X-Men: Days of Future Past", year: 2014, runtimeMin: 131, type: "film", otherEarth: { label: "Earth-10005", year: "2023" } },
+  avengers2: { id: "avengers2", title: "Avengers: Age of Ultron", year: 2015, runtimeMin: 141, type: "film", badge: "Avengers" },
   antman1: { id: "antman1", title: "Ant-Man", year: 2015, runtimeMin: 117, type: "film" },
   cap3: { id: "cap3", title: "Captain America: Civil War", year: 2016, runtimeMin: 147, type: "film" },
   drstrange1: { id: "drstrange1", title: "Doctor Strange", year: 2016, runtimeMin: 115, type: "film" },
@@ -1722,7 +1724,7 @@ const MOVIES_MARVEL = {
   // release year, same as the trilogy/The Wolverine. variant: "Rewrite",
   // same rewritten-branch cluster as xmenapocalypse above.
   deadpool1: { id: "deadpool1", title: "Deadpool", year: 2016, runtimeMin: 108, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2016", variant: "Rewrite" } },
-  gotg2: { id: "gotg2", title: "Guardians of the Galaxy Vol. 2", year: 2017, runtimeMin: 136, type: "film" },
+  gotg2: { id: "gotg2", title: "Guardians of the Galaxy Vol. 2", year: 2017, runtimeMin: 136, type: "film" },
   spiderman1: { id: "spiderman1", title: "Spider-Man: Homecoming", year: 2017, runtimeMin: 133, type: "film" },
   thor3: { id: "thor3", title: "Thor: Ragnarok", year: 2017, runtimeMin: 130, type: "film" },
   // 2029, explicitly on-screen (a car's dashboard display reads "March 1,
@@ -1733,7 +1735,7 @@ const MOVIES_MARVEL = {
   logan: { id: "logan", title: "Logan", year: 2017, runtimeMin: 137, type: "film", otherEarth: { label: "Earth-10005", year: "2029" } },
   blackpanther1: { id: "blackpanther1", title: "Black Panther", year: 2018, runtimeMin: 134, type: "film" },
   avengers3: { id: "avengers3", title: "Avengers: Infinity War", year: 2018, runtimeMin: 149, type: "film", badge: "Avengers" },
-  antman2: { id: "antman2", title: "Ant-Man and the Wasp", year: 2018, runtimeMin: 118, type: "film" },
+  antman2: { id: "antman2", title: "Ant-Man and the Wasp", year: 2018, runtimeMin: 118, type: "film" },
   // otherEarth: Earth-688 - Sony's own separate Spider-Man Universe (SSU),
   // built around Spider-Man-adjacent characters rather than the wall-crawler
   // himself (he doesn't appear on-screen in this universe at all) - a
@@ -1765,21 +1767,21 @@ const MOVIES_MARVEL = {
   // a specific year, since no exact one was ever confirmed (same lowercase
   // "rewrite <value>" format as the rest of the cluster's own labels, not
   // the "LATE 2010s (REWRITE)" format an earlier pass used).
-  newmutants: { id: "newmutants", title: "The New Mutants", year: 2020, runtimeMin: 94, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2020", variant: "Rewrite" } },
+  newmutants: { id: "newmutants", title: "The New Mutants", year: 2020, runtimeMin: 94, type: "film", otherEarth: { label: "Earth-10005", year: "cca 2020", variant: "Rewrite" } },
   blackwidow: { id: "blackwidow", title: "Black Widow", year: 2021, runtimeMin: 134, type: "film" },
   // otherEarth: Earth-688, same as venom1 above.
   venom2: { id: "venom2", title: "Venom: Let There Be Carnage", year: 2021, runtimeMin: 97, type: "film", otherEarth: { label: "Earth-688", year: "cca 2021" } },
-  shangchi: { id: "shangchi", title: "Shang-Chi and the Legend of the Ten Rings", year: 2021, runtimeMin: 132, type: "film" },
+  shangchi: { id: "shangchi", title: "Shang-Chi and the Legend of the Ten Rings", year: 2021, runtimeMin: 132, type: "film" },
   eternals: { id: "eternals", title: "Eternals", year: 2021, runtimeMin: 156, type: "film" },
   spiderman3: { id: "spiderman3", title: "Spider-Man: No Way Home", year: 2021, runtimeMin: 148, type: "film" },
   // otherEarth: Earth-688, same as venom1/venom2 above.
   morbius: { id: "morbius", title: "Morbius", year: 2022, runtimeMin: 104, type: "film", otherEarth: { label: "Earth-688", year: "cca 2022" } },
-  drstrange2: { id: "drstrange2", title: "Doctor Strange in the Multiverse of Madness", year: 2022, runtimeMin: 126, type: "film" },
+  drstrange2: { id: "drstrange2", title: "Doctor Strange in the Multiverse of Madness", year: 2022, runtimeMin: 126, type: "film" },
   thor4: { id: "thor4", title: "Thor: Love and Thunder", year: 2022, runtimeMin: 119, type: "film" },
   blackpanther2: { id: "blackpanther2", title: "Black Panther: Wakanda Forever", year: 2022, runtimeMin: 161, type: "film" },
-  antman3: { id: "antman3", title: "Ant-Man and the Wasp: Quantumania", year: 2023, runtimeMin: 125, type: "film" },
-  gotg3: { id: "gotg3", title: "Guardians of the Galaxy Vol. 3", year: 2023, runtimeMin: 150, type: "film" },
-  marvels: { id: "marvels", title: "The Marvels", year: 2023, runtimeMin: 105, type: "film" },
+  antman3: { id: "antman3", title: "Ant-Man and the Wasp: Quantumania", year: 2023, runtimeMin: 125, type: "film" },
+  gotg3: { id: "gotg3", title: "Guardians of the Galaxy Vol. 3", year: 2023, runtimeMin: 150, type: "film" },
+  marvels: { id: "marvels", title: "The Marvels", year: 2023, runtimeMin: 105, type: "film" },
   // otherEarth: Earth-688, same as venom1/venom2/morbius above.
   madameweb: { id: "madameweb", title: "Madame Web", year: 2024, runtimeMin: 116, type: "film", otherEarth: { label: "Earth-688", year: "cca 2024" } },
   // otherEarth here despite most of the film's own RUNTIME playing out on
@@ -1797,9 +1799,9 @@ const MOVIES_MARVEL = {
   // the otherEarth color/Earth-label at the top too, not just the card.
   deadpool3: { id: "deadpool3", title: "Deadpool & Wolverine", year: 2024, runtimeMin: 128, type: "film", otherEarth: { label: "Earth-10005", year: "2024" } },
   // otherEarth: Earth-688, same as madameweb above.
-  venom3: { id: "venom3", title: "Venom: The Last Dance", year: 2024, runtimeMin: 109, type: "film", otherEarth: { label: "Earth-688", year: "cca 2024" } },
+  venom3: { id: "venom3", title: "Venom: The Last Dance", year: 2024, runtimeMin: 109, type: "film", otherEarth: { label: "Earth-688", year: "cca 2024" } },
   // otherEarth: Earth-688, same as madameweb/venom3 above.
-  kraven: { id: "kraven", title: "Kraven the Hunter", year: 2024, runtimeMin: 127, type: "film", otherEarth: { label: "Earth-688", year: "cca 2024" } },
+  kraven: { id: "kraven", title: "Kraven the Hunter", year: 2024, runtimeMin: 127, type: "film", otherEarth: { label: "Earth-688", year: "cca 2024" } },
   cap4: { id: "cap4", title: "Captain America: Brave New World", year: 2025, runtimeMin: 118, type: "film" },
   thunderbolts: { id: "thunderbolts", title: "Thunderbolts*", year: 2025, runtimeMin: 126, type: "film" },
   // otherEarth (buildCard() in app.js, and season.otherEarth /
@@ -1836,7 +1838,7 @@ const MOVIES_MARVEL = {
   // cluster - not a mistake for a future resort pass to "fix" back to 1964.
   fantasticfour1: {
     id: "fantasticfour1",
-    title: "The Fantastic Four: First Steps",
+    title: "The Fantastic Four: First Steps",
     year: 2025,
     runtimeMin: 115,
     type: "film",
@@ -1844,7 +1846,7 @@ const MOVIES_MARVEL = {
   },
   spiderman4: { id: "spiderman4", title: "Spider-Man: Brand New Day", year: 2026, runtimeMin: 144, type: "film" },
   werewolfnight: { id: "werewolfnight", title: "Werewolf by Night", year: 2022, runtimeMin: 53, type: "film" },
-  gotgholiday: { id: "gotgholiday", title: "The Guardians of the Galaxy Holiday Special", year: 2022, runtimeMin: 44, type: "film" },
+  gotgholiday: { id: "gotgholiday", title: "The Guardians of the Galaxy Holiday Special", year: 2022, runtimeMin: 44, type: "film" },
   // Five short bonus films (4-15 min each) - originally bundled as
   // home-video EXTRAS on other MCU Blu-rays rather than released in
   // theaters, modeled here as ordinary movie cards (type: "film") despite
@@ -1880,7 +1882,7 @@ const MOVIES_MARVEL = {
   // sits on the OTHER side of thor1 instead, between it and avengers1 -
   // the two One-Shots bracket Thor rather than stacking back to back
   // before it.
-  oneshotfunnything: { id: "oneshotfunnything", title: "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer", year: 2011, runtimeMin: 4, type: "film" },
+  oneshotfunnything: { id: "oneshotfunnything", title: "Marvel One-Shot: A Funny Thing Happened on the Way to Thor's Hammer", year: 2011, runtimeMin: 4, type: "film" },
   // Bundled on Thor's own Blu-ray (Sept 13, 2011). Agent Coulson maneuvers
   // Tony Stark out of the Avengers Initiative roster in favor of Hawkeye -
   // positioned right after thor1 and right before avengers1 on request
@@ -1892,7 +1894,7 @@ const MOVIES_MARVEL = {
   // actually the EARLIER of this pair's two real home-video dates despite
   // sitting narratively after Thor here, so it lands there before
   // oneshotfunnything (Oct 25, 2011), not after.
-  oneshotconsultant: { id: "oneshotconsultant", title: "Marvel One-Shot: The Consultant", year: 2011, runtimeMin: 4, type: "film" },
+  oneshotconsultant: { id: "oneshotconsultant", title: "Marvel One-Shot: The Consultant", year: 2011, runtimeMin: 4, type: "film" },
   // Bundled on The Avengers' own Blu-ray (Sept 25, 2012) - a black-market
   // dealer's salvaged Chitauri tech goes wrong in the aftermath of the
   // Battle of New York. Positioned right after avengers1 on request; "cca
@@ -1904,12 +1906,12 @@ const MOVIES_MARVEL = {
   // by a mysterious visitor, a direct Iron Man 3 epilogue. Positioned
   // right after ironman3 on request; "cca early 2014", just past ironman3's
   // own book-sourced "December 2013 – Early 2014" band.
-  oneshotallhailtheking: { id: "oneshotallhailtheking", title: "Marvel One-Shot: All Hail the King", year: 2014, runtimeMin: 14, type: "film" },
+  oneshotallhailtheking: { id: "oneshotallhailtheking", title: "Marvel One-Shot: All Hail the King", year: 2014, runtimeMin: 14, type: "film" },
 };
 
 const SERIES_MARVEL = {
   wandavision: { id: "wandavision", title: "WandaVision" },
-  falconws: { id: "falconws", title: "The Falcon and the Winter Soldier" },
+  falconws: { id: "falconws", title: "The Falcon and the Winter Soldier" },
   loki: { id: "loki", title: "Loki" },
   whatif: { id: "whatif", title: "What If...?", animated: true },
   marvelzombies: { id: "marvelzombies", title: "Marvel Zombies", animated: true },
@@ -1937,7 +1939,7 @@ const SERIES_MARVEL = {
   // chronological placement below is deliberately its own standalone
   // "Ancient History" era at the very front of the axis instead, since
   // there's no single later era its individual episodes would slot into.
-  eyeswakanda: { id: "eyeswakanda", title: "Eyes of Wakanda", animated: true },
+  eyeswakanda: { id: "eyeswakanda", title: "Eyes of Wakanda", animated: true },
   // otherEarth (its season entry below, and see movie.otherEarth's own
   // comment for the general mechanism) - officially confirmed NOT
   // Earth-616/Sacred Timeline (Marvel TV boss Brad Winderbaum: the show
@@ -1968,7 +1970,7 @@ const SERIES_MARVEL = {
   // Miniseries uniting the four leads above - treated as a single-season
   // show like any other rather than anything special-cased, same pattern
   // as eyeswakanda/wonderman's own one-season entries.
-  defenders: { id: "defenders", title: "Marvel's The Defenders" },
+  defenders: { id: "defenders", title: "Marvel's The Defenders" },
   // Stop-motion animated shorts anthology - Baby Groot growing up
   // sometime between Guardians of the Galaxy Vol. 2 (2014 in-universe) and
   // Vol. 3, with no specific in-universe date ever confirmed for either
@@ -2803,7 +2805,7 @@ const SERIES_TBBT = {
   // untouched, having their own different seriesId. Replaces the neutral
   // "Series" badge text with "TBBT" specifically, same mechanism as
   // movie.badge replacing "Movie" with "Avengers"/"Episode N".
-  tbbt: { id: "tbbt", title: "The Big Bang Theory", badge: "TBBT" },
+  tbbt: { id: "tbbt", title: "The Big Bang Theory", badge: "TBBT" },
   youngsheldon: { id: "youngsheldon", title: "Young Sheldon" },
   georgieandmandy: { id: "georgieandmandy", title: "Georgie & Mandy's First Marriage" },
   // The franchise's second direct spin-off (after Young Sheldon) - HBO
@@ -2818,7 +2820,7 @@ const SERIES_TBBT = {
   // mechanism at all (see FRANCHISE_DATA.tbbt's own comment), and adding
   // one just for this one show's premise would be exactly the kind of
   // machinery TBBT's dataset is deliberately simpler than Marvel's without.
-  stuart: { id: "stuart", title: "Stuart Fails to Save the Universe" },
+  stuart: { id: "stuart", title: "Stuart Fails to Save the Universe" },
 };
 
 // year = the season's real premiere year (drives "Recommended"'s own
@@ -3490,6 +3492,251 @@ const ORDERINGS_TBBT = [
   },
 ];
 
+// -----------------------------------------------------------------------
+// The Lord of the Rings - fourth franchise. Simple in the same spirit as
+// TBBT (no otherEarth content, no story lines, no Doomsday-style
+// watchlist, no Core MCU-style exclusion list - FRANCHISE_DATA.lotr sets
+// all three to empty/[] below), but unlike TBBT it DOES get the usual
+// Chronological/Release Order pair (user request: "vytvoř dva způsoby
+// řazení jako je obvyklé u ostatních universů") rather than a single
+// flat "Recommended" ordering - three real films (the trilogy) plus a
+// prequel trilogy plus a prequel TV series genuinely differ in
+// in-universe order vs. real release order, the same shape Star Wars'
+// own two orderings exist to capture, unlike TBBT's four shows which
+// were always going to be watched in something close to release order
+// anyway.
+//   Seven films (the LOTR trilogy + The Hobbit trilogy + the standalone
+// prequel The War of the Rohirrim) plus one TV show (The Rings of Power,
+// TWO seasons only - a stricter standard than TBBT's own Stuart Fails to
+// Save the Universe (which does include real, dated, still-unaired
+// episodes): Season 3 has a confirmed Nov 11, 2026 premiere/episode count
+// but was deliberately left out on explicit user request ("ještě
+// nevznikla" - it doesn't exist yet), so don't re-add it just because a
+// date exists - wait until it's actually aired). Movie runtimes are real
+// theatrical (not extended-edition) minutes, verified via Wikipedia -
+// extended-edition runtimes are ALSO real and sourced (see
+// extendedRuntimeMin's own comment below), just not shown by default; The
+// Rings of Power's own episodeTitles/episodeRuntimes were verified
+// against TMDB's season pages, same sourcing standard as every other
+// curated show in this file.
+const MOVIES_LOTR = {
+  // badge: "LOTR" (uniform text across all three, like Marvel's own
+  // "Avengers"/TBBT's own "TBBT" - NOT a per-movie "Part I"/"II"/"III"
+  // the way Star Wars' Episode badges differ per film - user-requested
+  // this exact text) marks these three as this franchise's own flagship/
+  // highlighted titles - see isBadgeTier in app.js. The Hobbit trilogy
+  // and The War of the Rohirrim below deliberately do NOT get one, same
+  // "prequel content stays at the normal movie tier" shape as Star Wars'
+  // own prequels-vs-original-nine distinction (only the numbered
+  // Skywalker saga gets badge tier there, not every Star Wars film
+  // either).
+  //   extendedRuntimeMin (LOTR trilogy + Hobbit trilogy only - The War of
+  // the Rohirrim has no extended cut) backs the "Extended versions"
+  // header toggle (see buildExtendedVersionsToggle() in app.js) - real
+  // extended-edition runtimes, verified via Wikipedia same as the
+  // theatrical runtimeMin figures. movieDisplayRuntimeMin() (app.js) is
+  // the one place that picks between the two based on state.
+  // extendedVersions, so every place a card's runtime is read (the card
+  // itself, both progress-bar totals) stays in sync automatically.
+  lotr1: {
+    id: "lotr1",
+    title: "The Lord of the Rings: The Fellowship of the Ring",
+    badge: "LOTR",
+    year: 2001,
+    runtimeMin: 178,
+    extendedRuntimeMin: 228,
+    type: "film",
+  },
+  lotr2: {
+    id: "lotr2",
+    title: "The Lord of the Rings: The Two Towers",
+    badge: "LOTR",
+    year: 2002,
+    runtimeMin: 179,
+    extendedRuntimeMin: 235,
+    type: "film",
+  },
+  lotr3: {
+    id: "lotr3",
+    title: "The Lord of the Rings: The Return of the King",
+    badge: "LOTR",
+    year: 2003,
+    runtimeMin: 201,
+    extendedRuntimeMin: 263,
+    type: "film",
+  },
+  hobbit1: {
+    id: "hobbit1",
+    title: "The Hobbit: An Unexpected Journey",
+    year: 2012,
+    runtimeMin: 169,
+    extendedRuntimeMin: 182,
+    type: "film",
+  },
+  hobbit2: {
+    id: "hobbit2",
+    title: "The Hobbit: The Desolation of Smaug",
+    year: 2013,
+    runtimeMin: 161,
+    extendedRuntimeMin: 186,
+    type: "film",
+  },
+  hobbit3: {
+    id: "hobbit3",
+    title: "The Hobbit: The Battle of the Five Armies",
+    year: 2014,
+    runtimeMin: 144,
+    extendedRuntimeMin: 157,
+    type: "film",
+  },
+  // Animated (Kenji Kamiyama, Warner Bros/New Line), unlike every other
+  // title in this franchise - animated: true same convention as Star
+  // Wars'/Marvel's own animated flags. Set TA 2758-2759 per Tolkien's own
+  // Appendix A (Helm Hammerhand's death and the Battle of the Hornburg
+  // during the Long Winter) - the film's own marketing instead describes
+  // it as "183 years before" the trilogy, which would land closer to TA
+  // 2836; book-sourced Appendix A dating wins here, same preference this
+  // file gives sourced dates over marketing copy everywhere else (e.g.
+  // xmendofp's own dating discussion in the Marvel section above).
+  warofrohirrim: {
+    id: "warofrohirrim",
+    title: "The Lord of the Rings: The War of the Rohirrim",
+    year: 2024,
+    runtimeMin: 134,
+    animated: true,
+    type: "film",
+  },
+};
+
+const SERIES_LOTR = {
+  ringsofpower: { id: "ringsofpower", title: "The Lord of the Rings: The Rings of Power" },
+};
+
+// year = the season's real premiere year (drives Release Order's own
+// sort, same convention every other franchise's SEASONS_* uses).
+const SEASONS_LOTR = {
+  "rop-s1": {
+    id: "rop-s1",
+    seriesId: "ringsofpower",
+    number: 1,
+    label: "Season 1",
+    episodes: 8,
+    year: 2022,
+    episodeTitles: [
+      "A Shadow of the Past", "Adrift", "Adar", "The Great Wave",
+      "Partings", "Udûn", "The Eye", "Alloyed",
+    ],
+    episodeRuntimes: [66, 68, 70, 72, 73, 70, 73, 73],
+  },
+  "rop-s2": {
+    id: "rop-s2",
+    seriesId: "ringsofpower",
+    number: 2,
+    label: "Season 2",
+    episodes: 8,
+    year: 2024,
+    episodeTitles: [
+      "Elven Kings Under the Sky", "Where the Stars Are Strange", "The Eagle and the Sceptre", "Eldest",
+      "Halls of Stone", "Where Is He?", "Doomed to Die", "Shadow and Flame",
+    ],
+    episodeRuntimes: [77, 63, 67, 66, 62, 64, 73, 74],
+  },
+  // Season 3 (premieres Nov 11, 2026) is deliberately NOT in this dataset
+  // - removed on explicit user request ("ještě nevznikla", it doesn't
+  // exist yet) even though it has a confirmed date/episode count. This is
+  // a stricter standard than TBBT's own stuart-s1 (real, dated, unaired
+  // episodes included there) - the user drew the line differently for
+  // this franchise, so don't re-add rop-s3 just because a date exists;
+  // wait until the season has actually aired.
+};
+
+const ORDERINGS_LOTR = [
+  {
+    id: "chronological",
+    label: "Chronological",
+    description: "Ideal if you're already familiar with the Middle-Earth and want to experience every event in exact chronological sequence.",
+    eras: [
+      {
+        id: "second-age",
+        label: "The Second Age",
+        // rop-s1/s2 share one seriesId and sit consecutively, so
+        // groupEraItems() (app.js) merges them into ONE card, same as
+        // Loki's own two seasons under Marvel's Chronological - a single
+        // "Second Age" band is enough for the whole merged card, not one
+        // per season. (Season 3 is deliberately not in this dataset yet -
+        // see SEASONS_LOTR's own comment.)
+        //   No specific Second Age year is given - Amazon's own show
+        // deliberately compresses/rearranges the book's several-thousand-
+        // year Second Age timeline for drama, and there's no single
+        // official year for "when Season 1 happens" the way there is a
+        // real Third Age year for the Hobbit/LOTR films below - stating
+        // one here would be presenting a fan estimate as sourced fact.
+        itemIds: ["rop-s1", "rop-s2"],
+        yearBands: [{ label: "Second Age", span: 1 }],
+      },
+      {
+        id: "third-age",
+        label: "The Third Age",
+        // ~180 in-universe years pass between the Rings of Power's own
+        // Second Age and Helm Hammerhand's war (TA 2758-2759) - real gap,
+        // not just a flavor note, so this era gets gapBefore same as Star
+        // Wars' own big in-universe jumps do.
+        gapBefore: true,
+        // warofrohirrim (TA 2758-2759) sits a further ~180 years before
+        // Bilbo's own adventure (TA 2941) - a big in-universe jump same
+        // in kind as the era-level gapBefore above, but this one falls
+        // INSIDE this era rather than at its boundary, so it uses
+        // cardGapBefore instead (same mechanism ORDERINGS_MARVEL's own
+        // flat Chronological era uses for its own mid-era jumps - see
+        // that file's comment on era.cardGapBefore) - pulls hobbit1
+        // further from its predecessor without needing a whole extra
+        // named era for one film.
+        cardGapBefore: ["hobbit1"],
+        itemIds: ["warofrohirrim", "hobbit1", "hobbit2", "hobbit3", "lotr1", "lotr2", "lotr3"],
+        yearBands: [
+          { label: "TA 2758–2759", span: 1 },
+          { label: "TA 2941", span: 3 },
+          { label: "TA 3018–3019", span: 3 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "release",
+    label: "Release Order",
+    description: "Ideal for your first watch.",
+    // ONE flat era, same "no title bar needed for a single-era mode"
+    // trick every other franchise's own Release Order/flat-Chronological
+    // uses (see Star Wars' Release Order or Marvel's Chronological for
+    // the fullest version of this comment) - label: "" keeps the divider
+    // line with no text fighting the "Release Order" pill for the same
+    // job.
+    eras: [
+      {
+        id: "all",
+        label: "",
+        // warofrohirrim (Dec 2024) sorts strictly by real release date,
+        // landing right after rop-s2 (Aug-Oct 2024) as the sequence's own
+        // last item (rop-s3 isn't in this dataset - see SEASONS_LOTR's own
+        // comment) - rop-s1+rop-s2 still merge into one card (consecutive,
+        // same seriesId), warofrohirrim stays its own separate card right
+        // after. This era renders 8 cards.
+        itemIds: ["lotr1", "lotr2", "lotr3", "hobbit1", "hobbit2", "hobbit3", "rop-s1", "rop-s2", "warofrohirrim"],
+        yearBands: [
+          { label: "2001", span: 1 },
+          { label: "2002", span: 1 },
+          { label: "2003", span: 1 },
+          { label: "2012", span: 1 },
+          { label: "2013", span: 1 },
+          { label: "2014", span: 1 },
+          { label: "2022–2024", span: 1 },
+          { label: "2024", span: 1 },
+        ],
+      },
+    ],
+  },
+];
+
 const FRANCHISE_DATA = {
   starwars: {
     movies: MOVIES_STARWARS,
@@ -3540,6 +3787,19 @@ const FRANCHISE_DATA = {
     // an empty array directly, populateCoreMcuToggle()/
     // populateMultiverseMenu() hide because this dataset has no
     // otherEarth field anywhere in it either.
+    storyLines: [],
+    doomsdayWatchlist: [],
+    coreMcuExclude: [],
+  },
+  lotr: {
+    movies: MOVIES_LOTR,
+    series: SERIES_LOTR,
+    seasons: SEASONS_LOTR,
+    orderings: ORDERINGS_LOTR,
+    // Same "no equivalent concept in this franchise" reasoning as TBBT's
+    // own empty fields right above - no otherEarth content, no personal
+    // story arcs, no real-world marketing watchlist, no production-
+    // company carve-out to make here either.
     storyLines: [],
     doomsdayWatchlist: [],
     coreMcuExclude: [],

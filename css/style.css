@@ -300,6 +300,27 @@
   --accent-ink: #2b0a1f;
 }
 
+/* LOTR indigo/modrofialová - další nová, nikde jinde v paletě nepoužitá
+   barva (SW žlutá, Marvel červená, TBBT růžová, --other-earth rodina
+   fialová/modrá/oranžová/bílá) - schválně bez zelené (Kraj/Shire by se
+   nabízel, ale zelená je napevno vyhrazená pro --done) a schválně odsazená
+   i od --other-earth rodiny (Earth-828 je sytě "čistá" modrá, "Others" je
+   spíš fialová - tahle je mezi nima, blíž půlnoční obloze/Rivendellu než
+   jedné nebo druhé).
+     Rozjasněno z první verze (#8b85e6, kontrast cca 6.3:1 proti --bg) na
+   tenhle jasnější odstín (kontrast cca 7.25:1) na uživatelský požadavek
+   "o něco kontrastnější odstíny, aby obsah byl lépe vidět" - stejná
+   rodina/odstín (~stejný hue), jen o dost líp čitelná na tmavém pozadí,
+   teď na úrovni TBBT po jejím vlastním zesvětlení. --accent-dim odvozen
+   stejným ~56% poměrem, jaký drží každý jiný --accent/--accent-dim pár
+   v týhle paletě (viz TBBT vlastní komentář). */
+:root[data-franchise="lotr"] {
+  --accent: #9791ea;
+  --accent-dim: #555183;
+  --accent-glow: rgba(151, 145, 234, 0.35);
+  --accent-ink: #171340;
+}
+
 * {
   box-sizing: border-box;
 }

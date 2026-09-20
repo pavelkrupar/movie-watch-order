@@ -1964,7 +1964,8 @@
 
   function buildSeasonRowHtml(series, season) {
     const fullyWatched = isSeasonFullyWatched(season);
-    return `<div class="season-row${fullyWatched ? " is-watched" : ""}" data-season-id="${season.id}">${collapsedSeasonRowInnerHtml(series, season)}</div>`;
+    const partiallyWatched = !fullyWatched && hasAnyWatchedEpisode(season);
+    return `<div class="season-row${fullyWatched ? " is-watched" : ""}${partiallyWatched ? " is-partially-watched" : ""}" data-season-id="${season.id}">${collapsedSeasonRowInnerHtml(series, season)}</div>`;
   }
 
   // Just the two collapsed lines - reused both for the initial card build
@@ -2076,7 +2077,7 @@
     rowEl.replaceWith(placeholder);
 
     const fullyWatched = isSeasonFullyWatched(season);
-    rowEl.className = `season-row is-flying${fullyWatched ? " is-watched" : ""}`;
+    rowEl.className = `season-row is-flying${fullyWatched ? " is-watched" : ""}${!fullyWatched && hasAnyWatchedEpisode(season) ? " is-partially-watched" : ""}`;
     rowEl.innerHTML = `
       <button type="button" class="season-row__bulk${fullyWatched ? " is-watched" : ""}" aria-pressed="${fullyWatched}" aria-label="Mark whole ${escapeHtml(seasonDisplayLabel(season))} watched">
         <span class="hover-check" aria-hidden="true">${CHECK_SVG}</span>
@@ -2145,7 +2146,8 @@
     const { card, series, season, rowEl, placeholder, backdrop } = expandedSeason;
 
     rowEl.removeAttribute("style");
-    rowEl.className = `season-row${isSeasonFullyWatched(season) ? " is-watched" : ""}`;
+    const fullyWatchedOnCollapse = isSeasonFullyWatched(season);
+    rowEl.className = `season-row${fullyWatchedOnCollapse ? " is-watched" : ""}${!fullyWatchedOnCollapse && hasAnyWatchedEpisode(season) ? " is-partially-watched" : ""}`;
     rowEl.innerHTML = collapsedSeasonRowInnerHtml(series, season);
     placeholder.replaceWith(rowEl);
     wireCollapsedSeasonRow(card, series, season);
@@ -2220,6 +2222,12 @@
     const rowEl = expandedSeason.rowEl;
     const fullyWatched = isSeasonFullyWatched(season);
     rowEl.classList.toggle("is-watched", fullyWatched);
+    // "Rozkoukaná" (started, not finished) - user-requested distinction
+    // from the full is-watched treatment above, on the SPECIFIC season
+    // row that's in progress, not the whole (possibly multi-season)
+    // card - see .season-row.is-partially-watched's own CSS comment for
+    // the deliberately lighter visual treatment this drives.
+    rowEl.classList.toggle("is-partially-watched", !fullyWatched && hasAnyWatchedEpisode(season));
 
     const bulkBtn = rowEl.querySelector(".season-row__bulk");
     bulkBtn.classList.toggle("is-watched", fullyWatched);
@@ -2650,6 +2658,24 @@
       if (!state.watched.has(episodeId(season, n))) return false;
     }
     return true;
+  }
+
+  // Companion to isSeasonFullyWatched() above - true the moment even ONE
+  // episode is checked, regardless of how many others aren't. Backs the
+  // "partially watched" SEASON ROW treatment (see refreshExpandedRowUI()/
+  // buildSeasonRowHtml()/expandSeasonRow()/collapseExpandedSeason(), all
+  // of which set/restore a season-row's own is-partially-watched class) -
+  // deliberately scoped to the one row that's actually in progress, not
+  // the whole (possibly multi-season) card it lives on, so a single
+  // half-finished season out of a show's seven doesn't make the ENTIRE
+  // merged card read as "in progress" - a season that's merely STARTED,
+  // not finished, same distinction a real watch-order tracker needs
+  // between "untouched" and "in progress".
+  function hasAnyWatchedEpisode(season) {
+    for (let n = 1; n <= season.episodes; n++) {
+      if (state.watched.has(episodeId(season, n))) return true;
+    }
+    return false;
   }
 
   /* ---------------------------------------------------------------- */

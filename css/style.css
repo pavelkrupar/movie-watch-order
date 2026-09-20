@@ -2207,6 +2207,22 @@ body {
   background: rgba(52, 211, 153, 0.22);
 }
 
+/* "Rozkoukaná" (uživatelský požadavek) - aspoň jedna epizoda TÉHLE
+   KONKRÉTNÍ řady odškrtnutá, ale ne celá (hasAnyWatchedEpisode() v
+   app.js, vzájemně vylučující se s is-watched výše) - schválně na úrovni
+   jednotlivé řady, ne celé (často víceřadové) karty seriálu, ať jediná
+   rozkoukaná řada z pěti nedělá dojem, že je rozkoukaný celý seriál.
+   Jen tlumené ohraničení (--done-dim) bez pozadí/barvy textu, které má
+   plnohodnotné is-watched výše - ať je na první pohled jasné, že jde o
+   slabší, "ještě rozdělaný" signál, ne hotovo. Hover na nezhlédnutou řadu
+   (viz .season-row:not(.is-watched) pravidla výš) tohle ohraničení
+   dočasně přebije stejně, jako by přebilo klidovou šedou - žádná zvláštní
+   výjimka pro rozkoukaný stav není potřeba, chová se stejně jako každá
+   jiná ještě nedokončená řada. */
+.season-row.is-partially-watched {
+  border-color: var(--done-dim);
+}
+
 .card__hover-overlay {
   position: absolute;
   inset: 0;

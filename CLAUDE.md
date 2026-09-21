@@ -851,10 +851,35 @@ live-action sitcoms, nothing else), and `FRANCHISE_DATA.tbbt` sets
 those mechanisms has an equivalent concept here, and the same
 empty-array/no-otherEarth-field checks that already hide Multiverse/Core
 MCU/Doomsday/Storylines for Star Wars hide all four for this franchise
-too, automatically. `ORDERINGS_TBBT` has exactly ONE ordering
-("Recommended", one flat era) instead of a Chronological/Release Order
-pair, since there's no in-universe timeline distinct from real release
-order for a franchise with zero speculative-fiction/time-travel content.
+too, automatically. `ORDERINGS_TBBT` originally shipped with exactly ONE
+ordering ("Recommended", one flat era) instead of a Chronological/Release
+Order pair, reasoning there's no in-universe timeline distinct from real
+release order for a franchise with zero speculative-fiction/time-travel
+content - true enough for The Big Bang Theory/Stuart Fails to Save the
+Universe alone (both contemporary-set, no time skips), but not once
+Young Sheldon (a childhood PREQUEL) and Georgie & Mandy's First Marriage
+(picking up right after it) joined the dataset - both take place decades
+before The Big Bang Theory itself despite airing decades later in the
+real world, the same "in-universe order genuinely diverges from release
+order" shape Star Wars/LOTR already have two orderings to capture. A
+later user request ("Vytvoř pro TBBT universe nové řazení 'Chronological'
+a drž běžné principy...") added a real second ordering - see its own
+comment on `ORDERINGS_TBBT` in data.js for the full breakdown and sourcing
+(Young Sheldon's pilot is on-screen-dated to 1989, its finale closes out
+the story in 1993-1994, Georgie & Mandy's own Season 1 covers 1994-1995).
+"Recommended" stays index 0/the default - adding a second ordering doesn't
+change which one a franchise switch (or a fresh page load) lands on.
+Unlike LOTR's own Chronological (two NAMED eras, "The Second Age"/"The
+Third Age", with a real era-level `gapBefore` between them), TBBT's
+Chronological is ONE flat era sharing Recommended's own exact title, "The
+Big Bang Theory Universe" - a first pass here DID split it into two named
+eras at the big Georgie & Mandy -> TBBT jump, but the user preferred one
+continuous axis matching Recommended's own look ("Nech tu jednu velkou
+osu... nerozděluj osu"), so both real in-universe jumps (Georgie & Mandy
+-> TBBT, ~13 years; TBBT -> Stuart, ~7 years) are flagged via
+`cardGapBefore` (per-card spacing within the ONE era) instead of an era
+boundary - same mechanism ORDERINGS_MARVEL's own flat Chronological era
+already uses for its own mid-era jumps.
 Own accent color (`:root[data-franchise="tbbt"]` in style.css - a
 magenta/pink, chosen to sit far from every hue already in use, SW's gold
 and Marvel's red included, and far from `--done`'s green above all;
@@ -950,10 +975,14 @@ Gotcha #11 warns about).
 a real Chronological/Release Order pair.** `FRANCHISE_DATA.lotr` sets
 `storyLines`/`doomsdayWatchlist`/`coreMcuExclude` all to `[]`, same "no
 equivalent concept" reasoning as TBBT, and there's no `otherEarth` content
-either - but unlike TBBT (one flat "Recommended" ordering, since its four
-shows were always going to be watched close to release order anyway),
-LOTR gets the full two-ordering treatment (user request: "vytvoř dva
-způsoby řazení jako je obvyklé u ostatních universů") because its content
+either - but unlike TBBT's OWN state at the time this franchise was added
+(one flat "Recommended" ordering, since its four shows were then still
+believed to always be watched close to release order anyway - a claim
+that stopped holding once Young Sheldon/Georgie & Mandy's own prequel
+content was fully appreciated, see TBBT's own Chronological ordering
+added later, its own comment on `ORDERINGS_TBBT`), LOTR got the full
+two-ordering treatment from the start (user request: "vytvoř dva způsoby
+řazení jako je obvyklé u ostatních universů") because its content
 genuinely does diverge: The Hobbit trilogy is a PREQUEL (in-universe TA
 2941, released 2012-2014) to the LOTR trilogy (TA 3018-3019, released
 2001-2003), and The Rings of Power TV show is set thousands of years

@@ -3946,6 +3946,91 @@ const ORDERINGS_TBBT = [
       },
     ],
   },
+  // Chronological (user request: "Vytvoř pro TBBT universe nové řazení
+  // 'Chronological' a drž běžné principy pro chronologické řazení děje
+  // jako v ostatních universech" - keep the same principles every other
+  // franchise's own Chronological ordering already follows) - added
+  // SECOND, after Recommended, which stays index 0/the default (switching
+  // TO this franchise, or to any other, always resets to ORDERINGS[0] -
+  // see switchFranchise()). Unlike Recommended's own release-date-driven
+  // interleave (co-airing TBBT/Young Sheldon episode blocks in step), this
+  // sorts by real IN-UNIVERSE story time - Young Sheldon (a childhood
+  // prequel) and Georgie & Mandy's First Marriage (picking up right after
+  // it) both take place DECADES before The Big Bang Theory itself, despite
+  // airing decades later in the real world, the same "in-universe order
+  // genuinely diverges from release order" shape that already justifies
+  // Star Wars'/LOTR's own two-ordering pairs - TBBT just needed a second
+  // one added later, once this franchise grew prequel content of its own.
+  //   Real in-universe years below are sourced, not invented: Young
+  // Sheldon's own pilot is explicitly dated on-screen ("Nobody I knew in
+  // East Texas in 1989...") to Fall 1989, and its series finale (Season 7,
+  // 2024) closes out the story in 1993-1994 (George Sr.'s death, long
+  // established in the original Big Bang Theory as happening when Sheldon
+  // was 14); Georgie & Mandy's First Marriage begins explicitly "a few
+  // months" after that finale, its own Season 1 covering 1994-1995 (widely
+  // reported at release, e.g. by Collider/ScreenRant's own "where does
+  // this fit in the timeline" pieces). The Big Bang Theory itself and
+  // Stuart Fails to Save the Universe have no in-universe date distinct
+  // from their own real-world setting (contemporary sitcoms, not period
+  // pieces) - TBBT's 2007-2019 span is simply its real release years, and
+  // Stuart (2026-) is confirmed to take place AFTER The Big Bang Theory's
+  // own finale, with no other specific year given, so it's placed at its
+  // own plain real year too, same "no confirmed distinct date, don't
+  // invent one" rule this file applies everywhere else (e.g. Star Wars'
+  // own contemporary-set otherEarth-free content).
+  {
+    id: "chronological",
+    label: "Chronological",
+    labelCs: "Chronologicky",
+    description: "Ideal if you're already familiar with the franchise and want to experience every event in exact chronological sequence.",
+    descriptionCs: "Ideální, pokud už znáte tento vesmír a chcete zažít každou událost v přesném chronologickém pořadí.",
+    eras: [
+      {
+        // ONE flat era, same title as Recommended's own single era
+        // (explicit user request: "Nech tu jednu velkou osu 'VESMÍR
+        // TEORIE VELKÉHO TŘESKU' jako v recommended pořadí, nerozděluj
+        // osu" - keep one single axis, don't split it) - an earlier pass
+        // here split this into two named eras ("Before the Big Bang" /
+        // "The Big Bang Theory Universe") at the real ~13-year in-universe
+        // jump between Georgie & Mandy and TBBT, mirroring LOTR's own
+        // Second Age -> Third Age boundary; the user preferred this
+        // franchise keep its one-continuous-axis look instead, matching
+        // Recommended. Both real in-universe jumps (Georgie & Mandy 1995
+        // -> TBBT 2007, ~13 years; TBBT 2019 -> Stuart 2026, ~7 years) are
+        // still flagged, just via `cardGapBefore` (per-card, same
+        // mechanism ORDERINGS_MARVEL's own flat Chronological era and
+        // LOTR's Third Age use for a jump that doesn't get a whole new
+        // named era) instead of an era-level `gapBefore`.
+        id: "all",
+        label: "The Big Bang Theory Universe",
+        labelCs: "Vesmír Teorie velkého třesku",
+        // ys-s1..ys-s7 merge into ONE card (same seriesId, consecutive),
+        // then gm-s1/gm-s2 merge into a second card, tbbt-s1..s12 merge
+        // into a third, stuart-s1 stays its own fourth card - four cards
+        // total, same as the two-era version, just under one shared title
+        // bar instead of two.
+        cardGapBefore: ["tbbt-s1", "stuart-s1"],
+        itemIds: [
+          "ys-s1", "ys-s2", "ys-s3", "ys-s4", "ys-s5", "ys-s6", "ys-s7",
+          "gm-s1", "gm-s2",
+          "tbbt-s1", "tbbt-s2", "tbbt-s3", "tbbt-s4", "tbbt-s5", "tbbt-s6", "tbbt-s7", "tbbt-s8", "tbbt-s9", "tbbt-s10",
+          "tbbt-s11", "tbbt-s12",
+          "stuart-s1",
+        ],
+        // Real in-universe years, sourced not invented - see this
+        // ordering's own top comment above for the sourcing (Young
+        // Sheldon's on-screen 1989 pilot date/1993-1994 finale, Georgie &
+        // Mandy's own 1994-1995 Season 1, TBBT/Stuart's real release years
+        // standing in for their own in-universe dates).
+        yearBands: [
+          { label: "1989–1994", span: 1 },
+          { label: "1994–1995", span: 1 },
+          { label: "2007–2019", span: 1 },
+          { label: "2026", span: 1 },
+        ],
+      },
+    ],
+  },
 ];
 
 // -----------------------------------------------------------------------

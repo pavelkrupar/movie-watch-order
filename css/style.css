@@ -396,6 +396,80 @@ body {
   z-index: 3;
 }
 
+/* Přepínač jazyka - PŮVODNĚ position: absolute přímo na .site-header, ať
+   sedí v doslovném rohu STRÁNKY bez ohledu na to, jak široký je
+   .site-header__inner's vlastní vycentrovaný 1300px sloupec na širokém
+   monitoru. To se ale ukázalo jako špatný kompromis (uživatelský
+   požadavek: "je stále zbytečně velká mezera mezi přepínačem jazyků a
+   tím prostorem počítající počty zhlédnutí... zároveň někdy se to
+   překrývá") - na širokém monitoru vznikala zbytečná mezera mezi
+   přepínačem (u okraje STRÁNKY) a .progress-group (u okraje ZÚŽENÉHO
+   vycentrovaného sloupce), zatímco na užších šířkách, kde
+   .site-header__inner vyplňuje celou šířku, se oba prvky naopak
+   překrývaly (oba mířily do stejného pravého horního rohu). Řešení:
+   místo vlastní position: absolute je teď .lang-switch normální poslední
+   flex položka uvnitř .site-header__inner (viz index.html) - `gap` z
+   .site-header__inner mezi ním a .progress-group platí automaticky a
+   stejně na libovolné šířce, žádné manuální odhadování mezery, žádné
+   riziko překryvu. */
+/* Tlačítka pod sebou (ne vedle sebe), aby přepínač zabíral co nejméně
+   místa (uživatelský požadavek) - svislý sloupec je o dost užší než
+   vodorovná dvojice. */
+.lang-switch {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 0 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.lang-switch__btn {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.lang-switch__btn:hover {
+  color: var(--text);
+}
+
+/* CS je pro Star Wars/Marvel zakázané tlačítko (zatím pro ně neexistují
+   žádná česká data, viz franchiseHasCzech()/enforceLanguageAvailability()
+   v app.js), ne jen vizuálně ztlumené - stejný "cursor + nižší opacity"
+   jazyk jako .multiverse-menu__option:has(input:disabled) výš. */
+.lang-switch__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.lang-switch__btn:disabled:hover {
+  color: var(--text-dim);
+}
+
+/* Aktivní jazyk dostává plné akcentové pozadí - stejný "vyplněná pilulka"
+   jazyk jako .order-switch__btn[aria-selected="true"], jen tady řízené
+   přímo přes aria-pressed (přepínač jazyka je binární on/off pár tlačítek,
+   ne skupina karet jako u řazení). */
+.lang-switch__btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.lang-switch__btn[aria-pressed="true"]:hover {
+  color: var(--accent-ink);
+}
+
 .site-header__inner {
   max-width: 1300px;
   margin: 0 auto;

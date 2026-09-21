@@ -1629,6 +1629,173 @@ with a title's own "importance", biggest to smallest:
   "broken image" rather than as part of this app; reusing the site's own
   icon language fixed that.
 
+**EN/CS language switch - a data-driven translation layer, not a UI-string
+dictionary.** Two plain buttons sitting in the header's top-right area, as
+the last flex child of `.site-header__inner` right after `.progress-group`
+(see the "moved from `position: absolute`" bullet further below for why
+it's a normal flex item now, not pinned to the page's own literal corner).
+Stacked VERTICALLY (`flex-direction: column`), not side by side - a user
+request to shrink the control's footprint; two buttons stacked take
+roughly half the horizontal space a side-by-side pair would. `state.language`
+("en"/"cs", persisted, never reset by
+`switchFranchise()` - a language choice isn't tied to whichever franchise
+is active). `loc(en, cs)` (app.js) is the ONE function that decides which
+string shows, called from every render site that reads a movie/series/
+episode title or a season/ordering/era label/description -
+`buildCard()`/`buildSeriesCard()` (including the `aria-label`s and
+`minWidthForTwoLineTitle()`'s own measurement, so a Czech title's real
+wrap width is what actually gets measured, not the English one),
+`seasonDisplayLabel()`, `buildEpisodePillsHtml()` (per-episode, see
+below), `buildFranchiseSelect()`/`updateFranchiseSelectUI()`,
+`buildOrderSwitch()`/`updateOrderingDescription()`, and `render()`'s own
+era title/description rendering. Falls back to the English field whenever
+no Czech one exists - true for Star Wars/Marvel (neither has any Czech
+data at all) and true per-EPISODE/per-band for any entry that doesn't have
+a verified Czech value yet even within TBBT/LOTR (the two franchises that
+DO have Czech data, see below) - so nothing needed its own "do I have a
+translation" branch anywhere, same "degrade gracefully when the richer
+data isn't there" pattern already established for `episodeRuntimes`/
+`extendedRuntimeMin`.
+  Deliberately data-only, not a real i18n system (user request: "začni
+zatím pouze s universe Teorie velkého třesku, zbytek webu zatím
+nepřekládej") - only `title`/`label`/`description` fields on
+`MOVIES`/`SERIES`/`SEASONS`/`ORDERINGS`/era objects/`FRANCHISES`, plus
+per-episode `episodeTitles` (see below), can carry an optional `*Cs`
+counterpart (`titleCs`/`labelCs`/`descriptionCs`/`episodeTitlesCs`) that
+`loc()` reads. Plain UI CHROME - the "Watch Order" page title, generic
+"Movie"/"Series"/"Short" badge fallback text, progress-bar wording, every
+header checkbox/button's own label - is hardcoded English in
+index.html/app.js and stays that way regardless of this switch; building
+a real UI-string dictionary for that was explicitly out of scope for
+introducing the switch itself.
+  **Every `titleCs`/`episodeTitlesCs` value in this file is a REAL,
+verified Czech dub/broadcast title, not a translation invented for this
+project** - a follow-up user request ("Ověř, jak se jednotlivé tituly
+SKUTEČNĚ jmenují v češtině... Doplň i český překlad jednotlivých
+epizod") specifically asked for this after the switch's first pass had
+shipped with project-authored literal translations for three of the four
+shows' own titles (only "Teorie velkého třesku" happened to already be
+correct) and no episode-level Czech at all. Verified against ČSFD.cz,
+Czech Wikipedia's own episode-list tables, SerialZone.cz, dabingforum.cz
+(the Czech dubbing community's own forum) and, for the two newer HBO Max
+shows, HBO Max CZ's own listing directly - never invented/translated
+on the fly, same "verify, don't invent" discipline this file already
+applies to English episode titles/runtimes. Two real titles turned out to
+meaningfully differ from the project's own earlier guesses: Young
+Sheldon's real Czech title is **"Malý Sheldon"** ("Little/Small Sheldon"),
+not "Mladý Sheldon" ("Young Sheldon" word-for-word) as an earlier pass
+here had assumed; Georgie & Mandy's First Marriage's real Czech title is
+**"Georgie a Mandy: Poprvé svoji"**, not the project's own literal
+"Georgieho a Mandyino první manželství"; Stuart Fails to Save the
+Universe's real Czech title is **"Jak Stuart nezachránil vesmír"** (note
+the added "Jak"/"How" and past tense), not the project's own "Stuart
+nezachrání vesmír".
+  All 279 TBBT + 141 Young Sheldon + 44 Georgie & Mandy + 10 Stuart
+episode titles have a matching `episodeTitlesCs` entry on their season's
+`episodeTitles` array (same index, `buildEpisodePillsHtml()` looks both up
+by the same loop position) - EXCEPT Georgie & Mandy season 2's episodes
+14-16, left as `null` in that slot: as of this verification pass, neither
+HBO Max CZ nor ČSFD had a real Czech title recorded for those three yet
+(the season's other 19 episodes are fully titled - an indexing/
+localization lag, not evidence those three episodes aren't dubbed).
+`loc()` already treats a falsy Czech value as "no translation" and falls
+back to English, so this needed no special-casing - same mechanism a
+missing `titleCs` at the show level already uses. A slice season
+(`tbbt-s11a` etc.) carries its own `episodeTitlesCs` subset, matching how
+its `episodeTitles` (English) is already duplicated rather than derived
+from the parent - see "Season slices" above.
+  **The timeline's own date text and the header's two "Watched" progress
+labels are localized too** (user request: "přelož i texty na časové ose
+(např. Fall -> Podzim) + popisky... počítadla počtu zhlédnutých titulů a
+času") - the one deliberate expansion of this switch's scope past pure
+per-franchise `MOVIES`/`SERIES`/`SEASONS`/`ORDERINGS` data. `yearBands`
+entries (`ORDERINGS_TBBT`, data.js) carry an optional `labelCs` the same
+way any other label does, read via `loc(band.label, band.labelCs)` where
+`render()` builds `yearBandEntries` (app.js) - only entries whose English
+text contains a season-name word ("Fall"/"Winter"/"Spring"/"May") actually
+need one; a band that's already just digits ("2024–2026") has nothing to
+translate, so it's left without a `labelCs` and falls back exactly like
+any other missing `*Cs` field. The two progress-bar labels ("Watched" -
+`#progressLabelUnits`/`#progressLabelRuntime`, index.html) are genuine UI
+chrome, not data - `updateProgress()` (app.js) sets their text via
+`loc("Watched", "Zhlédnuto")` on every call (so a language switch, which
+already triggers a `render()` -> `updateProgress()` pass, updates them for
+free) rather than leaving them hardcoded in index.html the way the REST of
+this app's UI chrome (badges, page title, header checkbox labels)
+deliberately still is - a narrow, explicitly-requested exception, not a
+signal that UI-chrome translation is now in scope generally.
+  **The language switch moved from `position: absolute` in `.site-header`'s
+own literal top-right corner to an ordinary last flex child of
+`.site-header__inner`, right after `.progress-group`** (user request: "je
+stále zbytečně velká mezera mezi přepínačem jazyků a tím prostorem
+počítající počty zhlédnutí... zároveň někdy se to překrývá") - the
+original "literal page corner" positioning actively caused both bugs it
+was reported for: on a wide monitor, `.site-header__inner`'s own centered
+1300px column left the switch (pinned to the true page edge) visibly far
+from `.progress-group` (pinned to the narrower column's own edge); on a
+narrower viewport, where `.site-header__inner` fills the full width, the
+two competed for the exact same corner and overlapped instead. Making
+`.lang-switch` a normal flex item lets `.site-header__inner`'s own `gap`
+(28px) space it from `.progress-group` automatically, identically at every
+width - no more manual corner math, no overlap possible. `.lang-switch`
+itself no longer needs `position`/`top`/`right`/its own `z-index` at all;
+it's back to being just another flex child like `.brand`/`.controls`/
+`.progress-group`.
+  **The Lord of the Rings got the same treatment "analogicky" (user
+request) as TBBT's own pass, second franchise to have any Czech data at
+all.** Same real-source-verified standard throughout (`titleCs` on every
+`MOVIES_LOTR`/`SERIES_LOTR` entry, `labelCs` on `SEASONS_LOTR`/
+`ORDERINGS_LOTR`/its eras/`FRANCHISES`, `episodeTitlesCs` on both Rings of
+Power seasons - all against ČSFD.cz/Czech Wikipedia/Prime Video CZ, never
+invented) - see `MOVIES_LOTR`'s own comment in data.js for the full
+source rundown. Two real titles came back meaningfully different from a
+plain word-for-word guess, confirming the same lesson TBBT's own pass
+already taught: the Hobbit trilogy's Czech distribution title drops one
+"b" (**"Hobit"**, not "Hobbit"), and the LOTR trilogy's own subtitles mix
+grammatical number on purpose - "Pán prstenů: **Společenstvo Prstenu**"
+(genitive singular) for the first film vs. the franchise name/other two
+subtitles all using the plural "**prstenů**" - both confirmed against
+ČSFD exactly as shown, not typos to "fix" into agreement. The Third Age's
+`yearBands` entries ("TA 2758–2759" etc., `ORDERINGS_LOTR`) deliberately
+keep their English "TA" abbreviation even under Czech - research turned up
+real Czech terms for the ages themselves ("Druhý věk"/"Třetí věk", used as
+this franchise's own era `labelCs`) but confirmed no established Czech
+abbreviation analogous to English "SA"/"TA" exists anywhere (checked
+several Czech Tolkien fan sites plus Czech Wikipedia's own "Třetí věk"
+article, which always spells the age out in full rather than
+abbreviating) - inventing one would violate this file's own sourcing
+standard, so those three bands are simply left without a `labelCs` and
+fall back to English, same as any other untranslated value. The Second
+Age era's own single yearBands entry ("Second Age" -> "Druhý věk") stays
+CAPITALIZED, unlike TBBT's own "podzim"/"zima" bands (see the Style
+conventions entry below) - a user correction ("Druhý věk piš takto s
+velkým D, je to název") clarifying that "Druhý věk"/"Třetí věk" are proper
+names for specific ages of Middle-earth, not a plain common noun like a
+season of the year, so the lowercase-common-noun convention doesn't apply
+to them - matches `era.labelCs`'s own capitalized form.
+  **The CS button is a genuinely disabled control (not just a no-op),
+  for whichever franchise has no Czech data at all** - Star Wars/Marvel
+  today (user request: "u Star Wars a Marvelu zatím českou variantu
+  vypni... nepůjde na ní kliknout"). `franchiseHasCzech(franchiseId)`
+  (app.js) reads `franchise.labelCs`'s own presence off `FRANCHISES` -
+  the same signal every other "does this franchise support X" check in
+  this file already reads off `FRANCHISES`/`FRANCHISE_DATA` rather than a
+  separate hardcoded allow-list, so a future franchise's CS button enables
+  itself for free the moment that franchise gets its own `labelCs`, no
+  code change needed. `updateLanguageSwitchUI()` sets real `disabled` on
+  the `<button>` (blocks all interaction, including a synthetic click, not
+  just an early-return in the click handler) whenever the ACTIVE
+  franchise has none; `enforceLanguageAvailability()` wraps that plus a
+  fallback rule - if `state.language` is somehow still `"cs"` when
+  switching to a Czech-less franchise (stale persisted state from before
+  this restriction existed, or from a previous session on a franchise
+  that DID have Czech), it's reset to `"en"` and re-saved, same "reset
+  state that's meaningless for the new franchise" pattern
+  `switchFranchise()` already applies to `orderingId`/`storyLineId`/
+  `enabledEarths` etc. Called from both `buildLanguageSwitch()` (so page
+  load respects whatever franchise was last active) and `switchFranchise()`
+  itself.
+
 ## Gotchas already hit (don't reintroduce)
 
 1. **TDZ crash from `let`/`const` placed near where they're used, not at
@@ -1846,6 +2013,23 @@ with a title's own "importance", biggest to smallest:
   transformation to any NEW movie/series title added later - a title
   added without it will still render fine, just without the same
   protection against an awkward mid-phrase line break.
+- Czech `yearBands` `labelCs` text lowercases a plain common-noun
+  period/season word standing in for a date (user-requested: "česky piš
+  'Podzim', 'Zima' atd. vždy s malými písmeny") - `"podzim 2017"`,
+  `"zima–jaro 2018"`, `"květen 2019"` (TBBT), never capitalized the way
+  the English original ("Fall 2017") is - but this does NOT extend to a
+  word that's a genuine PROPER NAME rather than a common noun, even if it
+  fills the exact same slot: LOTR's "Second Age"/"Third Age" -> "Druhý
+  věk"/"Třetí věk" STAY capitalized in a yearBands `labelCs` too (user
+  correction: "Druhý věk piš takto s velkým D, je to název" - "it's a
+  name"), since Tolkien's Ages of Middle-earth are specific named things,
+  not a generic recurring season the way "podzim"/"zima" are. When adding
+  a new franchise's Czech yearBands text, judge each word on this same
+  distinction rather than applying "lowercase" as a blanket rule - a
+  season/quarter/month is a common noun (lowercase), a proper name for a
+  specific era/epoch/event is not (keep it capitalized, matching whatever
+  case the same name gets as an era `label`/`labelCs` heading elsewhere in
+  that ordering).
 
 ## Commit messages
 

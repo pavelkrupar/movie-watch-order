@@ -62,8 +62,12 @@
 const FRANCHISES = [
   { id: "starwars", label: "Star Wars" },
   { id: "marvel", label: "Marvel" },
-  { id: "tbbt", label: "The Big Bang Theory" },
-  { id: "lotr", label: "The Lord of the Rings" },
+  // labelCs backs the header's EN/CS language switch (see loc() in
+  // app.js) - TBBT was the first franchise to get one; LOTR followed on
+  // an explicit user request to do the same "analogically" (see
+  // MOVIES_LOTR's own comment for the full sourcing rundown).
+  { id: "tbbt", label: "The Big Bang Theory", labelCs: "Teorie velkého třesku" },
+  { id: "lotr", label: "The Lord of the Rings", labelCs: "Pán prstenů" },
 ];
 
 // The "Multiverse" checkbox filter's own buckets (see
@@ -2805,9 +2809,51 @@ const SERIES_TBBT = {
   // untouched, having their own different seriesId. Replaces the neutral
   // "Series" badge text with "TBBT" specifically, same mechanism as
   // movie.badge replacing "Movie" with "Avengers"/"Episode N".
-  tbbt: { id: "tbbt", title: "The Big Bang Theory", badge: "TBBT" },
-  youngsheldon: { id: "youngsheldon", title: "Young Sheldon" },
-  georgieandmandy: { id: "georgieandmandy", title: "Georgie & Mandy's First Marriage" },
+  // titleCs/labelCs/descriptionCs fields throughout this franchise back
+  // the header's own EN/CS language switch (see loc() in app.js) - this
+  // is deliberately the ONLY franchise with any Czech text at all so far
+  // (user request: "začni zatím pouze s universe Teorie velkého třesku,
+  // zbytek webu zatím nepřekládej") - loc() falls back to the plain
+  // English field whenever a Czech one does not exist, so Star Wars/
+  // Marvel/LOTR (and every UI-chrome string not driven by this data at
+  // all - the "Watch Order" title, generic "Movie"/"Series" badge text,
+  // progress-bar labels, etc.) simply stay English under Czech too,
+  // without needing their own special-casing anywhere.
+  //   Every titleCs below is the REAL official Czech dub/broadcast title
+  // (verified against ČSFD.cz/Czech Wikipedia/SerialZone.cz/dabingforum.cz/
+  // the actual streaming platform carrying the dub - HBO Max CZ for the
+  // two newer shows), not a translation invented for this project - an
+  // earlier pass here had shipped project-authored literal translations
+  // for three of these four ("Mladý Sheldon" for Young Sheldon, "Georgieho
+  // a Mandyino první manželství" for Georgie & Mandy, "Stuart nezachrání
+  // vesmír" for Stuart), since verifying the real ones was out of scope
+  // for introducing the switch itself - a follow-up user request ("Ověř,
+  // jak se jednotlivé tituly SKUTEČNĚ jmenují v češtině") asked for those
+  // to be checked against real sources instead, which turned up
+  // meaningfully different real titles for all three (see each entry's
+  // own comment below) - only "Teorie velkého třesku" was already correct.
+  //   Individual EPISODE titles (episodeTitlesCs on SEASONS_TBBT entries)
+  // are verified the same real-source way - loc() falls back to the
+  // English title for any episode that doesn't have one yet, so a
+  // partially-filled season reads as "not yet translated", never as
+  // broken/missing.
+  tbbt: { id: "tbbt", title: "The Big Bang Theory", titleCs: "Teorie velkého třesku", badge: "TBBT" },
+  // titleCs corrected from the project's own earlier literal-translation
+  // guess ("Mladý Sheldon") to the real Czech dub title, "Malý Sheldon"
+  // ("Little/Small Sheldon", not "Young Sheldon" word-for-word) -
+  // confirmed across ČSFD.cz, Czech Wikipedia, SerialZone.cz, Edna.cz and
+  // Kinobox.cz, all agreeing on "Malý Sheldon" and none using "Mladý
+  // Sheldon".
+  youngsheldon: { id: "youngsheldon", title: "Young Sheldon", titleCs: "Malý Sheldon" },
+  // titleCs verified against the real Czech HBO Max dub/title (ČSFD,
+  // FDb.cz, HBO Max CZ itself, dabingforum.cz all agree) - "Georgie a
+  // Mandy: Poprvé svoji", not the project's own earlier literal-
+  // translation guess ("Georgieho a Mandyino první manželství").
+  georgieandmandy: {
+    id: "georgieandmandy",
+    title: "Georgie & Mandy's First Marriage",
+    titleCs: "Georgie a Mandy: Poprvé svoji",
+  },
   // The franchise's second direct spin-off (after Young Sheldon) - HBO
   // Max, premiered July 23, 2026, Kevin Sussman reprising Stuart Bloom.
   // Its own premise sends Stuart bouncing across alternate universes after
@@ -2820,7 +2866,11 @@ const SERIES_TBBT = {
   // mechanism at all (see FRANCHISE_DATA.tbbt's own comment), and adding
   // one just for this one show's premise would be exactly the kind of
   // machinery TBBT's dataset is deliberately simpler than Marvel's without.
-  stuart: { id: "stuart", title: "Stuart Fails to Save the Universe" },
+    // titleCs verified against the real Czech HBO Max dub/title (Czech
+  // Wikipedia, ČSFD, dabingforum.cz all agree) - "Jak Stuart nezachránil
+  // vesmír", not the project's own earlier guess ("Stuart nezachrání
+  // vesmír") - the real title adds "Jak" ("How") and uses past tense.
+  stuart: { id: "stuart", title: "Stuart Fails to Save the Universe", titleCs: "Jak Stuart nezachránil vesmír" },
 };
 
 // year = the season's real premiere year (drives "Recommended"'s own
@@ -2831,7 +2881,7 @@ const SEASONS_TBBT = {
   // Wikipedia's own per-season episode-list pages, same sourcing standard
   // as tbbt-s11/tbbt-s12/ys-s1/ys-s2 above.
   "tbbt-s1": {
-    id: "tbbt-s1", seriesId: "tbbt", number: 1, label: "Season 1", episodes: 17, year: 2007,
+    id: "tbbt-s1", seriesId: "tbbt", number: 1, label: "Season 1", labelCs: "Řada 1", episodes: 17, year: 2007,
     episodeTitles: [
       "Pilot", "The Big Bran Hypothesis", "The Fuzzy Boots Corollary", "The Luminous Fish Effect",
       "The Hamburger Postulate", "The Middle-earth Paradigm", "The Dumpling Paradox", "The Grasshopper Experiment",
@@ -2839,10 +2889,21 @@ const SEASONS_TBBT = {
       "The Bat Jar Conjecture", "The Nerdvana Annihilation", "The Pork Chop Indeterminacy", "The Peanut Reaction",
       "The Tangerine Factor",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Pilot", "Hypotéza otrubové vlákniny", "Korolár seržanta Sněhulky", "Efekt světélkující rybky",
+      "Hamburgerový postulát", "Paradigma Pána prstenů", "Knedlíčkový paradox", "Koktejlový experiment",
+      "Cooper-Hofstadterova polarizace", "Loobenfeldův rozpad", "Lívancová anomálie", "Jeruzalémská dualita",
+      "Batnádoba a chybný předpoklad", "Zkáza mimoňoráje", "Roštěnkové distribuční dilema", "Reakce na arašídy",
+      "Mandarinkový faktor",
+    ],
     episodeRuntimes: [23, 21, 22, 21, 20, 21, 21, 20, 19, 21, 22, 20, 22, 20, 22, 20, 20],
   },
   "tbbt-s2": {
-    id: "tbbt-s2", seriesId: "tbbt", number: 2, label: "Season 2", episodes: 23, year: 2008,
+    id: "tbbt-s2", seriesId: "tbbt", number: 2, label: "Season 2", labelCs: "Řada 2", episodes: 23, year: 2008,
     episodeTitles: [
       "The Bad Fish Paradigm", "The Codpiece Topology", "The Barbarian Sublimation", "The Griffin Equivalency",
       "The Euclid Alternative", "The Cooper–Nowitzki Theorem", "The Panty Piñata Polarization", "The Lizard–Spock Expansion",
@@ -2851,10 +2912,22 @@ const SEASONS_TBBT = {
       "The Terminator Decoupling", "The Work Song Nanocluster", "The Dead Hooker Juxtaposition", "The Hofstadter Isotope",
       "The Vegas Renormalization", "The Classified Materials Turbulence", "The Monopolar Expedition",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Paradigma zkažené ryby", "Topologie váčkovitého poklopce", "Barbarská sublimace", "Griffinova ekvivalence",
+      "Euklidovská alternativa", "Cooper-Nowitzki teorém", "Polarizace kalhotkové všehochuti", "Rozšíření o tapír-Spock",
+      "Triangulace bílého chřestu", "Záhada s paní Vartabedianovou", "Hypotéza dárkových předmětů do koupele", "Labilita robozabijáka",
+      "Algoritmus přátelství", "Finanční alternativy", "Mateřská kapacita", "Polštářové stigma",
+      "Setkání s Terminátorem", "Produktivní pracovní píseň", "Polohy mrtvé šlapky", "Hofstadterův izotop",
+      "Lasvegaský reset", "Turbulence přísně tajných materiálů", "Expedice na monopól",
+    ],
     episodeRuntimes: [22, 21, 21, 21, 20, 21, 21, 20, 21, 21, 21, 21, 21, 21, 21, 21, 21, 20, 20, 20, 22, 19, 21],
   },
   "tbbt-s3": {
-    id: "tbbt-s3", seriesId: "tbbt", number: 3, label: "Season 3", episodes: 23, year: 2009,
+    id: "tbbt-s3", seriesId: "tbbt", number: 3, label: "Season 3", labelCs: "Řada 3", episodes: 23, year: 2009,
     episodeTitles: [
       "The Electric Can Opener Fluctuation", "The Jiminy Conjecture", "The Gothowitz Deviation", "The Pirate Solution",
       "The Creepy Candy Coating Corollary", "The Cornhusker Vortex", "The Guitarist Amplification", "The Adhesive Duck Deficiency",
@@ -2863,10 +2936,22 @@ const SEASONS_TBBT = {
       "The Precious Fragmentation", "The Pants Alternative", "The Wheaton Recurrence", "The Spaghetti Catalyst",
       "The Plimpton Stimulation", "The Staircase Implementation", "The Lunar Excitation",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Fluktuace elektrického otvíráku na konzervy", "Spor o cvrčka", "Gothowitzova deviace", "Řešení po pirátsku",
+      "Korolár hrůzostrašné polevy", "Fotbalový klam", "Zesílené vzpomínky", "Deficit lepících kachen",
+      "Formulace odplaty", "Experiment Gorila", "Mateřská shoda", "Okultní klamy",
+      "Bozemská reakce", "Einsteinova aproximace", "Centrální urychlovač částic", "Kauza Excelsior",
+      "Porcování miláška", "Alternativní sundavání kalhot", "Wheatonova repríza", "Špagetový katalyzátor",
+      "Plimptonovská stimulace", "Upotřebení schodiště", "Lunární excitace",
+    ],
     episodeRuntimes: [22, 21, 20, 21, 21, 20, 19, 21, 19, 21, 20, 19, 20, 19, 21, 21, 20, 21, 21, 20, 21, 20, 20],
   },
   "tbbt-s4": {
-    id: "tbbt-s4", seriesId: "tbbt", number: 4, label: "Season 4", episodes: 24, year: 2010,
+    id: "tbbt-s4", seriesId: "tbbt", number: 4, label: "Season 4", labelCs: "Řada 4", episodes: 24, year: 2010,
     episodeTitles: [
       "The Robotic Manipulation", "The Cruciferous Vegetable Amplification", "The Zazzy Substitution", "The Hot Troll Deviation",
       "The Desperation Emanation", "The Irish Pub Formulation", "The Apology Insufficiency", "The 21-Second Excitation",
@@ -2875,10 +2960,22 @@ const SEASONS_TBBT = {
       "The Toast Derivation", "The Prestidigitation Approximation", "The Zarnecki Incursion", "The Herb Garden Germination",
       "The Agreement Dissection", "The Wildebeest Implementation", "The Engagement Reaction", "The Roommate Transmogrification",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Robotická manipulace", "Obohacení košťálovou zeleninou", "Substituce domácím mazlíčkem", "Kyber-sexuální deviace",
+      "Feromonový zápach zoufalství", "Alibi z Irské hospody", "Nedostatečnost omluvy", "Jednadvacetisekundové vzrušení",
+      "Komplikovanost vztahů", "Hypotéza o cizím parazitovi", "Rekombinace Ligy spravedlnosti", "Využití kalhot do autobusu",
+      "Obstrukce v autě lásky", "Genialita uspávače hadů", "Úterý smažených nočků", "Jak je důležité míti Sheldona",
+      "Archimedův princip", "Axiom karetního triku", "Útok hackera Zarneckiho", "Kontrolní drb o okrasné zahradě",
+      "Anulování Dohody spolubydlících", "Operace pakůň", "Zásnubní reakce", "Výměna spolubydlících",
+    ],
     episodeRuntimes: [21, 21, 21, 20, 21, 22, 21, 19, 21, 20, 20, 21, 21, 21, 20, 20, 21, 21, 21, 21, 21, 21, 20, 21],
   },
   "tbbt-s5": {
-    id: "tbbt-s5", seriesId: "tbbt", number: 5, label: "Season 5", episodes: 24, year: 2011,
+    id: "tbbt-s5", seriesId: "tbbt", number: 5, label: "Season 5", labelCs: "Řada 5", episodes: 24, year: 2011,
     episodeTitles: [
       "The Skank Reflex Analysis", "The Infestation Hypothesis", "The Pulled Groin Extrapolation", "The Wiggly Finger Catalyst",
       "The Russian Rocket Reaction", "The Rhinitis Revelation", "The Good Guy Fluctuation", "The Isolation Permutation",
@@ -2887,10 +2984,22 @@ const SEASONS_TBBT = {
       "The Rothman Disintegration", "The Werewolf Transformation", "The Weekend Vortex", "The Transporter Malfunction",
       "The Hawking Excitation", "The Stag Convergence", "The Launch Acceleration", "The Countdown Reflection",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Analýza děvkovského reflexu", "Hypotéza o zamoření škůdci", "Misinterpretace namožených slabin", "Relativita triviálních rozhodnutí",
+      "Variace na Schrödingerovu kočku", "Symptomy běžného nachlazení", "Fluktuace dobráctví", "Selekce hlavní družičky",
+      "Rozptýlení ornitofobie", "Rozšíření Válečníků z Ka'a", "Speckermanova repríza", "Finta se třpytivou cetkou",
+      "Hypotéza rekombinace", "Zasvěcení do beta testování", "Následky hypotetické katastrofy", "Tip na dovolenou",
+      "Rothmanova degenerace", "Sheldonova teorie chaosu", "Víkendová vřava", "Porucha transportéru",
+      "Hawkingova excitace", "Rozlučkové fiasko", "Akcelerace startu", "Reflexe odpočtu",
+    ],
     episodeRuntimes: [21, 20, 20, 20, 21, 21, 20, 21, 21, 21, 20, 21, 21, 20, 20, 21, 21, 21, 20, 21, 19, 21, 21, 20],
   },
   "tbbt-s6": {
-    id: "tbbt-s6", seriesId: "tbbt", number: 6, label: "Season 6", episodes: 24, year: 2012,
+    id: "tbbt-s6", seriesId: "tbbt", number: 6, label: "Season 6", labelCs: "Řada 6", episodes: 24, year: 2012,
     episodeTitles: [
       "The Date Night Variable", "The Decoupling Fluctuation", "The Higgs Boson Observation", "The Re-Entry Minimization",
       "The Holographic Excitation", "The Extract Obliteration", "The Habitation Configuration", "The 43 Peculiarity",
@@ -2899,10 +3008,22 @@ const SEASONS_TBBT = {
       "The Monster Isolation", "The Contractual Obligation Implementation", "The Closet Reconfiguration", "The Tenure Turbulence",
       "The Closure Alternative", "The Proton Resurgence", "The Love Spell Potential", "The Bon Voyage Reaction",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Variabilita večera ve dvou", "Potenciální možnost rozchodu", "Poznatek o Higgsově bosonu", "Minimalizace dopadu návratu",
+      "Holografická stimulace", "Výmaz pasáže", "Párové dilema", "Záhada čísla 43",
+      "Konflikt s parkovacím místem", "Technika vykuchání ryby", "Vánoční deziluze", "Metafora o vaječném sendviči",
+      "Expedice do Bakersfieldu", "Kripke-Cooperova inverze", "Kritické dopady vyzrazení zápletky", "Nesporný důkaz náklonnosti",
+      "Vytěsnění monstra", "Implementace smluvního závazku", "Přeorganizování kumbálu", "Rozepře o definitivu",
+      "Alternativa zakončení", "Experimenty s Protonem", "Potenciál kouzla lásky", "Reakce na bon voyage",
+    ],
     episodeRuntimes: [21, 21, 19, 21, 21, 21, 21, 21, 20, 21, 21, 21, 21, 20, 21, 21, 19, 20, 20, 19, 20, 21, 21, 20],
   },
   "tbbt-s7": {
-    id: "tbbt-s7", seriesId: "tbbt", number: 7, label: "Season 7", episodes: 24, year: 2013,
+    id: "tbbt-s7", seriesId: "tbbt", number: 7, label: "Season 7", labelCs: "Řada 7", episodes: 24, year: 2013,
     episodeTitles: [
       "The Hofstadter Insufficiency", "The Deception Verification", "The Scavenger Vortex", "The Raiders Minimization",
       "The Workplace Proximity", "The Romance Resonance", "The Proton Displacement", "The Itchy Brain Simulation",
@@ -2911,10 +3032,22 @@ const SEASONS_TBBT = {
       "The Friendship Turbulence", "The Mommy Observation", "The Indecision Amalgamation", "The Relationship Diremption",
       "The Anything Can Happen Recurrence", "The Proton Transmogrification", "The Gorilla Dissolution", "The Status Quo Combustion",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Důsledek absence Hofstadtera", "Verifikace podvodu", "Egoismus lovce pokladů", "Minimalizace Dobyvatelů",
+      "Proximita pracoviště", "Ozvěny romance", "Výměna protonů", "Simulace svědění mozku",
+      "Anulace na Den díkůvzdání", "Vyvrácení existence objevu", "Cooperova extrakce", "Následek zaváhání",
+      "Rekalibrace zaměstnání", "Nejasnost s konferencí", "Manipulace lokomotivou", "Manipulace jídelním stolem",
+      "Turbulence přátelství", "Choulostivý moment překvapení", "Rozhodovací martyrium", "Tristní rozpad vztahu",
+      "Tradice nepředvídatelných čtvrtků", "Rozjímání s Protonem", "Gorilí exces", "Porušení statu quo",
+    ],
     episodeRuntimes: [21, 21, 21, 21, 19, 21, 20, 20, 19, 19, 21, 21, 20, 21, 20, 20, 19, 21, 19, 21, 19, 21, 19, 21],
   },
   "tbbt-s8": {
-    id: "tbbt-s8", seriesId: "tbbt", number: 8, label: "Season 8", episodes: 24, year: 2014,
+    id: "tbbt-s8", seriesId: "tbbt", number: 8, label: "Season 8", labelCs: "Řada 8", episodes: 24, year: 2014,
     episodeTitles: [
       "The Locomotion Interruption", "The Junior Professor Solution", "The First Pitch Insufficiency", "The Hook-Up Reverberation",
       "The Focus Attenuation", "The Expedition Approximation", "The Misinterpretation Agitation", "The Prom Equivalency",
@@ -2923,10 +3056,22 @@ const SEASONS_TBBT = {
       "The Colonization Application", "The Leftover Thermalization", "The Skywalker Incursion", "The Fortification Implementation",
       "The Communication Deterioration", "The Graduation Transmission", "The Maternal Combustion", "The Commitment Determination",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Loupež ve spacím kupé", "Naschvály odborného asistenta", "Nedostatečnost baseballové průpravy", "Fabulace o postelovém úletu",
+      "Mučivé metody soustředění", "Simulace důlní expedice", "Mylný výklad obchodní taktiky", "Kompenzace maturitního plesu",
+      "Korekce nosní přepážky", "Reflexe na základě šampaňského", "Infiltrace sterilní místnosti", "Dezintegrace vesmírné sondy",
+      "Optimalizace úzkosti", "Kritika internetového anonyma", "Renovace obchodu s komiksy", "Akcelerace náklonnosti",
+      "Přihláška na kolonizaci", "Křivda kvůli autorství", "Vpád na Skywalkerův ranč", "Realizace bunkru",
+      "Rozkol v komunikaci", "Improvizace se slavnostním projevem", "Koncepce mateřské přízně", "Razantní přerod vztahu",
+    ],
     episodeRuntimes: [21, 20, 19, 19, 19, 21, 20, 20, 20, 19, 19, 20, 20, 21, 20, 20, 20, 19, 21, 20, 19, 19, 19, 20],
   },
   "tbbt-s9": {
-    id: "tbbt-s9", seriesId: "tbbt", number: 9, label: "Season 9", episodes: 24, year: 2015,
+    id: "tbbt-s9", seriesId: "tbbt", number: 9, label: "Season 9", labelCs: "Řada 9", episodes: 24, year: 2015,
     episodeTitles: [
       "The Matrimonial Momentum", "The Separation Oscillation", "The Bachelor Party Corrosion", "The 2003 Approximation",
       "The Perspiration Implementation", "The Helium Insufficiency", "The Spock Resonance", "The Mystery Date Observation",
@@ -2935,10 +3080,22 @@ const SEASONS_TBBT = {
       "The Celebration Experimentation", "The Application Deterioration", "The Solder Excursion Diversion", "The Big Bear Precipitation",
       "The Viewing Party Combustion", "The Fermentation Bifurcation", "The Line Substitution Solution", "The Convergence Convergence",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Raketový nástup pomanželské krize", "Oscilace kolem rozchodů", "Selhání vědeckých principů", "Aproximace roku 2003",
+      "Zvyšování tělesné kondice", "Machinace s heliem", "Dozvuky Spocka", "Šmírování tajemného rande",
+      "Vystřídání partnerských rolí", "Kompenzace zhrzenosti", "Očekávání premiérové noci", "Transformace obchodní schůzky",
+      "Svérázné projevy empatie", "Přitransportování babči", "Valentýnské extempore", "Negativní reakce na pozitivní test",
+      "Experimentování s oslavou", "Rozčarování z patentové smlouvy", "Zmaření plánované pomsty", "Paralely slzavých údolí",
+      "Úskalí sendviče na party", "Nástrahy degustace", "Protest proti předbíhání ve frontě", "Scestný záchvat paranoie",
+    ],
     episodeRuntimes: [19, 19, 19, 19, 19, 19, 19, 18, 21, 21, 21, 18, 19, 19, 20, 19, 19, 18, 21, 19, 18, 20, 18, 20],
   },
   "tbbt-s10": {
-    id: "tbbt-s10", seriesId: "tbbt", number: 10, label: "Season 10", episodes: 24, year: 2016,
+    id: "tbbt-s10", seriesId: "tbbt", number: 10, label: "Season 10", labelCs: "Řada 10", episodes: 24, year: 2016,
     episodeTitles: [
       "The Conjugal Conjecture", "The Military Miniaturization", "The Dependence Transcendence", "The Cohabitation Experimentation",
       "The Hot Tub Contamination", "The Fetal Kick Catalyst", "The Veracity Elasticity", "The Brain Bowl Incubation",
@@ -2946,6 +3103,18 @@ const SEASONS_TBBT = {
       "The Romance Recalibration", "The Emotion Detection Automation", "The Locomotion Reverberation", "The Allowance Evaporation",
       "The Comic-Con Conundrum", "The Escape Hatch Identification", "The Collaboration Fluctuation", "The Recollection Dissipation",
       "The Separation Agitation", "The Cognition Regeneration", "The Gyroscopic Collapse", "The Long Distance Dissonance",
+    ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Sonda do rodinných vazeb", "Miniaturizace po vojensku", "Pseudoproblém se závislostí", "Experimentování se soužitím",
+      "Kontaminace vířivky", "Fetální kopnutí", "Aspekty pravdomluvnosti", "Inkubace mozkových buněk",
+      "Zneuznaný génius", "Šachování se společným majetkem", "Synchronicita narozenin", "Resumé vánočních svátků",
+      "Reorganizace vztahu", "Prototyp emočního detektoru", "Další manipulace lokomotivou", "Sublimace kapesného",
+      "Šaráda s Comic-Conem", "Metafora s únikovým východem", "Fluktuace spolupráce", "Bezprecedentní ztráta paměti",
+      "Frustrace z odloučení", "Akceptace nezdolatelné výzvy", "Konfiskace z přísně tajných důvodů", "Rizika vztahů na dálku",
     ],
     episodeRuntimes: [22, 19, 20, 20, 20, 18, 21, 19, 19, 20, 20, 21, 19, 19, 20, 18, 19, 20, 18, 19, 20, 20, 19, 19],
   },
@@ -2961,7 +3130,7 @@ const SEASONS_TBBT = {
     id: "tbbt-s11",
     seriesId: "tbbt",
     number: 11,
-    label: "Season 11",
+    label: "Season 11", labelCs: "Řada 11",
     episodes: 24,
     year: 2017,
     episodeTitles: [
@@ -2972,13 +3141,25 @@ const SEASONS_TBBT = {
       "The Athenaeum Allocation", "The Gates Excitation", "The Tenant Disassociation", "The Reclusive Potential",
       "The Comet Polarization", "The Monetary Insufficiency", "The Sibling Realignment", "The Bow Tie Asymmetry",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Akceptace nabídky k sňatku", "Nerozvážné interview", "Starosti s termínem svatby", "Účinné formy sbližování",
+      "Manuál k dospělým dětem", "Regenerace Protonů", "Reputace v sázce", "Tesla kontra Edison",
+      "Bitcoinová retrospektiva", "Destrukce sebedůvěry", "Extrémně otravná oslava", "Metriky svatebních rolí",
+      "Vibrace strun", "Férové odloučení", "Předloha detektivního románu", "Úmorná kampaň",
+      "Přiřčení rezervace", "Gatesova excitace", "Disociace nájemníků", "Potenciál izolace",
+      "Polarizace komety", "Nedostatek finančních prostředků", "Urovnání vyhrocených emocí", "Asymetrie vázacího motýlka",
+    ],
     episodeRuntimes: [21, 21, 20, 21, 19, 21, 20, 19, 19, 21, 20, 20, 21, 19, 21, 19, 20, 20, 21, 21, 20, 19, 20, 22],
   },
   "tbbt-s12": {
     id: "tbbt-s12",
     seriesId: "tbbt",
     number: 12,
-    label: "Season 12",
+    label: "Season 12", labelCs: "Řada 12",
     episodes: 24,
     year: 2018,
     episodeTitles: [
@@ -2988,6 +3169,18 @@ const SEASONS_TBBT = {
       "The Confirmation Polarization", "The Meteorite Manifestation", "The Donation Oscillation", "The D&D Vortex",
       "The Conference Valuation", "The Laureate Accumulation", "The Inspiration Deprivation", "The Decision Reverberation",
       "The Plagiarism Schism", "The Maternal Conclusion", "The Change Constant", "The Stockholm Syndrome",
+    ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Teorie
+    // velkého třesku" episode-title table (cross-checked against SerialZone.cz
+    // for this season) - real Czech dub titles, not a translation done for
+    // this project.
+    episodeTitlesCs: [
+      "Manželský kompromis", "Mystifikace se svatebním darem", "Kalkulace reprodukce", "Turbulence s Tamem",
+      "Planetární kolize", "Odveta za imitaci", "Odklon finančních prostředků", "Kulminace první noci",
+      "Frustrace z citace", "VHS reminiscence", "Rozhádaný paintball", "Skandální návrh",
+      "Radikální stanovisko", "Porcování meteoritu", "Revokace darování", "Hraní s celebritami",
+      "Nástrahy konkurence", "Akumulace laureátů", "Senzorická deprivace", "Definice postačování",
+      "Plagiátorské schizma", "Mateřská peripetie", "Proměnlivá konstanta", "Stockholmský syndrom",
     ],
     // Episodes 23/24 (the one-hour series finale) per-episode runtimes are
     // from Wikipedia's own infobox for each episode (30/23) rather than
@@ -3007,7 +3200,7 @@ const SEASONS_TBBT = {
     id: "tbbt-s11a",
     seriesId: "tbbt",
     number: 11,
-    label: "Season 11",
+    label: "Season 11", labelCs: "Řada 11",
     episodes: 11,
     year: 2017,
     sliceOf: "tbbt-s11",
@@ -3017,12 +3210,21 @@ const SEASONS_TBBT = {
       "The Collaboration Contamination", "The Proton Regeneration", "The Geology Methodology", "The Tesla Recoil",
       "The Bitcoin Entanglement", "The Confidence Erosion", "The Celebration Reverberation",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Akceptace nabídky k sňatku", "Nerozvážné interview", "Starosti s termínem svatby", "Účinné formy sbližování",
+      "Manuál k dospělým dětem", "Regenerace Protonů", "Reputace v sázce", "Tesla kontra Edison",
+      "Bitcoinová retrospektiva", "Destrukce sebedůvěry", "Extrémně otravná oslava",
+    ],
   },
   "tbbt-s11b": {
     id: "tbbt-s11b",
     seriesId: "tbbt",
     number: 11,
-    label: "Season 11",
+    label: "Season 11", labelCs: "Řada 11",
     episodes: 13,
     year: 2018,
     sliceOf: "tbbt-s11",
@@ -3033,12 +3235,22 @@ const SEASONS_TBBT = {
       "The Reclusive Potential", "The Comet Polarization", "The Monetary Insufficiency", "The Sibling Realignment",
       "The Bow Tie Asymmetry",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Metriky svatebních rolí", "Vibrace strun", "Férové odloučení", "Předloha detektivního románu",
+      "Úmorná kampaň", "Přiřčení rezervace", "Gatesova excitace", "Disociace nájemníků",
+      "Potenciál izolace", "Polarizace komety", "Nedostatek finančních prostředků", "Urovnání vyhrocených emocí",
+      "Asymetrie vázacího motýlka",
+    ],
   },
   "tbbt-s12a": {
     id: "tbbt-s12a",
     seriesId: "tbbt",
     number: 12,
-    label: "Season 12",
+    label: "Season 12", labelCs: "Řada 12",
     episodes: 10,
     year: 2018,
     sliceOf: "tbbt-s12",
@@ -3048,12 +3260,21 @@ const SEASONS_TBBT = {
       "The Planetarium Collision", "The Imitation Perturbation", "The Grant Allocation Derivation", "The Consummation Deviation",
       "The Citation Negation", "The VCR Illumination",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Manželský kompromis", "Mystifikace se svatebním darem", "Kalkulace reprodukce", "Turbulence s Tamem",
+      "Planetární kolize", "Odveta za imitaci", "Odklon finančních prostředků", "Kulminace první noci",
+      "Frustrace z citace", "VHS reminiscence",
+    ],
   },
   "tbbt-s12b": {
     id: "tbbt-s12b",
     seriesId: "tbbt",
     number: 12,
-    label: "Season 12",
+    label: "Season 12", labelCs: "Řada 12",
     episodes: 12,
     year: 2019,
     sliceOf: "tbbt-s12",
@@ -3063,24 +3284,38 @@ const SEASONS_TBBT = {
       "The Donation Oscillation", "The D&D Vortex", "The Conference Valuation", "The Laureate Accumulation",
       "The Inspiration Deprivation", "The Decision Reverberation", "The Plagiarism Schism", "The Maternal Conclusion",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Rozhádaný paintball", "Skandální návrh", "Radikální stanovisko", "Porcování meteoritu",
+      "Revokace darování", "Hraní s celebritami", "Nástrahy konkurence", "Akumulace laureátů",
+      "Senzorická deprivace", "Definice postačování", "Plagiátorské schizma", "Mateřská peripetie",
+    ],
   },
   "tbbt-s12c": {
     id: "tbbt-s12c",
     seriesId: "tbbt",
     number: 12,
-    label: "Season 12",
+    label: "Season 12", labelCs: "Řada 12",
     episodes: 2,
     year: 2019,
     sliceOf: "tbbt-s12",
     episodeOffset: 22,
     episodeTitles: ["The Change Constant", "The Stockholm Syndrome"],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: ["Proměnlivá konstanta", "Stockholmský syndrom"],
   },
 
   "ys-s1": {
     id: "ys-s1",
     seriesId: "youngsheldon",
     number: 1,
-    label: "Season 1",
+    label: "Season 1", labelCs: "Řada 1",
     episodes: 22,
     year: 2017,
     episodeTitles: [
@@ -3096,13 +3331,30 @@ const SEASONS_TBBT = {
       "A Dog, A Squirrel, and a Fish Named Fish", "Summer Sausage, a Pocket Poncho, and Tony Danza",
       "Vanilla Ice Cream, Gentleman Callers, and a Dinette Set",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Pilot", "Rakety, komunisté a Deweyova desetinná soustava",
+      "Poker, víra a vajíčka", "Terapeut, komiks a snídaňová klobása",
+      "Solární kalkulačka, trofej a poprsí roztleskávačky", "Nášivka, modem a Zantac",
+      "Bůček, vúdú a tajný závod", "Mys Canaveral, Shrodingerova kočka a vlasy Cyndi Lauper",
+      "Kirk, Spock a tříselná kýla", "Orlí pírko, fazolový lusk a folkový šlágr",
+      "Démoni, nedělní škola a prvočísla", "Počítač, umělohmotný poník a bedna piv",
+      "Kýchnutí, trest a Sissy Spacek", "Bramborový salát, násada a tátova whiskey",
+      "Dolomit, jablíčko a záhadná žena", "Smrtící asteroidy, Oklahoma a zježené vlasy",
+      "Jiu-Jitsu, bublinková fólie a čoko mlíko", "Matka, dítě a pozadí modrého ničemy",
+      "Gluony, guacamole a fialová", "Pes, veverka a rybička Rybička",
+      "Suchá klobása, pláštěnka a Tony Danza", "Vanilková zmrzlina, nápadníci a jídelní sestava",
+    ],
     episodeRuntimes: [21, 19, 21, 20, 20, 19, 19, 19, 20, 19, 19, 20, 21, 22, 19, 21, 21, 20, 21, 21, 20, 20],
   },
   "ys-s2": {
     id: "ys-s2",
     seriesId: "youngsheldon",
     number: 2,
-    label: "Season 2",
+    label: "Season 2", labelCs: "Řada 2",
     episodes: 22,
     year: 2018,
     episodeTitles: [
@@ -3118,13 +3370,30 @@ const SEASONS_TBBT = {
       "A Political Campaign and a Candy Land Cheater", "A Proposal and a Popsicle Stick Cross",
       "A Broken Heart and a Crock Monster", "A Swedish Science Thing and the Equation for Toast",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Pronikavé bzučení a balanční kolečka", "Geniální protivník a Sir Isaac Neutron",
+      "Krize víry a chapadlová rasa", "Finanční tajemství a rybí omáčka",
+      "Vědecká studie a československé svatební cukroví", "Sedm smrtelných hříchů a malý Carl Sagan",
+      "Uhlíková metoda datování a vycpaný mýval", "Osmibitová princezna a génius na píchlá kola",
+      "Rodinná dynamika a Pontiac Fiero", "Zakrnělé dětství a luxusní konzerva oříšků",
+      "Rasa superlidí a dopis Alfovi", "Břichobol a pořádný kus metafory",
+      "Nukleární reaktor a nic moc přezdívka", "David, Goliáš a čokomlíko zezadu",
+      "Matematická naléhavost a vzrostlé palmy", "Bochník chleba a stará dobrá vlajka",
+      "Albert Einstein a příběh o jiné Mary", "Stoprocentní skóre a opékání nad kahanem",
+      "Politická kampaň a švindlování při stolní hře", "Nabídka k sňatku a kříž z dřívek od nanuků",
+      "Zlomené srdce a krokomonstrum", "Švédské vědecké cosi a rovnice s toastem",
+    ],
     episodeRuntimes: [20, 19, 20, 20, 18, 19, 19, 20, 21, 19, 20, 18, 20, 19, 20, 18, 21, 18, 20, 21, 21, 19],
   },
   "ys-s1a": {
     id: "ys-s1a",
     seriesId: "youngsheldon",
     number: 1,
-    label: "Season 1",
+    label: "Season 1", labelCs: "Řada 1",
     episodes: 9,
     year: 2017,
     sliceOf: "ys-s1",
@@ -3135,12 +3404,23 @@ const SEASONS_TBBT = {
       "A Patch, a Modem, and a Zantac®", "A Brisket, Voodoo, and Cannonball Run",
       "Cape Canaveral, Schrödinger's Cat, and Cyndi Lauper's Hair", "Spock, Kirk, and Testicular Hernia",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Pilot", "Rakety, komunisté a Deweyova desetinná soustava",
+      "Poker, víra a vajíčka", "Terapeut, komiks a snídaňová klobása",
+      "Solární kalkulačka, trofej a poprsí roztleskávačky", "Nášivka, modem a Zantac",
+      "Bůček, vúdú a tajný závod", "Mys Canaveral, Shrodingerova kočka a vlasy Cyndi Lauper",
+      "Kirk, Spock a tříselná kýla",
+    ],
   },
   "ys-s1b": {
     id: "ys-s1b",
     seriesId: "youngsheldon",
     number: 1,
-    label: "Season 1",
+    label: "Season 1", labelCs: "Řada 1",
     episodes: 13,
     year: 2018,
     sliceOf: "ys-s1",
@@ -3154,12 +3434,25 @@ const SEASONS_TBBT = {
       "A Dog, A Squirrel, and a Fish Named Fish", "Summer Sausage, a Pocket Poncho, and Tony Danza",
       "Vanilla Ice Cream, Gentleman Callers, and a Dinette Set",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Orlí pírko, fazolový lusk a folkový šlágr", "Démoni, nedělní škola a prvočísla",
+      "Počítač, umělohmotný poník a bedna piv", "Kýchnutí, trest a Sissy Spacek",
+      "Bramborový salát, násada a tátova whiskey", "Dolomit, jablíčko a záhadná žena",
+      "Smrtící asteroidy, Oklahoma a zježené vlasy", "Jiu-Jitsu, bublinková fólie a čoko mlíko",
+      "Matka, dítě a pozadí modrého ničemy", "Gluony, guacamole a fialová",
+      "Pes, veverka a rybička Rybička", "Suchá klobása, pláštěnka a Tony Danza",
+      "Vanilková zmrzlina, nápadníci a jídelní sestava",
+    ],
   },
   "ys-s2a": {
     id: "ys-s2a",
     seriesId: "youngsheldon",
     number: 2,
-    label: "Season 2",
+    label: "Season 2", labelCs: "Řada 2",
     episodes: 10,
     year: 2018,
     sliceOf: "ys-s2",
@@ -3171,12 +3464,23 @@ const SEASONS_TBBT = {
       "Carbon Dating and a Stuffed Raccoon", "An 8-Bit Princess and a Flat Tire Genius",
       "Family Dynamics and a Red Fiero", "A Stunted Childhood and a Can of Fancy Mixed Nuts",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Pronikavé bzučení a balanční kolečka", "Geniální protivník a Sir Isaac Neutron",
+      "Krize víry a chapadlová rasa", "Finanční tajemství a rybí omáčka",
+      "Vědecká studie a československé svatební cukroví", "Sedm smrtelných hříchů a malý Carl Sagan",
+      "Uhlíková metoda datování a vycpaný mýval", "Osmibitová princezna a génius na píchlá kola",
+      "Rodinná dynamika a Pontiac Fiero", "Zakrnělé dětství a luxusní konzerva oříšků",
+    ],
   },
   "ys-s2b": {
     id: "ys-s2b",
     seriesId: "youngsheldon",
     number: 2,
-    label: "Season 2",
+    label: "Season 2", labelCs: "Řada 2",
     episodes: 11,
     year: 2019,
     sliceOf: "ys-s2",
@@ -3189,17 +3493,34 @@ const SEASONS_TBBT = {
       "A Political Campaign and a Candy Land Cheater", "A Proposal and a Popsicle Stick Cross",
       "A Broken Heart and a Crock Monster",
     ],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: [
+      "Rasa superlidí a dopis Alfovi", "Břichobol a pořádný kus metafory",
+      "Nukleární reaktor a nic moc přezdívka", "David, Goliáš a čokomlíko zezadu",
+      "Matematická naléhavost a vzrostlé palmy", "Bochník chleba a stará dobrá vlajka",
+      "Albert Einstein a příběh o jiné Mary", "Stoprocentní skóre a opékání nad kahanem",
+      "Politická kampaň a švindlování při stolní hře", "Nabídka k sňatku a kříž z dřívek od nanuků",
+      "Zlomené srdce a krokomonstrum",
+    ],
   },
   "ys-s2c": {
     id: "ys-s2c",
     seriesId: "youngsheldon",
     number: 2,
-    label: "Season 2",
+    label: "Season 2", labelCs: "Řada 2",
     episodes: 1,
     year: 2019,
     sliceOf: "ys-s2",
     episodeOffset: 21,
     episodeTitles: ["A Swedish Science Thing and the Equation for Toast"],
+    // episodeTitlesCs is the matching Czech-titled slice of the parent
+    // season's own episodeTitlesCs (same real-source verification, see that
+    // season's own comment) - kept in sync with episodeTitles above the same
+    // way this file's other slices already duplicate the English array.
+    episodeTitlesCs: ["Švédské vědecké cosi a rovnice s toastem"],
   },
 
   // episodeRuntimes on ys-s3..s7/gm-s1..s2/tbbt-s1..s10 above (added after
@@ -3210,7 +3531,7 @@ const SEASONS_TBBT = {
   // the same pass, from that same TMDB fetch (both fields came off the
   // same season pages).
   "ys-s3": {
-    id: "ys-s3", seriesId: "youngsheldon", number: 3, label: "Season 3", episodes: 21, year: 2019,
+    id: "ys-s3", seriesId: "youngsheldon", number: 3, label: "Season 3", labelCs: "Řada 3", episodes: 21, year: 2019,
     episodeTitles: [
       "Quirky Eggheads and Texas Snow Globes", "A Broom Closet and Satan's Monopoly Board",
       "An Entrepreneurialist and a Swat on the Bottom", "Hobbitses, Physicses and a Ball with Zip",
@@ -3224,10 +3545,27 @@ const SEASONS_TBBT = {
       "A House for Sale and Serious Woman Stuff", "A Baby Tooth and the Egyptian God of Knowledge",
       "A Secret Letter and a Lowly Disc of Processed Meat",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Potrhlí intoušové a texaská sněžítka", "Úklidový kumbál a satanské monopoly",
+      "Podnikatelista a naplácaný zadek", "Hobitci, fyzišky a švihnutí míčkem",
+      "Ananas a útěcha na mužské hrudi", "Parazol a setsakra trefa",
+      "Orangutan bornejský a kultura podněcující pokřikování", "Hřích lakomství a Chimichanga",
+      "Pozvání na oslavu, hrozny k fotbalu a pozemský kur", "Polévka mládeže a klubíčko lží",
+      "Živá drůbež, mrtvá drůbež a svátost manželská", "Tělový lesk a batoh přežití",
+      "Smlouvy, pravidla a ždibec prasečího mozečku", "Smůla, křížek a štěrk u krajnice",
+      "Přítelova bývalka a podrbání pro štěstí", "Pasadena",
+      "Akademický přečin a romantičtější Taco Bell", "Naražená žebra a detektor duchů z krabice lupínků",
+      "Dům na prodej a vážné ženské záležitosti", "Mléčný zub a egyptský bůh vědění",
+      "Schovaný dopis a běžné kolečko zpracovaného masa",
+    ],
     episodeRuntimes: [19, 19, 19, 19, 20, 18, 20, 21, 20, 19, 20, 18, 20, 18, 18, 20, 20, 20, 20, 19, 20],
   },
   "ys-s4": {
-    id: "ys-s4", seriesId: "youngsheldon", number: 4, label: "Season 4", episodes: 18, year: 2020,
+    id: "ys-s4", seriesId: "youngsheldon", number: 4, label: "Season 4", labelCs: "Řada 4", episodes: 18, year: 2020,
     episodeTitles: [
       "Graduation", "A Docent, A Little Lady and a Bouncer Named Dalton", "Training Wheels and an Unleashed Chicken",
       "Bible Camp and a Chariot of Love", "A Musty Crypt and a Stick to Pee On",
@@ -3238,10 +3576,25 @@ const SEASONS_TBBT = {
       "Mitch's Son and the Unconditional Approval of a Government Agency", "A Virus, Heartbreak and a World of Possibilities",
       "A Second Prodigy and the Hottest Tips for Pouty Lips", "A Black Hole", "The Wild and Woolly World of Nonlinear Dynamics",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Maturita", "Průvodce, mladá slečna a vyhazovač jménem Dalton",
+      "Balanční kolečka a odvázané kuře", "Biblický tábor a kočár lásky",
+      "Zatuchlá krypta a tyčinka na počurání", "Přípravný kurz a vynálezce zipu",
+      "Filozofie a červi, kteří po vás jdou", "Existenciální krize a bublifuk s hlavou médi",
+      "Rozbředlá zmrzlina a opička flašinetáře", "Kovbojský aerobik a 473 šroubů od vazelíny",
+      "Pager, klub a vrásčitý suchar", "Krabice pokladů a babča vědy",
+      "Vozítko pro starochy a nový model vzdělávání", "Posmání a bezvýhradný souhlas vládního institutu",
+      "Virus, žal a svět plný možností", "Druhé zázračné dítě a žhavé tipy pro plné rty",
+      "Černá díra", "Zdivočelý svět nelineární dynamiky",
+    ],
     episodeRuntimes: [19, 18, 19, 18, 19, 19, 18, 18, 19, 18, 19, 19, 18, 19, 18, 18, 18, 18],
   },
   "ys-s5": {
-    id: "ys-s5", seriesId: "youngsheldon", number: 5, label: "Season 5", episodes: 22, year: 2021,
+    id: "ys-s5", seriesId: "youngsheldon", number: 5, label: "Season 5", labelCs: "Řada 5", episodes: 22, year: 2021,
     episodeTitles: [
       "One Bad Night and Chaos of Selfish Desires", "Snoopin' Around and the Wonder Twins of Atheism",
       "Potential Energy and Hooch on a Park Bench", "Pish Posh and a Secret Back Room",
@@ -3255,10 +3608,27 @@ const SEASONS_TBBT = {
       "A God-Fearin' Baptist and a Hot Trophy Husband", "Uncle Sheldon and a Hormonal Firecracker",
       "White Trash, Holy Rollers and Punching People", "Clogged Pore, a Little Spanish and the Future",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Nevyvedený večer a Chaos sobeckých tužeb", "Čmuchání za zády a Obrat k ateismu",
+      "Potenciální energie a Kořalka na lavičce v parku", "Láryfáry a Tajná místnost",
+      "Plyšová zvířátka a Milá jižanská syzygie", "Praní peněz a Příval hormonů",
+      "Úvod do inženýrství a Kapka tužidla", "Velekancléř a Doupě hříchu",
+      "Šprajc a Zvláštně hypnotický bohém", "Drahá závada a Sprostí ulejváci",
+      "Noc jinde, Rosnička a Odporný zlozvyk", "Růžový Cadillac a Rituální tanec",
+      "Spousta náplastí a Cooperova kapitulace", "Stírací los a Ženské nástrahy",
+      "Humr, Pásovec a Mnohem větší číslo", "Kufřík plný peněz a Žluté klaunské auto",
+      "Sólo burák, Sociální tvor a Pravda", "Děti, Lži a Senzační kremrole",
+      "Bohabojný baptista a Sexy výstavní manžel", "Strýček Sheldon a Hormonální bouřlivák",
+      "Bílá spodina, Pánbíčkáři a Rozdávání ran", "Ucpaný pór, Trocha španělštiny a Budoucnost",
+    ],
     episodeRuntimes: [21, 19, 20, 19, 20, 20, 20, 20, 19, 19, 20, 19, 18, 20, 20, 18, 19, 18, 21, 19, 19, 20],
   },
   "ys-s6": {
-    id: "ys-s6", seriesId: "youngsheldon", number: 6, label: "Season 6", episodes: 22, year: 2022,
+    id: "ys-s6", seriesId: "youngsheldon", number: 6, label: "Season 6", labelCs: "Řada 6", episodes: 22, year: 2022,
     episodeTitles: [
       "Four Hundred Cartons of Undeclared Cigarettes and a Niblingo", "Future Worf and the Margarita of the South Pacific",
       "Passion's Harvest and a Sheldocracy", "Blonde Ambition and the Concept of Zero",
@@ -3272,10 +3642,27 @@ const SEASONS_TBBT = {
       "A New Weather Girl and a Stay-at-Home Coddler", "German for Beginners and a Crazy Old Man with a Bat",
       "A Romantic Getaway and a Germanic Meat-Based Diet", "A Tornado, a 10-Hour Flight and a Darn Fine Ring",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Čtyři sta kartonů neproclených cigaret a Synovnice", "Worf z budoucnosti a Margarita jižního pacifiku",
+      "Vášeň na seně a Sheldokracie", "Blonďatá ctižádost a Pojetí nuly",
+      "Kolejní poradce a Jižní riviéra", "Ošklivý auto, Nevěra a Pořádnej fotbal",
+      "Tvrdší oříšek a Zamluvený komiks", "Právnická hantýrka a Cizí intimní partie",
+      "Odchod ze školy a Medfordský zázrak", "Palačinková neděle a Ukázkové flirtování",
+      "Sálový počítač, Zábrany a Týden klidu na lůžku", "Předporodní oslava a Testosteronem nabitá debata",
+      "Studentský mejdan a Rodičovské chyby a Puchýř jako hrom", "Oslava bez dárků a Celý člověk",
+      "Mladistvá úzkost a Ulička hanby", "Ukradené auto a Zdrhání z domova",
+      "Německá lidovka a Konečně dospělý", "Malí zelení mužíčci a Nabídka k sňatku",
+      "Nová rosnička a Rozmazlování v domácnosti", "Němčina pro začátečníky a Dědek s pálkou",
+      "Romantický výlet a Německá masitá strava", "Tornádo, Desetihodinový let a Vážně parádní prstýnek",
+    ],
     episodeRuntimes: [20, 20, 20, 18, 19, 20, 18, 21, 21, 18, 21, 19, 19, 21, 20, 19, 19, 18, 20, 19, 20, 20],
   },
   "ys-s7": {
-    id: "ys-s7", seriesId: "youngsheldon", number: 7, label: "Season 7", episodes: 14, year: 2024,
+    id: "ys-s7", seriesId: "youngsheldon", number: 7, label: "Season 7", labelCs: "Řada 7", episodes: 14, year: 2024,
     episodeTitles: [
       "A Wiener Schnitzel and Underwear in a Tree", "A Roulette Wheel and a Piano Playing Dog",
       "A Strudel and a Hot American Boy Toy", "Ants on a Log and a Cheating Winker",
@@ -3285,11 +3672,24 @@ const SEASONS_TBBT = {
       "A Little Snip and Teaching Old Dogs", "A New Home and a Traditional Texas Torture",
       "Funeral (1)", "Memoir (2)",
     ],
+    // Verified against Czech Wikipedia's own "Seznam dílů seriálu Malý
+    // Sheldon" episode-title table (cross-checked against SerialZone.cz for
+    // season 1) - real Czech dub titles, not a translation done for this
+    // project.
+    episodeTitlesCs: [
+      "Půlka řízku a kalhotky na stromě", "Ruleta a pes hrající na klavír",
+      "Štrúdl a sexy Amík", "Mravenci na kládě a schvalování podvádění",
+      "Frankensteinova zrůda a chlápek s hárem", "Baptisté, katolíci a křest ve dřezu",
+      "Patřičná svatba a kostlivci ve skříni", "Nákotník a plastová kadibudka",
+      "Moderní fyzika a stipendium pro mimino", "Prospěšné práce a klíč ke spokojenému manželství",
+      "Malé šmiknutí a rané akademické úspěchy", "Nový domov a tradiční texaská muka",
+      "Pohřeb", "Paměti",
+    ],
     episodeRuntimes: [21, 19, 20, 20, 20, 21, 21, 19, 20, 22, 19, 20, 22, 22],
   },
 
   "gm-s1": {
-    id: "gm-s1", seriesId: "georgieandmandy", number: 1, label: "Season 1", episodes: 22, year: 2024,
+    id: "gm-s1", seriesId: "georgieandmandy", number: 1, label: "Season 1", labelCs: "Řada 1", episodes: 22, year: 2024,
     episodeTitles: [
       "The 6:10 to Lubbock", "Some New York Nonsense", "Secrets, Lies and a Chunk of Change", "Todd's Mom",
       "Thanksgiving", "A Regular Samaritan", "An Old Mustang", "Diet Crap",
@@ -3298,10 +3698,20 @@ const SEASONS_TBBT = {
       "Two Idiots on a Dirt Bike", "TV Money", "Snitch v. Deadbeat", "Ladies Love Brunch",
       "Guilt Boots", "Big Decisions",
     ],
+    // Verified against HBO Max CZ's own Czech episode listing (real dub
+    // titles, not a translation done for this project).
+    episodeTitlesCs: [
+      "Vlak v 18:10 do Lubbocku", "Nějaký newyorský nesmysl", "Tajemství, lži a pěkná sumička", "Toddova máma",
+      "Den díkůvzdání", "Obyčejný samaritán", "Starej Mustang", "Dietní kraviny",
+      "Konference a morální převaha", "Rozdvojený dům", "Pracovat pro nepřítele", "Tyfový Georgie",
+      "Chlapská záležitost", "Bookmakerka a rozchod", "Bohyně z hudebnin", "Hádka o dítěti",
+      "Dva idioti a enduro", "Honorář", "Práskač vs. Šupák", "Den matek",
+      "Odpustek", "Zásadní rozhodnutí",
+    ],
     episodeRuntimes: [21, 18, 18, 18, 18, 19, 19, 19, 20, 19, 20, 18, 21, 19, 18, 20, 18, 19, 18, 18, 20, 21],
   },
   "gm-s2": {
-    id: "gm-s2", seriesId: "georgieandmandy", number: 2, label: "Season 2", episodes: 22, year: 2025,
+    id: "gm-s2", seriesId: "georgieandmandy", number: 2, label: "Season 2", labelCs: "Řada 2", episodes: 22, year: 2025,
     episodeTitles: [
       "A Tie Breaker and a Huge Mistake", "Fan Mail and Old-Timey Organ Music", "A Will and a Dead Man's Wife",
       "Dirty Hands and a Barbed-Wire Fence", "A Pregnancy Test and an Old Man's Prostate",
@@ -3313,6 +3723,26 @@ const SEASONS_TBBT = {
       "A Country Club, a Yokel and a New Boss", "A New Scoreboard and a Horse's You-Know-What",
       "A Little Schmoozin' and a Nose for the News", "Splurges and Secrets",
       "Funky Chili and Friends Who Take Their Clothes Off", "A New Beau and Someone Else's Mom's House",
+    ],
+    // Verified against HBO Max CZ's own Czech episode listing, cross-
+    // checked against individual ČSFD.cz episode pages - real dub titles,
+    // not a translation done for this project. Episodes 14-16 are left
+    // out (loc() falls back to the English title for them) - as of this
+    // verification pass, neither HBO Max CZ nor ČSFD had a real Czech
+    // title recorded for those three yet (an indexing/localization lag,
+    // not evidence the episodes aren't dubbed - S2's other 19 episodes
+    // are fully titled).
+    episodeTitlesCs: [
+      "Rozstřel a obrovská chyba", "Dopisy fanoušků a varhanní hudba", "Závěť a žena nebožtíka",
+      "Ušpiněné ruce a ostnatý drát", "Těhotenský test a meteorický roj",
+      "Zlomené srdce a pivní ping-pong", "Veřejná lavička a hafo víry",
+      "Pokousání, naplácání a přehnutí přes koleno", "Odplata a poloviční cirkus",
+      "Miami Beach a kouzelné rodinné Vánoce", "Nové hobby, úchylák a výpomoc",
+      "Jméno Boží a prostořeká bloncka", "Velká oslava a panáky tequily", null,
+      null, null,
+      "Diskriminace a nová šéfová", "Výsledková tabule a nečekaný sponzor",
+      "Na kus řeči a čuch na zprávy", "Utrácení a manželské tajnosti",
+      "Zkažené chilli a provádění intimností", "Nový nápadník a ventilování vzteku",
     ],
     episodeRuntimes: [19, 18, 19, 21, 19, 18, 20, 19, 19, 18, 18, 18, 20, 18, 19, 20, 19, 19, 19, 19, 19, 20],
   },
@@ -3330,7 +3760,7 @@ const SEASONS_TBBT = {
     id: "stuart-s1",
     seriesId: "stuart",
     number: 1,
-    label: "Season 1",
+    label: "Season 1", labelCs: "Řada 1",
     episodes: 10,
     year: 2026,
     episodeTitles: [
@@ -3344,6 +3774,21 @@ const SEASONS_TBBT = {
       "Spoiler: We're as Confused as You Are",
       "Spoiler: We Couldn't Get Green Lantern",
       "Spoiler: Filmed Before a Live Studio Audience",
+    ],
+    // Verified against Czech Wikipedia's own episode table for "Jak
+    // Stuart nezachránil vesmír" (cs.wikipedia.org) - real HBO dub
+    // titles, not a translation done for this project.
+    episodeTitlesCs: [
+      "Spoiler: Gary umře",
+      "Spoiler: Je v tom Zack",
+      "Spoiler: Bert kouzlí",
+      "Spoiler: Stuart vyrobí peněženku",
+      "Spoiler: Bert se žení",
+      "Spoiler: Kukuřice chutná skvěle",
+      "Spoiler: Dexys Midnight Runner obdrží tantiémy",
+      "Spoiler: Jsme taky tak zmatení",
+      "Spoiler: Green Lantern neměl čas",
+      "Spoiler: Natáčeno před živým publikem",
     ],
     // No episodeRuntimes here, unlike every other full season in this
     // file (added in the same pass that added theirs) - TMDB has real
@@ -3363,7 +3808,9 @@ const ORDERINGS_TBBT = [
   {
     id: "recommended",
     label: "Recommended",
+    labelCs: "Doporučené",
     description: "My recommended order, which roughly follows release dates and seamlessly connects all the crossovers and twists.",
+    descriptionCs: "Moje doporučené pořadí, které zhruba sleduje data vydání a plynule propojuje všechny crossovery a zvraty.",
     eras: [
       {
         // ONE flat era, same "no title bar needed for a single-era mode"
@@ -3391,6 +3838,7 @@ const ORDERINGS_TBBT = [
         // timeline, not something to "fix" by reverting to label: "".
         id: "all",
         label: "The Big Bang Theory Universe",
+        labelCs: "Vesmír Teorie velkého třesku",
         // TBBT S1-10 sort by plain release year, same as everything else
         // here. groupEraItems() (app.js) merges any run of consecutive
         // same-seriesId seasons regardless of whether a season is whole or
@@ -3466,23 +3914,31 @@ const ORDERINGS_TBBT = [
         // read the same but are conceptually distinct, e.g. two different
         // otherEarth titles - Gotcha #11/#12's "don't merge by text alone"
         // warning - not for genuinely one shared dating printed twice).
+        // labelCs on each entry below backs loc() in drawYearBands() (see
+        // render() in app.js) - only the season-name WORDS need
+        // translating ("Fall"/"Winter"/"Spring"/"May" -> "podzim"/
+        // "zima"/"jaro"/"květen"), so a band whose label is already just
+        // digits ("2024–2026", "2026") has no labelCs at all - loc()
+        // already falls back to the plain label in that case, same as any
+        // other missing *Cs field in this file, so there's nothing to gain
+        // from adding an identical labelCs just to have one everywhere.
         yearBands: [
           // tbbt-s1..s10 + tbbt-s11a merged (see the itemIds comment
           // above) - "Fall 2017" is this card's own LATER end (tbbt-s11a
           // covers TBBT S11's first 11 episodes, Sep-Dec 2017), not its
           // 2007 start alone, so the label spells out the full real range
           // this one card actually covers rather than just its start year.
-          { label: "2007 – Fall 2017", span: 1 },
-          { label: "Fall 2017", span: 1 },
+          { label: "2007 – Fall 2017", labelCs: "2007 – podzim 2017", span: 1 },
+          { label: "Fall 2017", labelCs: "podzim 2017", span: 1 },
           // tbbt-s11b + ys-s1b (blocks 3+4) - both real Jan-May 2018
-          { label: "Winter–Spring 2018", span: 2 },
+          { label: "Winter–Spring 2018", labelCs: "zima–jaro 2018", span: 2 },
           // tbbt-s12a + ys-s2a (blocks 5+6) - both real Sep-Dec 2018
-          { label: "Fall 2018", span: 2 },
+          { label: "Fall 2018", labelCs: "podzim 2018", span: 2 },
           // tbbt-s12b + ys-s2b (blocks 7+8) - both real Jan-May 2019
-          { label: "Winter–Spring 2019", span: 2 },
-          { label: "May 2019", span: 1 },
+          { label: "Winter–Spring 2019", labelCs: "zima–jaro 2019", span: 2 },
+          { label: "May 2019", labelCs: "květen 2019", span: 1 },
           // ys-s2c + ys-s3..s7 merged
-          { label: "May 2019 – 2024", span: 1 },
+          { label: "May 2019 – 2024", labelCs: "květen 2019 – 2024", span: 1 },
           // gm-s1 + gm-s2 merged
           { label: "2024–2026", span: 1 },
           { label: "2026", span: 1 },
@@ -3520,6 +3976,30 @@ const ORDERINGS_TBBT = [
 // against TMDB's season pages, same sourcing standard as every other
 // curated show in this file.
 const MOVIES_LOTR = {
+  // titleCs throughout this franchise (movies below, SERIES_LOTR/
+  // SEASONS_LOTR/ORDERINGS_LOTR further down) is the REAL official Czech
+  // theatrical/streaming release title - verified against ČSFD.cz/Czech
+  // Wikipedia/Prime Video CZ, same "verify, don't invent" standard
+  // SERIES_TBBT's own comment documents - added on explicit user request
+  // to extend the language switch "analogicky" (analogously) to this
+  // franchise after TBBT's own pass. Two things NOT to "fix": the
+  // trilogy's own genitive forms differ on purpose ("Společenstvo
+  // Prstenu" - singular - in the first film's own subtitle vs. "Pán
+  // prstenů"/"Dvě věže"/"Návrat krále" - the franchise name itself and
+  // the other two subtitles use the plural "prstenů" - this is exactly
+  // how ČSFD lists it, not a typo); and the Hobbit trilogy's Czech
+  // distribution title drops one "b" ("Hobit", not "Hobbit"), also
+  // confirmed against ČSFD rather than assumed. The Third Age's own
+  // yearBands entries (ORDERINGS_LOTR further down) keep their English
+  // "TA" abbreviation even under Czech - research turned up real Czech
+  // terms for the ages themselves ("Druhý věk"/"Třetí věk") but no
+  // established Czech abbreviation analogous to "SA"/"TA" (checked
+  // several Czech Tolkien fan sites and Czech Wikipedia's own "Třetí věk"
+  // article, which always spells the age out in full rather than
+  // abbreviating it) - inventing one here would violate this file's own
+  // sourcing standard, so those bands are left without a labelCs and
+  // simply fall back to the English form, same as any other untranslated
+  // value.
   // badge: "LOTR" (uniform text across all three, like Marvel's own
   // "Avengers"/TBBT's own "TBBT" - NOT a per-movie "Part I"/"II"/"III"
   // the way Star Wars' Episode badges differ per film - user-requested
@@ -3541,6 +4021,7 @@ const MOVIES_LOTR = {
   lotr1: {
     id: "lotr1",
     title: "The Lord of the Rings: The Fellowship of the Ring",
+    titleCs: "Pán prstenů: Společenstvo Prstenu",
     badge: "LOTR",
     year: 2001,
     runtimeMin: 178,
@@ -3550,6 +4031,7 @@ const MOVIES_LOTR = {
   lotr2: {
     id: "lotr2",
     title: "The Lord of the Rings: The Two Towers",
+    titleCs: "Pán prstenů: Dvě věže",
     badge: "LOTR",
     year: 2002,
     runtimeMin: 179,
@@ -3559,6 +4041,7 @@ const MOVIES_LOTR = {
   lotr3: {
     id: "lotr3",
     title: "The Lord of the Rings: The Return of the King",
+    titleCs: "Pán prstenů: Návrat krále",
     badge: "LOTR",
     year: 2003,
     runtimeMin: 201,
@@ -3568,6 +4051,7 @@ const MOVIES_LOTR = {
   hobbit1: {
     id: "hobbit1",
     title: "The Hobbit: An Unexpected Journey",
+    titleCs: "Hobit: Neočekávaná cesta",
     year: 2012,
     runtimeMin: 169,
     extendedRuntimeMin: 182,
@@ -3576,6 +4060,7 @@ const MOVIES_LOTR = {
   hobbit2: {
     id: "hobbit2",
     title: "The Hobbit: The Desolation of Smaug",
+    titleCs: "Hobit: Šmakova dračí poušť",
     year: 2013,
     runtimeMin: 161,
     extendedRuntimeMin: 186,
@@ -3584,6 +4069,7 @@ const MOVIES_LOTR = {
   hobbit3: {
     id: "hobbit3",
     title: "The Hobbit: The Battle of the Five Armies",
+    titleCs: "Hobit: Bitva pěti armád",
     year: 2014,
     runtimeMin: 144,
     extendedRuntimeMin: 157,
@@ -3601,6 +4087,7 @@ const MOVIES_LOTR = {
   warofrohirrim: {
     id: "warofrohirrim",
     title: "The Lord of the Rings: The War of the Rohirrim",
+    titleCs: "Pán prstenů: Válka Rohirů",
     year: 2024,
     runtimeMin: 134,
     animated: true,
@@ -3609,7 +4096,7 @@ const MOVIES_LOTR = {
 };
 
 const SERIES_LOTR = {
-  ringsofpower: { id: "ringsofpower", title: "The Lord of the Rings: The Rings of Power" },
+  ringsofpower: { id: "ringsofpower", title: "The Lord of the Rings: The Rings of Power", titleCs: "Pán prstenů: Prsteny moci" },
 };
 
 // year = the season's real premiere year (drives Release Order's own
@@ -3619,12 +4106,19 @@ const SEASONS_LOTR = {
     id: "rop-s1",
     seriesId: "ringsofpower",
     number: 1,
-    label: "Season 1",
+    label: "Season 1", labelCs: "Řada 1",
     episodes: 8,
     year: 2022,
     episodeTitles: [
       "A Shadow of the Past", "Adrift", "Adar", "The Great Wave",
       "Partings", "Udûn", "The Eye", "Alloyed",
+    ],
+    // Verified against ČSFD.cz's own per-episode pages (cross-checked
+    // against Czech Wikipedia and serialzone.cz) - real Prime Video CZ
+    // dub/subtitle titles, not a translation done for this project.
+    episodeTitlesCs: [
+      "Stín minulosti", "Na moři", "Adar", "Velká vlna",
+      "Odchody", "Udûn", "Oko", "Slitina",
     ],
     episodeRuntimes: [66, 68, 70, 72, 73, 70, 73, 73],
   },
@@ -3632,12 +4126,19 @@ const SEASONS_LOTR = {
     id: "rop-s2",
     seriesId: "ringsofpower",
     number: 2,
-    label: "Season 2",
+    label: "Season 2", labelCs: "Řada 2",
     episodes: 8,
     year: 2024,
     episodeTitles: [
       "Elven Kings Under the Sky", "Where the Stars Are Strange", "The Eagle and the Sceptre", "Eldest",
       "Halls of Stone", "Where Is He?", "Doomed to Die", "Shadow and Flame",
+    ],
+    // Verified individually against ČSFD.cz's own per-episode pages (each
+    // one matches its real S02E0x code) - real Prime Video CZ dub/
+    // subtitle titles, not a translation done for this project.
+    episodeTitlesCs: [
+      "Králové elfů pod nebem", "Kde jsou hvězdy podivné", "Orel a žezlo", "Nejstarší",
+      "Síně z kamene", "Kde je?", "Odsouzeni k smrti", "Stín a plamen",
     ],
     episodeRuntimes: [77, 63, 67, 66, 62, 64, 73, 74],
   },
@@ -3654,11 +4155,14 @@ const ORDERINGS_LOTR = [
   {
     id: "chronological",
     label: "Chronological",
+    labelCs: "Chronologicky",
     description: "Ideal if you're already familiar with the Middle-Earth and want to experience every event in exact chronological sequence.",
+    descriptionCs: "Ideální, pokud už znáte Středozem a chcete zažít každou událost v přesném chronologickém pořadí.",
     eras: [
       {
         id: "second-age",
         label: "The Second Age",
+        labelCs: "Druhý věk",
         // rop-s1/s2 share one seriesId and sit consecutively, so
         // groupEraItems() (app.js) merges them into ONE card, same as
         // Loki's own two seasons under Marvel's Chronological - a single
@@ -3672,11 +4176,18 @@ const ORDERINGS_LOTR = [
         // real Third Age year for the Hobbit/LOTR films below - stating
         // one here would be presenting a fan estimate as sourced fact.
         itemIds: ["rop-s1", "rop-s2"],
-        yearBands: [{ label: "Second Age", span: 1 }],
+        // labelCs capitalized (user correction: "Druhý věk piš takto s
+        // velkým D, je to název") - unlike TBBT's own "podzim"/"zima"
+        // (plain common nouns naming a season), "Druhý věk"/"Třetí věk"
+        // are proper names for specific, capitalized ages of Middle-earth
+        // - matches era.labelCs above, which already uses this same
+        // capitalized form.
+        yearBands: [{ label: "Second Age", labelCs: "Druhý věk", span: 1 }],
       },
       {
         id: "third-age",
         label: "The Third Age",
+        labelCs: "Třetí věk",
         // ~180 in-universe years pass between the Rings of Power's own
         // Second Age and Helm Hammerhand's war (TA 2758-2759) - real gap,
         // not just a flavor note, so this era gets gapBefore same as Star
@@ -3704,7 +4215,9 @@ const ORDERINGS_LOTR = [
   {
     id: "release",
     label: "Release Order",
+    labelCs: "Podle data vydání",
     description: "Ideal for your first watch.",
+    descriptionCs: "Ideální pro první zhlédnutí.",
     // ONE flat era, same "no title bar needed for a single-era mode"
     // trick every other franchise's own Release Order/flat-Chronological
     // uses (see Star Wars' Release Order or Marvel's Chronological for

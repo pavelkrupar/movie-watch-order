@@ -67,6 +67,12 @@
   // a filter like the three keys above, but persisted the same way for
   // the same reason: it shouldn't reset just because the page reloaded.
   const EXTENDED_VERSIONS_STORAGE_KEY = "sw-watch-order:extendedVersions";
+  // which UI language is active ("en"/"cs") - see loc() and the language
+  // switch's own section further below. Independent of state.franchiseId
+  // (a language choice isn't tied to whichever franchise you're currently
+  // looking at, unlike orderingId/storyLineId/enabledEarths etc. - it's
+  // never reset by switchFranchise()).
+  const LANGUAGE_STORAGE_KEY = "sw-watch-order:language";
   // shared checkmark glyph - the season bulk-check and every episode row
   // use this same small square checkbox look
   const CHECK_SVG =
@@ -234,12 +240,15 @@
     doomsdayWatchlistCheckbox: document.getElementById("doomsdayWatchlistCheckbox"),
     extendedVersionsWrap: document.getElementById("extendedVersionsWrap"),
     extendedVersionsCheckbox: document.getElementById("extendedVersionsCheckbox"),
+    langSwitch: document.getElementById("langSwitch"),
     scroll: document.getElementById("timelineScroll"),
     track: document.getElementById("timelineTrack"),
     progressFill: document.getElementById("progressFill"),
+    progressLabelUnits: document.getElementById("progressLabelUnits"),
     progressCount: document.getElementById("progressCount"),
     progressTotal: document.getElementById("progressTotal"),
     progressRuntimeFill: document.getElementById("progressRuntimeFill"),
+    progressLabelRuntime: document.getElementById("progressLabelRuntime"),
     progressRuntimeWatched: document.getElementById("progressRuntimeWatched"),
     progressRuntimeTotal: document.getElementById("progressRuntimeTotal"),
     hintLeft: document.querySelector(".scroll-hint--left"),
@@ -288,12 +297,16 @@
     // own eraGroups mapping the way those do - only what runtime number a
     // card/progress total shows.
     extendedVersions: loadExtendedVersions(),
+    // "en"/"cs" - see loc()'s own comment for what this does and doesn't
+    // translate today.
+    language: loadLanguage(),
     watched: loadWatched(),
   };
 
   init();
 
   function init() {
+    buildLanguageSwitch();
     buildFranchiseSelect();
     buildOrderSwitch();
     buildStoryLineSelect();
@@ -640,6 +653,125 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /*  Language switch (EN/CS) - pinned to the page's own top-right corner  */
+  /* ---------------------------------------------------------------- */
+  // Two plain buttons, not a dropdown - only two languages exist, and a
+  // dropdown for a binary choice would be one extra click for no benefit
+  // (same reasoning the order-switch pills already apply to Chronological/
+  // Release Order). Positioned via CSS (position: absolute on .lang-switch,
+  // a direct child of .site-header, not .site-header__inner - see its own
+  // CSS comment) rather than as another flex item in the header's own row,
+  // so it sits at the literal page corner (user request: "úplně do
+  // pravého horního rohu") regardless of how wide .site-header__inner's
+  // own centered 1300px content column is on a wide screen.
+  //   Only DATA-driven text (a movie/series title, a season/ordering/era
+  // label or description - anything read off MOVIES/SERIES/SEASONS/
+  // ORDERINGS/FRANCHISES in data.js) is affected by this at all - see
+  // loc()'s own comment further below for exactly which render call sites
+  // read through it. Plain UI chrome (this page's own "Watch Order" title,
+  // generic "Movie"/"Series"/"Short" badge fallback text, the progress
+  // bars' "Watched X / Y" wording, every checkbox/button label in this
+  // header) is hardcoded English in index.html/app.js and stays that way
+  // regardless of this switch - translating it too would need a real
+  // UI-string dictionary, deliberately out of scope for this first pass
+  // (user request: "zbytek webu zatím nepřekládej").
+  function buildLanguageSwitch() {
+    enforceLanguageAvailability();
+    els.langSwitch.querySelectorAll(".lang-switch__btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const lang = btn.dataset.lang;
+        if (lang === state.language || btn.disabled) return;
+        state.language = lang;
+        saveLanguage(lang);
+        updateLanguageSwitchUI();
+        // Every other builder below reads .label/.description fresh off
+        // FRANCHISES/ORDERINGS each time it runs, so re-running the ones
+        // that don't already get called by render() is enough to pick up
+        // the new language everywhere text is shown - no dedicated
+        // "re-translate the page" pass needed.
+        updateFranchiseSelectUI();
+        updateOrderingDescription();
+        buildOrderSwitch();
+        render();
+      });
+    });
+  }
+
+  // Star Wars/Marvel have no Czech data at all yet (see FRANCHISES' own
+  // labelCs comment in data.js) - user request: "u Star Wars a Marvelu
+  // zatím českou variantu vypni... nepůjde na ní kliknout". `franchise
+  // .labelCs`'s own presence is the same signal every other "does this
+  // franchise support X" check in this file already reads off FRANCHISES/
+  // FRANCHISE_DATA (storyLines/doomsdayWatchlist/otherEarth content, etc.)
+  // rather than a separate hardcoded list, so a future franchise picks
+  // this up for free the moment it gets its own labelCs.
+  function franchiseHasCzech(franchiseId) {
+    const franchise = FRANCHISES.find((f) => f.id === franchiseId) || FRANCHISES[0];
+    return !!franchise.labelCs;
+  }
+
+  // Disables the CS button entirely (not just visually) when the active
+  // franchise has no Czech data - and, since a franchise switch can leave
+  // state.language stranded on "cs" from a PREVIOUS franchise that did
+  // have it (or from before this restriction existed at all), forces it
+  // back to "en" in that case too, same "reset state that's meaningless
+  // for the new franchise" pattern switchFranchise() already applies to
+  // orderingId/storyLineId/enabledEarths etc. Called both at init
+  // (buildLanguageSwitch()) and on every franchise switch.
+  function enforceLanguageAvailability() {
+    const hasCzech = franchiseHasCzech(state.franchiseId);
+    if (!hasCzech && state.language === "cs") {
+      state.language = "en";
+      saveLanguage("en");
+    }
+    updateLanguageSwitchUI();
+  }
+
+  function updateLanguageSwitchUI() {
+    const hasCzech = franchiseHasCzech(state.franchiseId);
+    els.langSwitch.querySelectorAll(".lang-switch__btn").forEach((btn) => {
+      const isCs = btn.dataset.lang === "cs";
+      btn.disabled = isCs && !hasCzech;
+      btn.setAttribute("aria-pressed", String(btn.dataset.lang === state.language));
+    });
+  }
+
+  // The one place that decides whether a piece of data-driven text shows
+  // in English or Czech - every render call site that reads a
+  // movie/series title, or a season/ordering/era label/description, goes
+  // through this instead of reading the plain English field directly (see
+  // buildCard()/buildSeriesCard()/seasonDisplayLabel()/render()'s own era
+  // rendering/buildFranchiseSelect()/updateFranchiseSelectUI()/
+  // buildOrderSwitch()/updateOrderingDescription()). Falls back to the
+  // English string whenever no Czech one exists - true for every
+  // franchise but TBBT today, and for TBBT's own individual episode
+  // titles too (see SERIES_TBBT's own comment in data.js for why those
+  // specifically aren't translated yet) - so nothing anywhere needs its
+  // own "do I have a translation" branch, same "degrade gracefully when
+  // the richer data isn't there" pattern this file already uses for
+  // episodeRuntimes/extendedRuntimeMin.
+  function loc(en, cs) {
+    return state.language === "cs" && cs ? cs : en;
+  }
+
+  function loadLanguage() {
+    try {
+      const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      return stored === "cs" ? "cs" : "en";
+    } catch {
+      return "en";
+    }
+  }
+
+  function saveLanguage(value) {
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, value);
+    } catch {
+      /* localStorage unavailable (private mode etc.) - fail silently */
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /*  Franchise picker                                                   */
   /* ---------------------------------------------------------------- */
   // A native <select>'s OPEN dropdown list can't be restyled with CSS at
@@ -662,7 +794,7 @@
       const opt = document.createElement("button");
       opt.type = "button";
       opt.className = "franchise-menu__option";
-      opt.textContent = franchise.label;
+      opt.textContent = loc(franchise.label, franchise.labelCs);
       opt.dataset.franchiseId = franchise.id;
       opt.setAttribute("role", "option");
       opt.addEventListener("click", () => {
@@ -695,8 +827,19 @@
   // without rebuilding the menu or re-wiring its listeners a second time.
   function updateFranchiseSelectUI() {
     const current = FRANCHISES.find((f) => f.id === state.franchiseId) || FRANCHISES[0];
-    els.franchiseSelectLabel.textContent = current.label;
+    els.franchiseSelectLabel.textContent = loc(current.label, current.labelCs);
+    // Every option's own textContent is re-set here too, not just the
+    // selected one - buildFranchiseSelect() only sets it ONCE, at init,
+    // so without this a language switch would correctly update the
+    // visible button label (read fresh every call, right above) while the
+    // menu's own dropdown options stayed frozen in whichever language was
+    // active at page load - exactly the bug this fixes ("texty jsou už
+    // fixně česky" - dropdown items stuck on Czech regardless of the
+    // switch, since state.language happened to already be "cs" from a
+    // previous session when the page first built the menu).
     [...els.franchiseMenu.children].forEach((opt) => {
+      const franchise = FRANCHISES.find((f) => f.id === opt.dataset.franchiseId);
+      if (franchise) opt.textContent = loc(franchise.label, franchise.labelCs);
       opt.setAttribute("aria-selected", String(opt.dataset.franchiseId === current.id));
     });
   }
@@ -741,6 +884,10 @@
     // booleans above.
     state.extendedVersions = false;
     saveExtendedVersions(false);
+    // Same reasoning again - Czech data doesn't exist for every franchise
+    // (see franchiseHasCzech()'s own comment) - drops back to English and
+    // disables the CS button when switching to one that has none.
+    enforceLanguageAvailability();
     updateFranchiseSelectUI();
     buildOrderSwitch(); // rebuilds the pills from the new ORDERINGS, and syncs their active state + the description text
     populateStoryLineMenu(); // rebuilds the dropdown's options from the new STORY_LINES (and hides it entirely if there are none)
@@ -804,7 +951,7 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "order-switch__btn";
-      btn.textContent = ordering.label;
+      btn.textContent = loc(ordering.label, ordering.labelCs);
       btn.dataset.orderingId = ordering.id;
       btn.setAttribute("role", "tab");
       btn.addEventListener("click", () => {
@@ -847,7 +994,9 @@
   function updateOrderingDescription() {
     const storyLine = STORY_LINES.find((sl) => sl.id === state.storyLineId) || null;
     const ordering = ORDERINGS.find((o) => o.id === state.orderingId);
-    els.orderingDescription.textContent = storyLine ? storyLine.description : ordering.description;
+    els.orderingDescription.textContent = storyLine
+      ? loc(storyLine.description, storyLine.descriptionCs)
+      : loc(ordering.description, ordering.descriptionCs);
   }
 
   /* ---------------------------------------------------------------- */
@@ -1392,13 +1541,13 @@
 
       const title = document.createElement("h2");
       title.className = "era-block__title";
-      title.textContent = era.label;
+      title.textContent = loc(era.label, era.labelCs);
       label.appendChild(title);
 
       if (era.description) {
         const desc = document.createElement("p");
         desc.className = "era-block__desc";
-        desc.textContent = era.description;
+        desc.textContent = loc(era.description, era.descriptionCs);
         label.appendChild(desc);
       }
 
@@ -1449,7 +1598,7 @@
           } else {
             yearBandEntries.push({
               bandRef: band,
-              label: band.label,
+              label: loc(band.label, band.labelCs),
               milestone: band.milestone,
               otherEarth: band.otherEarth,
               otherEarthVariant: band.otherEarthVariant,
@@ -1536,7 +1685,7 @@
     // Earths apart by artwork alone anymore.
     if (otherEarth) card.dataset.otherEarthLabel = otherEarth.label;
 
-    const posterHtml = posterPlaceholderHtml(movie.title);
+    const posterHtml = posterPlaceholderHtml(loc(movie.title, movie.titleCs));
     // "(Animated)" suffix (user-requested) - the tile no longer shows real
     // artwork, so live-action vs. animated is no longer visible at a
     // glance the way a real poster's own art style used to make obvious;
@@ -1570,7 +1719,7 @@
     `;
 
     const btn = card.querySelector(".card__poster-wrap");
-    btn.setAttribute("aria-label", `${escapeHtml(movie.title)} – ${isWatched ? "watched, click to unmark" : "mark as watched"}`);
+    btn.setAttribute("aria-label", `${escapeHtml(loc(movie.title, movie.titleCs))} – ${isWatched ? "watched, click to unmark" : "mark as watched"}`);
     btn.addEventListener("click", () => toggleWatched(movie.id, card, btn));
 
     return card;
@@ -1591,7 +1740,7 @@
     const movie = MOVIES[movieId];
     btn.setAttribute(
       "aria-label",
-      `${movie.title} – ${nowWatched ? "watched, click to unmark" : "mark as watched"}`
+      `${loc(movie.title, movie.titleCs)} – ${nowWatched ? "watched, click to unmark" : "mark as watched"}`
     );
 
     updateProgress();
@@ -1692,7 +1841,7 @@
     if (otherEarth) card.dataset.otherEarthLabel = otherEarth.label;
 
     const rowsHtml = seasons.map((s) => buildSeasonRowHtml(series, s)).join("");
-    const posterHtml = posterPlaceholderHtml(series.title);
+    const posterHtml = posterPlaceholderHtml(loc(series.title, series.titleCs));
     // series.badge (e.g. "TBBT") replaces the neutral "Series" text the
     // same way movie.badge replaces "Movie" in buildCard() - see its own
     // comment above. "(Animated)" suffix - see the matching comment in
@@ -1813,7 +1962,7 @@
     const widestContentW = Math.max(
       ...seasons.map((s) => measureTextWidth(seasonDisplayLabel(s), SEASON_NAME_FONT)),
       ...seasons.map((s) => measureTextWidth(seasonMetaLineText(s), SEASON_META_FONT)),
-      minWidthForTwoLineTitle(series.title)
+      minWidthForTwoLineTitle(loc(series.title, series.titleCs))
     );
     const ROW_CHROME = 32; // per column: row padding + top-row gap + chevron
     const CARD_CHROME = 26; // once, not per column: .card__frame's border + .card__meta's own side padding, see css
@@ -1981,7 +2130,7 @@
         type="button"
         class="season-row__header"
         aria-expanded="false"
-        aria-label="${escapeHtml(series.title)} – ${escapeHtml(displayLabel)} (${season.year})${fullyWatched ? ", watched" : ""}, show episodes"
+        aria-label="${escapeHtml(loc(series.title, series.titleCs))} – ${escapeHtml(displayLabel)} (${season.year})${fullyWatched ? ", watched" : ""}, show episodes"
       >
         <span class="season-row__top">
           <span class="season-row__name">${escapeHtml(displayLabel)}</span>
@@ -2032,10 +2181,13 @@
       // to skip the added "EN:" entirely - printing "E1: Part I" would be
       // redundant with the title already stating its own position.
       const prefix = season.episodePrefix || "E";
-      const label = season.episodeTitles
+      const episodeTitle = season.episodeTitles
+        ? loc(season.episodeTitles[n - 1], season.episodeTitlesCs && season.episodeTitlesCs[n - 1])
+        : null;
+      const label = episodeTitle
         ? season.episodeTitlesAreSelfNumbered
-          ? season.episodeTitles[n - 1]
-          : `${prefix}${realNum}: ${season.episodeTitles[n - 1]}`
+          ? episodeTitle
+          : `${prefix}${realNum}: ${episodeTitle}`
         : `Episode ${realNum}`;
       html += `<button type="button" class="episode-pill${w ? " is-watched" : ""}" data-ep="${n}" aria-pressed="${w}">${escapeHtml(label)}</button>`;
     }
@@ -2455,6 +2607,16 @@
     // whichever franchise's MOVIES/SEASONS is currently bound
     // (switchFranchise() reassigns those, see applyFranchiseData()), so a
     // franchise switch needs them to change right along with the counts.
+    // "Watched" is plain UI chrome (not per-franchise data), but the user
+    // explicitly asked for these two specific labels to be localized
+    // alongside the timeline's own date text - unlike the rest of this
+    // app's UI chrome (badges, page title, header checkbox labels), which
+    // stays English per the language switch's own documented scope (see
+    // CLAUDE.md) - so it's set here via loc() rather than left hardcoded
+    // in index.html, same call re-run on every render/language switch.
+    els.progressLabelUnits.textContent = loc("Watched", "Zhlédnuto");
+    els.progressLabelRuntime.textContent = loc("Watched", "Zhlédnuto");
+
     const total = getTotalUnits();
     const count = getWatchedUnitsCount();
     els.progressTotal.textContent = total;
@@ -2642,7 +2804,8 @@
   // widenSeriesCard's width measurement - a slice's longer name must count
   // there too) goes through this instead of reading season.label directly.
   function seasonDisplayLabel(season) {
-    if (!season.sliceOf || season.episodeNumbers) return season.label;
+    const label = loc(season.label, season.labelCs);
+    if (!season.sliceOf || season.episodeNumbers) return label;
     const pad = (n) => String(n).padStart(2, "0");
     const first = (season.episodeOffset || 0) + 1;
     const last = (season.episodeOffset || 0) + season.episodes;
@@ -2650,7 +2813,7 @@
     // one episode - Clone Wars S2's "Lightsaber Lost") would read as the
     // redundant "e11-e11" with the two-sided range format below
     const range = first === last ? `e${pad(first)}` : `e${pad(first)}-e${pad(last)}`;
-    return `${season.label} (${range})`;
+    return `${label} (${range})`;
   }
 
   function isSeasonFullyWatched(season) {

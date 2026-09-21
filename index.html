@@ -105,7 +105,7 @@
             <div class="progress__fill" id="progressFill"></div>
           </div>
           <p class="progress__label">
-            Watched <span id="progressCount">0</span> / <span id="progressTotal">0</span>
+            <span id="progressLabelUnits">Watched</span> <span id="progressCount">0</span> / <span id="progressTotal">0</span>
           </p>
         </div>
 
@@ -114,9 +114,14 @@
             <div class="progress__fill" id="progressRuntimeFill"></div>
           </div>
           <p class="progress__label">
-            Watched <span id="progressRuntimeWatched">0m</span> / <span id="progressRuntimeTotal">0m</span>
+            <span id="progressLabelRuntime">Watched</span> <span id="progressRuntimeWatched">0m</span> / <span id="progressRuntimeTotal">0m</span>
           </p>
         </div>
+      </div>
+
+      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language">
+        <button type="button" class="lang-switch__btn" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" class="lang-switch__btn" data-lang="cs" aria-pressed="false">CS</button>
       </div>
     </div>
   </header>

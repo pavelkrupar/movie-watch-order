@@ -2308,6 +2308,28 @@
     expandedSeason = null;
   }
 
+  // Recomputes .episode-strip's own max-height from the ACTUAL available
+  // vertical space (.timeline-scroll's own rect - same bounds
+  // clampExpandedRowToViewport() clamps position against, see its own
+  // comment for why that's the right rect to measure rather than
+  // window.innerHeight) instead of a hardcoded guess - user request: a
+  // long season (or a big merged multi-season card, TBBT's own S1-S11a
+  // topping 100+ episodes) must show every episode at once whenever the
+  // screen actually has room, not stop early just because a static
+  // constant said so. Runs BEFORE the position math in
+  // repositionExpandedRow() below - that function reads rowEl.offsetHeight
+  // to center the row on its placeholder, so the strip's real (possibly
+  // taller) height needs to already be settled first, not measured off
+  // its old size from before this resize/reopen.
+  function updateExpandedEpisodeStripMaxHeight() {
+    if (!expandedSeason) return;
+    const stripEl = expandedSeason.rowEl.querySelector(".episode-strip");
+    if (!stripEl) return;
+    const bounds = els.scroll.getBoundingClientRect();
+    const margin = 16; // stejný duch jako clampExpandedRowToViewport's vlastní margin, jen o kousek širší dech nahoře/dole
+    stripEl.style.maxHeight = `${Math.max(60, bounds.height - margin * 2)}px`;
+  }
+
   // Checkbox width isn't known until it's actually rendered (it's not a
   // fixed constant anywhere), so the row's final left edge - checkbox
   // width included - is only settled after that first paint. Also used to
@@ -2315,6 +2337,7 @@
   // moved/resized while it was away.
   function repositionExpandedRow() {
     if (!expandedSeason) return;
+    updateExpandedEpisodeStripMaxHeight();
     const { rowEl, placeholder } = expandedSeason;
     const trackRect = els.track.getBoundingClientRect();
     const placeholderRect = placeholder.getBoundingClientRect();

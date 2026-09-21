@@ -2148,16 +2148,26 @@ body {
    pokud show nemá vlastní kurátorské názvy (episodeTitles v datech). Teď
    už rozbalená řada plave nad zatemněným pozadím (viz .season-backdrop),
    takže si klidně může vzít víc místa - zalamuje se přes víc řádků místo
-   vodorovného scrollu, ať je vidět víc epizod najednou. Jen pro opravdu
-   dlouhou sérii (22 dílů) je tu ještě svislý scroll jako pojistka, ať
-   seznam neroste bez konce. */
+   vodorovného scrollu, ať je vidět víc epizod najednou.
+     max-height se NEUDÁVÁ tady napevno (bývalo tu "172px", cca 4 zalomené
+   řádky) - uživatelský požadavek: i u hodně dlouhé série (přes 100 dílů u
+   sloučené karty) se má vždy zobrazit úplně všechno najednou, pokud na to
+   je na obrazovce místo, ne se zbytečně brzy zaseknout na vnitřním
+   scrollu jen kvůli odhadnuté konstantě - stejná "změř to doopravdy"
+   filozofie jako capSeasonListHeights()/CLAUDE.md's Gotcha #6.
+   updateExpandedEpisodeStripMaxHeight() (app.js, voláno z
+   repositionExpandedRow() - tedy při každém rozbalení i při resize) tam
+   místo toho dosadí inline style.maxHeight spočítaný ze skutečně
+   dostupné výšky .timeline-scroll. overflow-y: auto tu zůstává jako
+   opravdu POSLEDNÍ záchrana - stejná role jako .timeline-scroll's vlastní
+   overflow-y, viz "page never scrolls vertically" pravidlo v CLAUDE.md -
+   zapne se jen když ani celá dostupná výška obrazovky nestačí. */
 .episode-strip {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
   gap: 5px;
   max-width: min(70vw, 620px);
-  max-height: 172px;
   overflow-y: auto;
   padding: 1px 6px 1px 1px;
   scrollbar-width: thin;

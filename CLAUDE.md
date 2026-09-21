@@ -1171,6 +1171,27 @@ line-clamp, so it wraps freely) binary-searched down to the narrowest
 width where its real rendered height still fits 2 lines. Any future card
 content that's allowed to wrap (rather than staying on one line) needs
 this same real-measurement treatment, not a single-line width shortcut.
+  `.episode-strip`'s own `max-height` (the wrapped episode-pill list
+inside an expanded season row) used to be a flat CSS constant (`172px`,
+~4 wrapped lines) - fine for a short season, but a long one with real,
+long curated titles (TBBT's own episode names run much wider per pill
+than a plain "Episode N") wraps into far more lines than that, so the
+internal scrollbar kicked in well before the actual screen ran out of
+room - user-reported bug: "i když je dílů hodně a zabere to hodně
+prostoru, pokud to prostor monitoru dovolí, vždy se musí otevřít vše".
+Fixed the same way `capSeasonListHeights()` already fixes the analogous
+problem for the season LIST (not a single expanded row): the CSS constant
+is gone, and `updateExpandedEpisodeStripMaxHeight()` (app.js) sets a real
+inline `max-height` off `.timeline-scroll`'s own currently available
+height (the same rect `clampExpandedRowToViewport()` already clamps
+position against) every time a season expands or the window resizes
+(called from `repositionExpandedRow()`, before its own position math -
+that math reads `rowEl.offsetHeight`, which has to already reflect the
+strip's real, newly-uncapped height). `overflow-y: auto` stays in the CSS
+as a genuine last resort (same role as `.timeline-scroll`'s own fallback
+scrollbar, see the "page never scrolls vertically" rule) - it only
+engages when even the FULL available screen height still isn't enough,
+not as the default outcome for any season past a few dozen episodes.
 
 **Two base orderings + Storylines as a third, MUTUALLY EXCLUSIVE mode** -
 not a filter layered on top of the other two. `ORDERINGS` (data.js) has

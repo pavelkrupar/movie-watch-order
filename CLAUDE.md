@@ -1218,13 +1218,21 @@ single-line width measurement is the wrong question for it, and a naive
 under-measured it for "Your Friendly Neighborhood Spider-Man" (this app's
 longest series title yet - real greedy word-wrap doesn't split into even
 halves: "Your Friendly" wraps far shorter than "Neighborhood
-Spider-Man"). `minWidthForTwoLineTitle()` fixes this the same
-"measure the real thing" way as everything else in this section: a
-hidden, off-DOM clone of `.card__title`'s own font/line-height (no
-line-clamp, so it wraps freely) binary-searched down to the narrowest
-width where its real rendered height still fits 2 lines. Any future card
-content that's allowed to wrap (rather than staying on one line) needs
-this same real-measurement treatment, not a single-line width shortcut.
+Spider-Man"). A since-REMOVED `minWidthForTwoLineTitle()` fixed this
+the "measure the real thing" way (an off-DOM clone binary-searched to
+the narrowest width still fitting 2 lines) - but once the no-poster-art
+redesign moved the title INSIDE the tile (see below), that title line no
+longer shared the card's width at all, and the leftover measurement just
+silently widened every long-titled show (user-reported on The Rings of
+Power: ~18% wider than any other series, as wide as a movie card - also
+hit YFNSM, She-Hulk, Falcon & Winter Soldier, Stuart, Georgie & Mandy,
+several Star Wars shows at smaller viewports). Removed outright:
+`widenSeriesCard()` now measures ONLY season-row content, and the tile
+title is `fitTilePlaceholderTitles()`'s job alone. Lesson: when a
+redesign moves content elsewhere, delete the sizing code that budgeted
+for its OLD location too - stale measurement fails silently as "a bit
+too big", never as an error. Any future card content that's allowed to
+wrap still needs real (not single-line) measurement, wherever it lives.
   `.episode-strip`'s own `max-height` (the wrapped episode-pill list
 inside an expanded season row) used to be a flat CSS constant (`172px`,
 ~4 wrapped lines) - fine for a short season, but a long one with real,
@@ -1717,9 +1725,9 @@ roughly half the horizontal space a side-by-side pair would. `state.language`
 is active). `loc(en, cs)` (app.js) is the ONE function that decides which
 string shows, called from every render site that reads a movie/series/
 episode title or a season/ordering/era label/description -
-`buildCard()`/`buildSeriesCard()` (including the `aria-label`s and
-`minWidthForTwoLineTitle()`'s own measurement, so a Czech title's real
-wrap width is what actually gets measured, not the English one),
+`buildCard()`/`buildSeriesCard()` (including the `aria-label`s, and the
+tile title `fitTilePlaceholderTitles()` then fits, so a Czech title's
+real wrap is what actually gets measured, not the English one),
 `seasonDisplayLabel()`, `buildEpisodePillsHtml()` (per-episode, see
 below), `buildFranchiseSelect()`/`updateFranchiseSelectUI()`,
 `buildOrderSwitch()`/`updateOrderingDescription()`, and `render()`'s own
@@ -1883,7 +1891,7 @@ to them - matches `era.labelCs`'s own capitalized form.
    all three fixed the same way: moving the declaration up to the block of
    top-level state near the top of the IIFE. New module-level state goes
    there, always - even a single `let` for a lazily-created helper element
-   (`titleMeasureEl`, `minWidthForTwoLineTitle()`) isn't safe to declare
+   (`titleMeasureEl`, since removed along with its function) isn't safe to declare
    "right next to" the function that uses it, if that function can run
    during the first render.
 
@@ -2080,9 +2088,8 @@ to them - matches `era.labelCs`'s own capitalized form.
   sentence-leading "The" too), e.g. `"The Lord of the Rings"`.
   This needs no CSS or app.js changes to take effect - the browser already
   treats U+00A0 as unbreakable for line-wrapping purposes, and the tile
-  title's own real-measurement sizing (`minWidthForTwoLineTitle()`,
-  `fitTilePlaceholderTitles()` - see the "Measure the real thing" section
-  above) already measures whatever the browser actually renders, wrap
+  title's own real-measurement sizing (`fitTilePlaceholderTitles()` - see
+  the "Measure the real thing" section above) already measures whatever the browser actually renders, wrap
   points included, so it adapts automatically to the new unbreakable
   chunks instead of needing to know about them. Apply this same
   transformation to any NEW movie/series title added later - a title

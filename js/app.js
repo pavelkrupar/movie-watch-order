@@ -190,23 +190,11 @@
   // spirit as the rest of the file's "measure the real thing" approach,
   // just for text instead of layout
   let measureCtx = null;
-  // Hidden off-DOM clone used by minWidthForTwoLineTitle() below to
-  // real-measure a series title's wrapped height at a candidate width -
-  // declared up here, not next to that function, for the same reason as
-  // measureCtx above (see Gotcha #1 in CLAUDE.md: anything render()/init()
-  // can reach transitively must be declared before init() runs, not just
-  // "near" the function that uses it).
-  let titleMeasureEl = null;
   const SEASON_NAME_FONT = "600 12px Inter, system-ui, -apple-system, sans-serif";
   // .season-row__meta's own font (year · episode count · runtime, see
   // seasonMetaLineText()) - widenSeriesCard() measures this too, not just
   // the name, since either line can end up the widest thing in the row.
   const SEASON_META_FONT = "10.5px Inter, system-ui, -apple-system, sans-serif";
-  // .card__title's own font - unlike the two above, the title is allowed
-  // to WRAP across up to 2 lines (-webkit-line-clamp: 2, css) rather than
-  // staying on one, so widenSeriesCard() below only ever budgets HALF this
-  // measured width for it, not the whole thing - see the comment there.
-  const SERIES_TITLE_FONT = "600 13px Inter, system-ui, -apple-system, sans-serif";
   /**
    * Only one season is ever expanded at a time, ACROSS THE WHOLE PAGE (not
    * just per card). Expanding one moves its actual row element out of the
@@ -1879,48 +1867,6 @@
     return measureCtx.measureText(text).width;
   }
 
-  // .card__title wraps across up to 2 lines (-webkit-line-clamp: 2) rather
-  // than staying on one like a season row - so unlike SEASON_NAME_FONT/
-  // SEASON_META_FONT above, a single canvas measureText() width isn't the
-  // right question for it. Real greedy word-wrap rarely splits a title
-  // into two even halves (tried that first - half of "Your Friendly
-  // Neighborhood Spider-Man"'s single-line width still clipped it to 3
-  // lines, because "Your Friendly" wraps far shorter than "Neighborhood
-  // Spider-Man" ever could), so this measures the REAL thing instead
-  // (same philosophy as capSeasonListHeights() elsewhere): a hidden,
-  // off-DOM clone of .card__title's own font/line-height, WITHOUT the
-  // line-clamp so it wraps freely, binary-searched down to the narrowest
-  // width where its real rendered height still fits within 2 lines.
-  function minWidthForTwoLineTitle(text) {
-    if (!titleMeasureEl) {
-      titleMeasureEl = document.createElement("div");
-      titleMeasureEl.style.position = "absolute";
-      titleMeasureEl.style.visibility = "hidden";
-      titleMeasureEl.style.left = "-9999px";
-      titleMeasureEl.style.top = "-9999px";
-      titleMeasureEl.style.whiteSpace = "normal";
-      titleMeasureEl.style.font = SERIES_TITLE_FONT;
-      titleMeasureEl.style.lineHeight = "1.35";
-      document.body.appendChild(titleMeasureEl);
-    }
-    titleMeasureEl.textContent = text;
-    const lineH = 13 * 1.35; // matches .card__title's font-size/line-height in css
-    const singleLineW = Math.ceil(measureTextWidth(text, SERIES_TITLE_FONT));
-
-    let lo = 20;
-    let hi = singleLineW + 2; // guaranteed to fit on ONE line, so well within 2
-    while (hi - lo > 1) {
-      const mid = Math.floor((lo + hi) / 2);
-      titleMeasureEl.style.width = `${mid}px`;
-      if (titleMeasureEl.offsetHeight <= lineH * 2 + 1) {
-        hi = mid;
-      } else {
-        lo = mid;
-      }
-    }
-    return hi;
-  }
-
   /**
    * A merged card with more than MAX_VISIBLE_SEASON_ROWS seasons (Clone
    * Wars' 7) lays its season rows out in extra COLUMNS instead of growing
@@ -1940,7 +1886,6 @@
    * poster size - see resizeWideSeriesCards()).
    */
   function widenSeriesCard(card, seasons) {
-    const series = SERIES[seasons[0].seriesId];
     const list = card.querySelector(".season-list");
     const columns = Math.ceil(seasons.length / MAX_VISIBLE_SEASON_ROWS);
 
@@ -1950,19 +1895,19 @@
     // (the meta line has no chevron eating into its space, but 3 numbers
     // can still out-measure a short name). Both lines share the same row
     // width, so whichever is wider is what actually has to fit.
-    //   .card__title is different from both - it's allowed to wrap across
-    // up to 2 lines instead of staying on one (see SERIES_TITLE_FONT's own
-    // comment), so minWidthForTwoLineTitle() (real wrap measurement, not a
-    // single-line width) is what has to fit instead. This is what actually
-    // caught the gap in the first place: "Your Friendly Neighborhood
-    // Spider-Man", this app's longest series title yet, was the first one
-    // whose name alone (not any season row) needed more room than a
-    // normal single-column card has, and got silently clipped by the
-    // line-clamp before this existed.
+    //   The series TITLE is deliberately NOT measured here any more. It
+    // used to be (via a since-removed minWidthForTwoLineTitle(), added for
+    // "Your Friendly Neighborhood Spider-Man"), back when the title was a
+    // 2-line .card__title UNDER the poster sharing this card's width. Since
+    // the no-poster-art redesign the title lives INSIDE the tile instead,
+    // where fitTilePlaceholderTitles() fits it on its own (shrinking font
+    // / growing the tile a little) - so measuring it here only widened
+    // long-titled shows for no reason (user-reported: The Rings of Power's
+    // card rendered ~18% wider than any other series with the same short
+    // season rows, as wide as a movie card).
     const widestContentW = Math.max(
       ...seasons.map((s) => measureTextWidth(seasonDisplayLabel(s), SEASON_NAME_FONT)),
-      ...seasons.map((s) => measureTextWidth(seasonMetaLineText(s), SEASON_META_FONT)),
-      minWidthForTwoLineTitle(loc(series.title, series.titleCs))
+      ...seasons.map((s) => measureTextWidth(seasonMetaLineText(s), SEASON_META_FONT))
     );
     const ROW_CHROME = 32; // per column: row padding + top-row gap + chevron
     const CARD_CHROME = 26; // once, not per column: .card__frame's border + .card__meta's own side padding, see css

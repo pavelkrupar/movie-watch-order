@@ -4228,13 +4228,34 @@ const SEASONS_LOTR = {
     ],
     episodeRuntimes: [77, 63, 67, 66, 62, 64, 73, 74],
   },
-  // Season 3 (premieres Nov 11, 2026) is deliberately NOT in this dataset
-  // - removed on explicit user request ("ještě nevznikla", it doesn't
-  // exist yet) even though it has a confirmed date/episode count. This is
-  // a stricter standard than TBBT's own stuart-s1 (real, dated, unaired
-  // episodes included there) - the user drew the line differently for
-  // this franchise, so don't re-add rop-s3 just because a date exists;
-  // wait until the season has actually aired.
+  // Season 3 - added on explicit user request ("Přidej 3. sérii Prstenů
+  // moci") on Nov 14, 2026, three days after it started airing. It had
+  // earlier been kept OUT of this dataset on the user's own request
+  // ("ještě nevznikla") while it only had an announced date; now that it's
+  // actually streaming, that objection no longer applies.
+  //   Prime Video releases it in three batches: E1-4 on Nov 11, E5-6 on
+  // Nov 18, E7-8 on Nov 25, 2026 (Forbes/Yahoo/GameRant schedules agree).
+  // Only E1-4 have confirmed titles so far - English per Forbes/Yahoo
+  // (citing Prime Video's own listing; a GameRant list with different
+  // titles conflicts with everything else and was ignored), Czech per
+  // Prime Video CZ's own season page. E5-8 are deliberately left out of
+  // both arrays rather than guessed: buildEpisodePillsHtml() (app.js)
+  // falls back to a plain "Episode N" pill for any index past the end of
+  // episodeTitles, so the season still shows all 8 episodes correctly.
+  //   No episodeRuntimes yet, for the same reason as TBBT's own stuart-s1:
+  // seasonTotalRuntimeMin() needs a real number for every episode, and
+  // E5-8 haven't aired. Fill in titles + runtimes (TMDB) once the season
+  // finishes on Nov 25.
+  "rop-s3": {
+    id: "rop-s3",
+    seriesId: "ringsofpower",
+    number: 3,
+    label: "Season 3", labelCs: "Řada 3",
+    episodes: 8,
+    year: 2026,
+    episodeTitles: ["Marnûkh", "The Gift of Men", "The Secret Fire", "Gundabad"],
+    episodeTitlesCs: ["Marnûkh", "Dar lidí", "Tajný Oheň", "Gundabad"],
+  },
 };
 
 const ORDERINGS_LOTR = [
@@ -4253,15 +4274,16 @@ const ORDERINGS_LOTR = [
         // groupEraItems() (app.js) merges them into ONE card, same as
         // Loki's own two seasons under Marvel's Chronological - a single
         // "Second Age" band is enough for the whole merged card, not one
-        // per season. (Season 3 is deliberately not in this dataset yet -
-        // see SEASONS_LOTR's own comment.)
+        // per season - rop-s3 joins the same merged card too, still one
+        // band. (Season 3 was added later than S1/S2 - see SEASONS_LOTR's
+        // own comment.)
         //   No specific Second Age year is given - Amazon's own show
         // deliberately compresses/rearranges the book's several-thousand-
         // year Second Age timeline for drama, and there's no single
         // official year for "when Season 1 happens" the way there is a
         // real Third Age year for the Hobbit/LOTR films below - stating
         // one here would be presenting a fan estimate as sourced fact.
-        itemIds: ["rop-s1", "rop-s2"],
+        itemIds: ["rop-s1", "rop-s2", "rop-s3"],
         // labelCs capitalized (user correction: "Druhý věk piš takto s
         // velkým D, je to název") - unlike TBBT's own "podzim"/"zima"
         // (plain common nouns naming a season), "Druhý věk"/"Třetí věk"
@@ -4315,12 +4337,14 @@ const ORDERINGS_LOTR = [
         id: "all",
         label: "",
         // warofrohirrim (Dec 2024) sorts strictly by real release date,
-        // landing right after rop-s2 (Aug-Oct 2024) as the sequence's own
-        // last item (rop-s3 isn't in this dataset - see SEASONS_LOTR's own
-        // comment) - rop-s1+rop-s2 still merge into one card (consecutive,
-        // same seriesId), warofrohirrim stays its own separate card right
-        // after. This era renders 8 cards.
-        itemIds: ["lotr1", "lotr2", "lotr3", "hobbit1", "hobbit2", "hobbit3", "rop-s1", "rop-s2", "warofrohirrim"],
+        // landing right after rop-s2 (Aug-Oct 2024) - rop-s1+rop-s2 still
+        // merge into one card (consecutive, same seriesId), warofrohirrim
+        // stays its own separate card right after, and rop-s3 (Nov 2026)
+        // comes last as a SEPARATE card of its own - warofrohirrim sits
+        // between it and S2, so it can't merge with them here (unlike
+        // Chronological, where all three seasons merge). This era renders
+        // 9 cards.
+        itemIds: ["lotr1", "lotr2", "lotr3", "hobbit1", "hobbit2", "hobbit3", "rop-s1", "rop-s2", "warofrohirrim", "rop-s3"],
         yearBands: [
           { label: "2001", span: 1 },
           { label: "2002", span: 1 },
@@ -4330,6 +4354,7 @@ const ORDERINGS_LOTR = [
           { label: "2014", span: 1 },
           { label: "2022–2024", span: 1 },
           { label: "2024", span: 1 },
+          { label: "2026", span: 1 },
         ],
       },
     ],

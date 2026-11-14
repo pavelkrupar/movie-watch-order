@@ -991,14 +991,14 @@ earlier still (the Second Age) despite being the most recently released
 (`SEASONS_LOTR`, `ringsofpower` in `SERIES_LOTR`) - real theatrical
 (non-extended-edition) runtimes verified via Wikipedia, The Rings of
 Power's own episodeTitles/episodeRuntimes verified via TMDB, same
-sourcing standard as every other curated show in this file. The show is
-deliberately only TWO seasons in this dataset, not three - Season 3 has a
-real, confirmed Nov 11, 2026 premiere/8-episode order, and an earlier
-pass DID include it (same "real and dated, even not yet aired" standard
-TBBT's own `stuart-s1` established), but it was removed again on explicit
-user request ("ještě nevznikla" - it doesn't exist yet): this franchise
-draws that line stricter than TBBT does, so don't re-add `rop-s3` just
-because it has a real date - wait until it's actually aired. The seventh
+sourcing standard as every other curated show in this file. Season 3
+(`rop-s3`) was first kept OUT on explicit user request while it only had
+an announced date ("ještě nevznikla"), then added on request once it
+had actually started streaming (Nov 14, 2026 - E1-4 out Nov 11, E5-6
+due Nov 18, E7-8 Nov 25). Only E1-4 carry titles (EN + real Prime Video
+CZ titles); E5-8 fall back to plain "Episode N" pills, and there are no
+`episodeRuntimes` yet (same reason as TBBT's `stuart-s1`) - fill both in
+from TMDB once the season finishes. The seventh
 film, the standalone animated prequel `warofrohirrim` (2024, Warner
 Bros/New Line, `animated: true`), was added in a follow-up pass - set TA
 2758-2759 per Tolkien's own Appendix A (Helm Hammerhand's death, the Long
@@ -1052,8 +1052,10 @@ sourced fact, the same restraint this file already applies to Loki's own
 undated "OUTSIDE TIME" band.
   Release Order is the usual single flat era (`label: ""`) sorted by real
 release year - `warofrohirrim`'s real Dec 2024 release date sorts it right
-after `rop-s2` (Aug-Oct 2024), as the sequence's own last item. Both
-orderings render 8 cards.
+after `rop-s2` (Aug-Oct 2024), and `rop-s3` (2026) after it as its own
+separate card (it can't merge with S1/S2 there, unlike Chronological,
+where all three seasons merge into one card). Chronological renders 8
+cards, Release Order 9.
   **"Extended versions" header checkbox** (user request) - a single
 `.header-toggle` checkbox, visually identical to Marvel's own Core
 MCU/Doomsday toggles but a plain DISPLAY preference, not a filter: no

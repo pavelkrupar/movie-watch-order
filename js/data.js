@@ -1850,6 +1850,12 @@ const MOVIES_MARVEL = {
     otherEarth: { label: "Earth-828", year: "1964" },
   },
   spiderman4: { id: "spiderman4", title: "Spider-Man: Brand New Day", year: 2026, runtimeMin: 144, type: "film" },
+  // Added a month BEFORE its Dec 18, 2026 release on explicit user request.
+  // 165 min is the pre-release figure reported by The Hollywood Reporter
+  // (and flagged there as possibly not final) - re-check once it's out.
+  // No official in-universe date yet - see its "cca 2028" band on
+  // ORDERINGS_MARVEL's Chronological, shared with spiderman4.
+  avengers5: { id: "avengers5", title: "Avengers: Doomsday", year: 2026, runtimeMin: 165, type: "film", badge: "Avengers" },
   werewolfnight: { id: "werewolfnight", title: "Werewolf by Night", year: 2022, runtimeMin: 53, type: "film" },
   gotgholiday: { id: "gotgholiday", title: "The Guardians of the Galaxy Holiday Special", year: 2022, runtimeMin: 44, type: "film" },
   // Five short bonus films (4-15 min each) - originally bundled as
@@ -2307,6 +2313,7 @@ const ORDERINGS_MARVEL = [
           "daredevilba-s1",
           "daredevilba-s2",
           "spiderman4",
+          "avengers5",
           "logan",
         ],
         // agentcarter-s1/-s2 and daredevilba-s1/-s2 each merge into ONE
@@ -2476,7 +2483,10 @@ const ORDERINGS_MARVEL = [
           { label: "back to 1964", span: 1, otherEarth: "Earth-828" },
           { label: "cca 2026", span: 1 },
           { label: "cca late 2026 – 2027", span: 1 },
-          { label: "cca 2028", span: 1 },
+          // spiderman4 + avengers5 - neither has a confirmed in-universe
+          // year, Doomsday is simply placed right after Brand New Day
+          // (matching their real release order), sharing its "cca" band.
+          { label: "cca 2028", span: 2 },
           { label: "2029", span: 1, otherEarth: "Earth-10005" },
         ],
       },
@@ -2607,6 +2617,7 @@ const ORDERINGS_MARVEL = [
           "wonderman-s1",
           "daredevilba-s2",
           "spiderman4",
+          "avengers5",
         ],
         // Same otherEarth split-per-band treatment as Chronological's own
         // yearBands (see the big comment on ORDERINGS_MARVEL and Gotcha #12)
@@ -2708,7 +2719,7 @@ const ORDERINGS_MARVEL = [
           { label: "2025", span: 1, otherEarth: "Earth-828" },
           { label: "2025", span: 1 },
           { label: "2025", span: 1, otherEarth: "Earth-89521" },
-          { label: "2026", span: 3 },
+          { label: "2026", span: 4 },
         ],
       },
     ],

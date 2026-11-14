@@ -1078,6 +1078,29 @@ hides the whole control (same pattern as Core MCU/Doomsday) whenever the
 active franchise has no `extendedRuntimeMin` content anywhere in its
 `MOVIES` at all - every franchise but LOTR today.
 
+**A fifth franchise: The Hunger Games - movies only.** Six films
+(`MOVIES_HG`; `SERIES_HG`/`SEASONS_HG` are `{}`), the Katniss tetralogy
+(`hg1`-`hg4`, badge tier, uniform `badge: "Main Saga"` - user-chosen
+text, replacing an earlier "Katniss"; badges have no `*Cs` variant
+anywhere, so it stays English under CS like "LOTR"/"TBBT") plus the two
+prequels at plain movie tier (`hgballad`, `hgsunrise`). Sunrise on the
+Reaping (Nov 20, 2026) was added a week BEFORE release on explicit user
+request - unlike LOTR's Rings of Power S3, which the user wanted kept
+out until aired; that line is drawn per franchise by the user, not a
+general rule. Its 158-min runtime is the pre-release figure - re-check
+once it's out. Both orderings are one flat era titled "The Hunger Games
+Universe" (user request, same real-title choice as TBBT's own flat era).
+Chronological is dated by Games number ("10th Games"/"50th Games"/
+"74th Games"/"75th Games"/"Second Rebellion" for both Mockingjay parts -
+Panem has no stated calendar year), with `cardGapBefore` on `hgsunrise`
+and `hg1` for the 40-/24-year jumps. Third franchise with Czech data:
+every `titleCs` is the real Czech distribution title (ČSFD/Kinobox/ČT24 -
+notably the first film is plain "Hunger Games", and Sunrise is "Hunger
+Games: Úsvit sklizně", Forum Film); yearBands use "N. Hladové hry" (the
+Czech novels' own term), "Druhé povstání" is this app's own rendering
+(capitalized as a proper name). Own accent: ember orange
+(`:root[data-franchise="hg"]`).
+
 **Marvel One-Shots and the classic Netflix "Defenders Saga" shows - real
 Earth-616 content positioned by user request, not by strict date.**
 Twelve titles added in one pass, none of them `otherEarth` (all genuinely

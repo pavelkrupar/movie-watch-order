@@ -321,6 +321,20 @@
   --accent-ink: #171340;
 }
 
+/* Hunger Games ohnivá oranžová ("Girl on Fire" / reprodrozd) - hue zhruba
+   mezi SW žlutou (#ffc857) a Marvel červenou (#ff4d5e), od obou čitelně
+   odsazená; schválně ne zelená (napevno --done). Oranžová rodina
+   --other-earth (Spider-Man Earths) žije jen u Marvelu, tahle franšíza
+   žádný otherEarth obsah nemá, takže se nikdy nepotkají na jedné stránce.
+   Kontrast proti --bg cca 8.5:1, --accent-dim stejným ~56% poměrem jako
+   ostatní páry (viz TBBT/LOTR komentáře výše). */
+:root[data-franchise="hg"] {
+  --accent: #ff8a42;
+  --accent-dim: #8f4d25;
+  --accent-glow: rgba(255, 138, 66, 0.35);
+  --accent-ink: #2b1405;
+}
+
 * {
   box-sizing: border-box;
 }

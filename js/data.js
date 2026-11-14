@@ -1,10 +1,10 @@
 /**
  * Data layer.
  * -----------------------------------------------------------------------
- * Four franchises today, Star Wars, Marvel, The Big Bang Theory and The
- * Lord of the Rings - each one a fully separate MOVIES/SERIES/SEASONS/
- * ORDERINGS(/STORY_LINES) dataset, suffixed _STARWARS / _MARVEL / _TBBT /
- * _LOTR below. app.js never reads those suffixed names directly - it
+ * Five franchises today, Star Wars, Marvel, The Big Bang Theory, The
+ * Lord of the Rings and The Hunger Games - each one a fully separate
+ * MOVIES/SERIES/SEASONS/ORDERINGS(/STORY_LINES) dataset, suffixed
+ * _STARWARS / _MARVEL / _TBBT / _LOTR / _HG below. app.js never reads those suffixed names directly - it
  * reads the bare, unsuffixed MOVIES/SERIES/SEASONS/ORDERINGS/STORY_LINES
  * identifiers everywhere (rendering, watched-state counting, runtime
  * totals, persistence validation, all of it), declared `let` at the very
@@ -68,6 +68,7 @@ const FRANCHISES = [
   // MOVIES_LOTR's own comment for the full sourcing rundown).
   { id: "tbbt", label: "The Big Bang Theory", labelCs: "Teorie velkého třesku" },
   { id: "lotr", label: "The Lord of the Rings", labelCs: "Pán prstenů" },
+  { id: "hg", label: "The Hunger Games", labelCs: "Hunger Games" },
 ];
 
 // The "Multiverse" checkbox filter's own buckets (see
@@ -4335,6 +4336,176 @@ const ORDERINGS_LOTR = [
   },
 ];
 
+// -----------------------------------------------------------------------
+// The Hunger Games - fifth franchise. Movies only (MOVIES_HG; SERIES_HG/
+// SEASONS_HG are both empty, same as TBBT's MOVIES_TBBT is empty from the
+// other direction) - no otherEarth content, no story lines, no Doomsday-
+// style watchlist, no Core MCU-style exclusions (FRANCHISE_DATA.hg sets
+// all three to [] below), same "simple franchise" spirit as TBBT/LOTR.
+// Gets the usual Chronological/Release Order pair (user request: "jako
+// obvykle podle data uvedení a pak podle časové osy filmového světa") -
+// the two prequels (The Ballad of Songbirds & Snakes, Sunrise on the
+// Reaping) are set decades before Katniss' own four films despite being
+// released after them, the same "prequel released later" shape LOTR's
+// Hobbit trilogy/Star Wars' prequels have.
+//   Six films: the Katniss tetralogy (2012-2015), The Ballad of Songbirds
+// & Snakes (2023) and Sunrise on the Reaping (Nov 20, 2026 - added a week
+// BEFORE its theatrical release, on explicit user request: "včetně
+// letošního nového filmu" - unlike LOTR's own Rings of Power S3, which
+// the user asked to keep OUT until it aired; the user's own call per
+// franchise, not a general rule). Runtimes are real theatrical minutes
+// verified via Wikipedia/TMDB; Sunrise on the Reaping's 158 min is the
+// pre-release figure most listings agree on (Apple TV, most cinema
+// chains - a couple of outliers say 150/163) - re-check once it's out.
+//   titleCs = the REAL Czech distribution titles (third franchise with
+// Czech data, after TBBT/LOTR - user request "Vytvoř českou jazykovou
+// mutaci"), verified against ČSFD/Kinobox/ČT24 reviews: the first film
+// kept the plain "Hunger Games" in Czech cinemas (no subtitle), the rest
+// are "Vražedná pomsta"/"Síla vzdoru 1./2. část"/"Balada o ptácích a
+// hadech"; Sunrise on the Reaping is "Hunger Games: Úsvit sklizně"
+// (Forum Film's Czech release, Nov 19, 2026 - same title as Fragment's
+// Czech translation of the novel). Never word-for-word guesses - same
+// "verify, don't invent" rule as TBBT/LOTR's own Czech data.
+// ("1. část"/"2. část" carry a non-breaking space so the tile
+// title never wraps a lone "část" away from its number.)
+//   badge: "Main Saga" (user request, replacing an earlier "Katniss") on
+// the four main films - this franchise's own badge tier (see buildCard()'s
+// isBadgeTier), one uniform label for the main saga the same way LOTR's
+// own trilogy shares "LOTR". Badge text is UI-chrome-like and has no *Cs
+// counterpart anywhere in this app, so it stays English under CS too, same
+// as "Movie"/"Series"/"LOTR"/"TBBT". The two prequels
+// sit at plain movie tier, same main-saga-vs-prequel distinction LOTR
+// draws for The Hobbit.
+const MOVIES_HG = {
+  hg1: {
+    id: "hg1",
+    title: "The Hunger Games",
+    titleCs: "Hunger Games",
+    badge: "Main Saga",
+    year: 2012,
+    runtimeMin: 142,
+    type: "film",
+  },
+  hg2: {
+    id: "hg2",
+    title: "The Hunger Games: Catching Fire",
+    titleCs: "Hunger Games: Vražedná pomsta",
+    badge: "Main Saga",
+    year: 2013,
+    runtimeMin: 146,
+    type: "film",
+  },
+  hg3: {
+    id: "hg3",
+    title: "The Hunger Games: Mockingjay – Part 1",
+    titleCs: "Hunger Games: Síla vzdoru 1. část",
+    badge: "Main Saga",
+    year: 2014,
+    runtimeMin: 123,
+    type: "film",
+  },
+  hg4: {
+    id: "hg4",
+    title: "The Hunger Games: Mockingjay – Part 2",
+    titleCs: "Hunger Games: Síla vzdoru 2. část",
+    badge: "Main Saga",
+    year: 2015,
+    runtimeMin: 137,
+    type: "film",
+  },
+  hgballad: {
+    id: "hgballad",
+    title: "The Hunger Games: The Ballad of Songbirds & Snakes",
+    titleCs: "Hunger Games: Balada o ptácích a hadech",
+    year: 2023,
+    runtimeMin: 157,
+    type: "film",
+  },
+  hgsunrise: {
+    id: "hgsunrise",
+    title: "The Hunger Games: Sunrise on the Reaping",
+    titleCs: "Hunger Games: Úsvit sklizně",
+    year: 2026,
+    runtimeMin: 158,
+    type: "film",
+  },
+};
+
+const SERIES_HG = {};
+const SEASONS_HG = {};
+
+const ORDERINGS_HG = [
+  {
+    id: "chronological",
+    label: "Chronological",
+    labelCs: "Chronologicky",
+    descriptionCs: "Ideální, pokud už Panem znáte a chcete sledovat jednotlivé události a vývoj postav chronologicky.",
+    description: "Ideal if you already know Panem and want to follow its events and character arcs in chronological order.",
+    // ONE flat era titled "The Hunger Games Universe" (user request -
+    // same real-title-on-a-flat-era choice as TBBT's own "The Big Bang
+    // Theory Universe", rendered upper case by .era-block__title; see that
+    // era's comment for the "only fully visible near the track's midpoint"
+    // caveat) - only six films, no natural era split worth several titles.
+    //   yearBands labelCs uses "Hladové hry" - the term the Czech
+    // translations of Collins' novels use for the Games themselves. "Druhé
+    // povstání" for the Second Rebellion is this app's own rendering (no
+    // established Czech term found) - capitalized as a proper name of a
+    // specific war, per CLAUDE.md's proper-name vs. common-noun rule. Panem has no calendar year
+    // the films ever state, so the axis is dated by the Games number
+    // itself - the one in-universe dating system the books/films
+    // actually use (10th Games: Ballad; 50th = 2nd Quarter Quell:
+    // Sunrise; 74th/75th = 3rd Quarter Quell: the first two Katniss
+    // films). Mockingjay 1+2 cover the rebellion that follows the 75th
+    // Games, with no Games of their own to date them by - hence the
+    // "Second Rebellion" band (the war's own in-universe name) spanning
+    // both.
+    //   Two real in-universe jumps, both well past the >10-year
+    // threshold ORDERINGS_MARVEL's own cardGapBefore comment sets
+    // (10th -> 50th Games = 40 years, 50th -> 74th = 24 years) - flagged
+    // via cardGapBefore within the one era rather than splitting it into
+    // named eras (TBBT's own user-preferred "one continuous axis" shape).
+    eras: [
+      {
+        id: "all",
+        label: "The Hunger Games Universe",
+        labelCs: "Vesmír Hunger Games",
+        cardGapBefore: ["hgsunrise", "hg1"],
+        itemIds: ["hgballad", "hgsunrise", "hg1", "hg2", "hg3", "hg4"],
+        yearBands: [
+          { label: "10th Games", labelCs: "10. Hladové hry", span: 1 },
+          { label: "50th Games", labelCs: "50. Hladové hry", span: 1 },
+          { label: "74th Games", labelCs: "74. Hladové hry", span: 1 },
+          { label: "75th Games", labelCs: "75. Hladové hry", span: 1 },
+          { label: "Second Rebellion", labelCs: "Druhé povstání", span: 2 },
+        ],
+      },
+    ],
+  },
+  {
+    id: "release",
+    label: "Release Order",
+    labelCs: "Podle data vydání",
+    description: "Ideal for your first watch.",
+    descriptionCs: "Ideální pro první zhlédnutí.",
+    eras: [
+      {
+        id: "all",
+        label: "The Hunger Games Universe",
+        labelCs: "Vesmír Hunger Games",
+        itemIds: ["hg1", "hg2", "hg3", "hg4", "hgballad", "hgsunrise"],
+        yearBands: [
+          { label: "2012", span: 1 },
+          { label: "2013", span: 1 },
+          { label: "2014", span: 1 },
+          { label: "2015", span: 1 },
+          { label: "2023", span: 1 },
+          { label: "2026", span: 1 },
+        ],
+      },
+    ],
+  },
+];
+
 const FRANCHISE_DATA = {
   starwars: {
     movies: MOVIES_STARWARS,
@@ -4398,6 +4569,16 @@ const FRANCHISE_DATA = {
     // own empty fields right above - no otherEarth content, no personal
     // story arcs, no real-world marketing watchlist, no production-
     // company carve-out to make here either.
+    storyLines: [],
+    doomsdayWatchlist: [],
+    coreMcuExclude: [],
+  },
+  hg: {
+    movies: MOVIES_HG,
+    series: SERIES_HG,
+    seasons: SEASONS_HG,
+    orderings: ORDERINGS_HG,
+    // Same "no equivalent concept here" reasoning as TBBT/LOTR above.
     storyLines: [],
     doomsdayWatchlist: [],
     coreMcuExclude: [],

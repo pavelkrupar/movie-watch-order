@@ -995,8 +995,9 @@ sourcing standard as every other curated show in this file. Season 3
 (`rop-s3`) was first kept OUT on explicit user request while it only had
 an announced date ("ještě nevznikla"), then added on request once it
 had actually started streaming (Nov 14, 2026 - E1-4 out Nov 11, E5-6
-due Nov 18, E7-8 Nov 25). Only E1-4 carry titles (EN + real Prime Video
-CZ titles); E5-8 fall back to plain "Episode N" pills, and there are no
+out Nov 18, E7-8 Nov 25). E1-4 carry titles (EN + real Prime Video CZ
+titles), E5-6 English titles only (no Czech one published yet - `loc()`
+falls back to English); E7-8 fall back to plain "Episode N" pills, and there are no
 `episodeRuntimes` yet (same reason as TBBT's `stuart-s1`) - fill both in
 from TMDB once the season finishes. The seventh
 film, the standalone animated prequel `warofrohirrim` (2024, Warner

@@ -4249,7 +4249,11 @@ const SEASONS_LOTR = {
   // Only E1-4 have confirmed titles so far - English per Forbes/Yahoo
   // (citing Prime Video's own listing; a GameRant list with different
   // titles conflicts with everything else and was ignored), Czech per
-  // Prime Video CZ's own season page. E5-8 are deliberately left out of
+  // Prime Video CZ's own season page. E5-6 (aired Nov 18) were added in a
+  // follow-up pass - "The Lady of Lórien"/"From Valinor" per TMDB and
+  // Edna.cz. No Czech title exists for them yet (SerialZone/Edna list only
+  // the English one), so episodeTitlesCs deliberately stays 4 long:
+  // loc() falls back to English for indices 5-6. E7-8 are left out of
   // both arrays rather than guessed: buildEpisodePillsHtml() (app.js)
   // falls back to a plain "Episode N" pill for any index past the end of
   // episodeTitles, so the season still shows all 8 episodes correctly.
@@ -4264,7 +4268,7 @@ const SEASONS_LOTR = {
     label: "Season 3", labelCs: "Řada 3",
     episodes: 8,
     year: 2026,
-    episodeTitles: ["Marnûkh", "The Gift of Men", "The Secret Fire", "Gundabad"],
+    episodeTitles: ["Marnûkh", "The Gift of Men", "The Secret Fire", "Gundabad", "The Lady of Lórien", "From Valinor"],
     episodeTitlesCs: ["Marnûkh", "Dar lidí", "Tajný Oheň", "Gundabad"],
   },
 };

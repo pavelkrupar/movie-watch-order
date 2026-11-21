@@ -1904,6 +1904,27 @@ to them - matches `era.labelCs`'s own capitalized form.
   load respects whatever franchise was last active) and `switchFranchise()`
   itself.
 
+**"Less AI-looking" visual redesign (user request: "aby to nevypadalo
+tolik jako AI").** Every function, element and color MEANING stayed - only
+the generic look went: (1) no glows anywhere (all `text-shadow`/accent-
+glow `box-shadow`s removed; `--accent-glow`/`--done-glow` tokens still
+exist for flat tints); (2) fonts - IBM Plex Sans at 600 for titles
+(`--font-display`: brand, franchise name, era titles, tile titles, dialog
+titles; a Fraunces serif was tried first and rejected - the user wants a
+plain sans-serif), IBM Plex Sans Condensed for controls/badges/axis dates
+(`--font-ui`), IBM Plex Sans for body (`--font-body`, must match
+`SEASON_NAME_FONT`/`SEASON_META_FONT` in app.js); `init()` re-runs the
+resize pass on `document.fonts.ready` so tiles/rows are measured with the
+real faces; (3) warm charcoal neutrals instead of navy (`--bg` etc.),
+per-franchise/per-Earth accents untouched; (4) pills -> small radii
+(3-6px); (5) the starfield shows only for Star Wars
+(`:root[data-franchise="starwars"] .starfield`); (6) tiles: title bottom-
+left, filmstrip icon small top-right, meta text left-aligned; (7) flat
+fills instead of gradients (header, card meta, progress, Quell row, which
+now gets an inset left accent rule). Era titles and the victors dialog
+headings stay UPPERCASE on purpose (the user explicitly asked for
+"THE HUNGER GAMES UNIVERSE" casing earlier).
+
 ## Gotchas already hit (don't reintroduce)
 
 1. **TDZ crash from `let`/`const` placed near where they're used, not at

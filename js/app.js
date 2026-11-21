@@ -190,11 +190,11 @@
   // spirit as the rest of the file's "measure the real thing" approach,
   // just for text instead of layout
   let measureCtx = null;
-  const SEASON_NAME_FONT = "600 12px Inter, system-ui, -apple-system, sans-serif";
+  const SEASON_NAME_FONT = "600 12px 'IBM Plex Sans', system-ui, -apple-system, sans-serif";
   // .season-row__meta's own font (year · episode count · runtime, see
   // seasonMetaLineText()) - widenSeriesCard() measures this too, not just
   // the name, since either line can end up the widest thing in the row.
-  const SEASON_META_FONT = "10.5px Inter, system-ui, -apple-system, sans-serif";
+  const SEASON_META_FONT = "10.5px 'IBM Plex Sans', system-ui, -apple-system, sans-serif";
   /**
    * Only one season is ever expanded at a time, ACROSS THE WHOLE PAGE (not
    * just per card). Expanding one moves its actual row element out of the
@@ -328,6 +328,15 @@
     );
 
     els.scroll.addEventListener("scroll", updateScrollHints, { passive: true });
+
+    // The web fonts (IBM Plex, see index.html) load async, AFTER
+    // the first render() has already measured tile titles and season rows
+    // with a fallback face of different width - re-run the same
+    // measure-the-real-thing pass the resize handler above does once
+    // they're in, so nothing stays sized for the wrong font.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => window.dispatchEvent(new Event("resize")));
+    }
 
     // Escape is a second way to dismiss an expanded season, on top of the
     // backdrop click handled in expandSeasonRow()

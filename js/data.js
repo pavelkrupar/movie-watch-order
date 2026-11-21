@@ -1113,7 +1113,7 @@ const ORDERINGS_STARWARS = [
       {
         id: "hr",
         label: "The High Republic",
-        description: "The Republic thrives under the Jedi's watch - until a hidden threat the Order never sees coming.",
+        description: "The Republic thrives under the Jedi's watch – until a hidden threat the Order never sees coming.",
         itemIds: ["ac-s1"],
         yearBands: [{ label: "cca 132 BBY", span: 1 }],
       },
@@ -1495,7 +1495,7 @@ const STORY_LINES_STARWARS = [
   {
     id: "maul",
     label: "Maul",
-    description: "Follow the Sith apprentice who refused to stay dead - from Naboo to his final duel with Kenobi.",
+    description: "Follow the Sith apprentice who refused to stay dead – from Naboo to his final duel with Kenobi.",
     // No `replace` here either, same reasoning as Anakin above - his arc
     // doesn't fit Chronological's generic eras any better than Anakin's
     // does, so it gets its own `chapters.chronological`.

@@ -2,16 +2,16 @@
 /*  Tokeny                                                               */
 /* -------------------------------------------------------------------- */
 :root {
-  --bg: #05070d;
-  --bg-elevated: #0d1220;
-  --surface: #131a2c;
-  --surface-hover: #1a2338;
-  --border: #262f47;
-  --border-soft: #1c2438;
+  --bg: #100f0e;
+  --bg-elevated: #181715;
+  --surface: #1e1c1a;
+  --surface-hover: #282522;
+  --border: #3a3631;
+  --border-soft: #2a2724;
 
-  --text: #eef1fb;
-  --text-dim: #9aa4c2;
-  --text-faint: #5d6684;
+  --text: #f0ebe3;
+  --text-dim: #aaa398;
+  --text-faint: #716a60;
 
   --accent: #ffc857;       /* Star Wars žlutá - výchozí, přepsáno níže per-franšíza */
   --accent-dim: #a97f2e;
@@ -172,7 +172,7 @@
   --tile-icon-color: color-mix(in srgb, var(--tile-color) 24%, var(--bg-elevated));
   --tile-icon-color-strong: color-mix(in srgb, var(--tile-color) 34%, var(--bg-elevated));
 
-  --line: #3a4363;
+  --line: #4d4842;
 
   /* Výchozí hodnoty pro první vykreslení, než JS (viz sizeTimelineToViewport
      v js/app.js) dopočítá skutečné rozměry podle výšky okna. Karty se pak
@@ -214,8 +214,20 @@
      slivers - wide eras are unaffected (already past this width) */
   --era-title-min-w: 600px;
 
-  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  /* Tři role písma (redesign "ať to nevypadá jako AI" - dřív Barlow
+     Condensed verzálkami s prostrkáním + Inter, typický generický
+     "sci-fi dashboard"): --font-display = IBM Plex Sans v silnějším řezu
+     jen pro názvy (titulky na dlaždicích, název webu/franšízy, název éry,
+     nadpis dialogu) - patkové Fraunces bylo vyzkoušené a zamítnuté
+     (uživatel chce "normální nepatkové" písmo); --font-ui =
+     zúžený IBM Plex Sans Condensed pro ovládání, odznaky a data na ose,
+     kde je místa málo (hlavička musí zůstat jednořádková, viz
+     .site-header__inner); --font-body = IBM Plex Sans na běžný text.
+     POZOR: --font-body musí sedět s SEASON_NAME_FONT/SEASON_META_FONT v
+     app.js (canvas měření šířky řádků sérií, viz widenSeriesCard()). */
+  --font-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-ui: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
 }
 
 /* Konkrétní "odjinud přilepené" univerzum přepisuje --other-earth-current
@@ -374,11 +386,19 @@ body {
     radial-gradient(1.5px 1.5px at 45% 35%, #fff, transparent 60%),
     radial-gradient(1px 1px at 20% 55%, #fff, transparent 60%),
     radial-gradient(1px 1px at 70% 90%, #fff, transparent 60%),
-    radial-gradient(ellipse at 20% -10%, #131c33 0%, transparent 55%),
-    radial-gradient(ellipse at 90% 0%, #1c1430 0%, transparent 50%),
+    radial-gradient(ellipse at 20% -10%, #1b1a1f 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 0%, #1d1820 0%, transparent 50%),
     var(--bg);
   background-repeat: no-repeat;
   opacity: 0.9;
+  display: none;
+}
+
+/* Hvězdné pozadí jen u Star Wars - u ostatních franšíz (sitcom, Středozem,
+   Panem) působilo jako generická šablona, ne jako záměr. data-franchise
+   na <html> nastavuje applyFranchiseData() v app.js. */
+:root[data-franchise="starwars"] .starfield {
+  display: block;
 }
 
 /* -------------------------------------------------------------------- */
@@ -388,8 +408,7 @@ body {
   position: relative;
   z-index: 1;
   border-bottom: 1px solid var(--border-soft);
-  background: linear-gradient(180deg, rgba(13, 18, 32, 0.9), rgba(13, 18, 32, 0.4));
-  backdrop-filter: blur(6px);
+  background: var(--bg);
 }
 
 /* Stejný z-index:1 jako .timeline-section (viz níže) je záměr, ne
@@ -436,7 +455,7 @@ body {
   flex: 0 0 auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 5px;
   padding: 3px;
 }
 
@@ -444,12 +463,12 @@ body {
   border: none;
   background: transparent;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   padding: 3px 8px;
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -508,10 +527,10 @@ body {
 .brand__title {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: clamp(17px, 1.9vw, 22px);
   line-height: 1;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   color: var(--text);
   white-space: nowrap;
 }
@@ -556,7 +575,7 @@ body {
   gap: 3px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 5px;
 }
 
 .order-switch__btn {
@@ -564,12 +583,12 @@ body {
   border: none;
   background: transparent;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   padding: 6px 16px;
-  border-radius: 999px;
+  border-radius: 3px;
   cursor: pointer;
   transition: color 0.2s ease, background 0.2s ease;
   white-space: nowrap;
@@ -599,14 +618,14 @@ body {
   gap: 6px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 4px;
   margin: 0;
   padding: 6px 14px;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease, border-color 0.2s ease;
@@ -657,7 +676,7 @@ body {
   padding: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
 }
 
@@ -673,12 +692,12 @@ body {
   border: none;
   background: transparent;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -709,14 +728,14 @@ body {
   gap: 6px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 4px;
   margin: 0;
   padding: 6px 14px;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease, border-color 0.2s ease;
@@ -762,7 +781,7 @@ body {
   padding: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
 }
 
@@ -777,12 +796,12 @@ body {
   align-items: center;
   gap: 9px;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 3px;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -833,13 +852,13 @@ body {
   gap: 7px;
   flex: 0 0 auto;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 4px;
   padding: 6px 14px;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease, border-color 0.2s ease;
@@ -850,7 +869,8 @@ body {
   border-color: var(--accent-dim);
 }
 
-/* Checked - full accent treatment (border + text + glow), deliberately
+/* Checked - full accent treatment (border + text; the glow was dropped in
+   the "less AI-looking" redesign, no glows anywhere now), deliberately
    MORE prominent than .multiverse-select[data-active] gets for a partial
    filter (that one stays a thin outline, see its own comment for why) -
    this isn't a small tweak to the current view, it locks Multiverse and
@@ -859,7 +879,6 @@ body {
 .header-toggle[data-active="true"] {
   border-color: var(--accent);
   color: var(--accent);
-  text-shadow: 0 0 10px var(--accent-glow);
 }
 
 .header-toggle input[type="checkbox"] {
@@ -889,11 +908,11 @@ body {
   width: min(560px, calc(100vw - 32px));
   max-height: min(86vh, 860px);
   padding: 22px 24px 18px;
-  border: 1px solid var(--accent-dim);
-  border-radius: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
   background: var(--bg-elevated);
   color: var(--text);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 24px var(--accent-glow);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   overflow: hidden;
 }
 
@@ -919,12 +938,11 @@ body {
 .victors-dialog__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--accent);
-  text-shadow: 0 0 12px var(--accent-glow);
 }
 
 .victors-dialog__close {
@@ -932,7 +950,7 @@ body {
   width: 32px;
   height: 32px;
   border: 1px solid var(--border);
-  border-radius: 50%;
+  border-radius: 4px;
   background: none;
   color: var(--text-dim);
   font-size: 20px;
@@ -968,9 +986,9 @@ body {
 .victors-dialog__subtitle {
   margin: 22px 0 6px;
   font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--accent);
 }
@@ -981,7 +999,7 @@ body {
   align-items: baseline;
   gap: 0 8px;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-soft);
   font-size: 13px;
 }
 
@@ -1003,8 +1021,9 @@ body {
 
 /* Řádek Čtvrtoher - jemně podbarvený akcentem, ať je vidět i bez najetí. */
 .victors-list__item--quell {
-  background: linear-gradient(90deg, var(--accent-glow), transparent 70%);
-  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+  border-radius: 0;
+  box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .victors-quell {
@@ -1015,7 +1034,6 @@ body {
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  text-shadow: 0 0 8px var(--accent-glow);
 }
 
 /* Popis Čtvrtoher - celořádkový text POD řádkem (flex-basis 100 %), ne
@@ -1050,7 +1068,7 @@ body {
   flex: none;
   width: 28px;
   text-align: right;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-weight: 600;
   color: var(--accent);
 }
@@ -1117,7 +1135,7 @@ body {
    přidání další franšíze v budoucnu znamenalo jen novou položku ve
    FRANCHISES (data.js), ne novou komponentu. Sedí hned vedle "Watch Order"
    v .brand a je stylovaný jako stejně velký nadpis (viz .brand__title) -
-   akcentová barva/glow ho odlišuje jako tu interaktivní část dvojice,
+   akcentová barva ho odlišuje jako tu interaktivní část dvojice,
    převzato z bývalého <span> na "Watch Order" (to teď zůstává v obyčejné
    barvě, viz .brand__title výše).
    Vlastní tlačítko + <div role="listbox"> místo nativního <select> - jeho
@@ -1141,11 +1159,10 @@ body {
   margin: 0;
   padding: 0;
   color: var(--accent);
-  text-shadow: 0 0 16px var(--accent-glow);
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: clamp(17px, 1.9vw, 22px); /* musí odpovídat .brand__title */
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   line-height: 1;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -1177,7 +1194,7 @@ body {
   padding: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.75);
 }
 
@@ -1193,12 +1210,12 @@ body {
   border: none;
   background: transparent;
   color: var(--text-dim);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -1245,7 +1262,7 @@ body {
   padding: 6px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .progress {
@@ -1261,7 +1278,7 @@ body {
 
 .progress__track {
   height: 5px;
-  border-radius: 999px;
+  border-radius: 1px;
   background: var(--surface);
   border: 1px solid var(--border);
   overflow: hidden;
@@ -1270,7 +1287,7 @@ body {
 .progress__fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--done-dim), var(--done));
+  background: var(--done);
   border-radius: inherit;
   transition: width 0.35s ease;
 }
@@ -1443,8 +1460,8 @@ body {
      Barva stejná jako u data nad ní (--accent-dim výchozí, přepsáno níže
    pro milestone/otherEarth pásmo stejně jako .year-band__label samotné) -
    pořád ale ta MÉNĚ výrazná ze dvou linek na ose: tenká (1px), bez záře.
-   Hlavní, výrazná linka je titulek éry (.era-block__title, accent barva +
-   záře, plná šířka) úplně nahoře nad vším ostatním - tahle drobná linka
+   Hlavní, výrazná linka je titulek éry (.era-block__title, accent barva,
+   plná šířka) úplně nahoře nad vším ostatním - tahle drobná linka
    je jen jemný "reach" indikátor u konkrétního data, ne součást hlavní
    struktury osy. */
 .year-band__span {
@@ -1466,10 +1483,10 @@ body {
 }
 
 .year-band__label {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
   color: var(--accent-dim);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -1487,7 +1504,6 @@ body {
 /* Bitva o Yavin - rok 0, jediný bod, který osa výslovně vyznačuje */
 .year-band--milestone .year-band__label {
   color: var(--accent);
-  text-shadow: 0 0 12px var(--accent-glow);
 }
 
 /* Pásmo patřící titulu "přilepenému" na osu odjinud, mimo Sacred Timeline
@@ -1501,10 +1517,10 @@ body {
 }
 
 .year-band__earth {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--other-earth-current);
   white-space: nowrap;
@@ -1601,8 +1617,9 @@ body {
 }
 
 /* Název éry je záhlaví celé časové osy - tady je vidět, že osa je hlavní
-   nosná věc webu, ne jen popisek. Větší, akcentová barva + jemná záře
-   (stejné pojetí jako "Watch Order" ve jméně webu), ale pořád jen text -
+   nosná věc webu, ne jen popisek. Větší, akcentová barva, verzálkami s
+   mírným prostrkáním (jako titulky filmového programu) - bez záře (redesign "ať to
+   nevypadá jako AI" zrušil záře na celé stránce), ale pořád jen text -
    plakáty filmů/seriálů zůstávají barevně/velikostně nejvýraznější prvek. */
 .era-block__title {
   margin: 0;
@@ -1611,12 +1628,11 @@ body {
   gap: 10px;
   width: 100%;
   font-family: var(--font-display);
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
-  text-shadow: 0 0 14px var(--accent-glow);
   white-space: nowrap;
 }
 
@@ -1772,7 +1788,7 @@ body {
 .card__frame {
   border: 1px solid var(--accent-dim);
   background: var(--surface);
-  border-radius: 14px;
+  border-radius: 5px;
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
   box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.7);
@@ -1805,13 +1821,13 @@ body {
 
 .card__origin-earth {
   margin: 3px 0 0;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--other-earth-current);
-  text-align: center;
+  text-align: left;
 }
 
 /* Zvednutí (translateY) I ztučnění ohraničení (box-shadow prstenec níže)
@@ -1847,12 +1863,12 @@ body {
 }
 
 .card.is-watched:not(.card--series):hover .card__frame {
-  box-shadow: 0 0 0 1px var(--done), 0 14px 28px -14px var(--done-glow);
+  box-shadow: 0 0 0 1px var(--done), 0 12px 24px -14px rgba(0, 0, 0, 0.7);
 }
 
 .card.is-watched .card__frame {
   border-color: var(--done);
-  box-shadow: 0 0 0 1px var(--done), 0 14px 28px -14px var(--done-glow);
+  box-shadow: 0 0 0 1px var(--done), 0 12px 24px -14px rgba(0, 0, 0, 0.7);
 }
 
 /* Celý plakát je klikací tlačítko: najetí myší odhalí overlay s akcí
@@ -1931,48 +1947,48 @@ body {
 .card__poster-placeholder {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-start;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   padding: 14px;
   background: var(--tile-bg);
-  text-align: center;
+  text-align: left;
   overflow: hidden;
 }
 
+/* Redesign: ikona filmového pásu už není velký vycentrovaný "watermark"
+   za nadpisem (typický generický zástupný obrázek), ale menší značka v
+   pravém horním rohu - nadpis vlevo dole a značka v rohu čtou jako
+   tištěný plakát/hřbet krabičky, ne jako chybějící obrázek. Pořád stejná
+   ikona i barevná logika (--tile-icon-color, per-Earth), jen jinde. */
 .card__poster-placeholder-icon {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 68%;
-  height: 68%;
-  transform: translate(-50%, -50%);
+  top: 12px;
+  right: 12px;
+  width: 30%;
+  height: 30%;
   color: var(--tile-icon-color);
 }
 
 /* Nadpis má nést hlavní váhu dlaždice bez toho, aby přes ni ležel vlastní
    neprůhledný podklad (chip) - ten byl vyzkoušený a zamítnutý jako špatný
    nápad (moc "nalepený" kus navíc přes ikonu/pozadí). Čitelnost teď zase
-   stojí na kombinaci tučného řezu (800 - jediné místo na stránce, které
-   tuhle váhu potřebuje, viz komentář u fontu v index.html) a stínu (dvě
-   vrstvy - těsná ostrá pro hranu písmen, širší měkká pro celkový odstup od
-   pozadí pod ním) plus toho, že --tile-bg (viz :root výše) je dost tmavá
-   sama o sobě (--surface), aby stín stačil. Obě vrstvy zesíleny
-   (uživatelský požadavek - "ať nápis víc vynikne") oproti první verzi -
-   pořád ne tak silné, aby to četlo jako vlastní podklad/chip (viz výš, proč
-   byl zamítnutý), jen o dost výraznější odstup od podkladu než čistě
-   kosmetický nádech. */
+   stojí na kontrastu světlého písma (IBM Plex Sans 600) s tmavým
+   --tile-bg. Dřív (Barlow 800, vycentrovaný přes velkou ikonu) potřeboval
+   dvouvrstvý stín, aby vynikl nad ikonou za sebou - od redesignu "ať to
+   nevypadá jako AI" sedí vlevo dole a ikona je malá v pravém horním rohu
+   (viz .card__poster-placeholder-icon), takže se nepřekrývají a stín není
+   potřeba. */
 .card__poster-placeholder-title {
   position: relative;
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   color: var(--text);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
 /* Velikost titulku stoupá se stupněm čtyřstupňové hierarchie STEJNÝM
@@ -1986,7 +2002,7 @@ body {
    (.card--movie + jeden z těchhle dvou modifikátorů, viz buildCard() v
    app.js). */
 .card--movie .card__poster-placeholder-title {
-  font-size: 23px;
+  font-size: 21px;
 }
 
 /* SHORT dostává i o dost lehčí řez (600 místo základních 800) -
@@ -2000,8 +2016,8 @@ body {
    fitTilePlaceholderTitles() (app.js), stejný "shrink pak grow" mechanismus
    jako u každé jiné dlaždice. */
 .card--short .card__poster-placeholder-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 /* O kousek větší než jen "23px * 1.384" by z čistého poměru vyšlo
@@ -2012,7 +2028,7 @@ body {
    každého jiného tieru - viz jeho vlastní komentář: dlouhý název nejdřív
    zvýší dlaždici, teprve pak zmenší font, napříč VŠEMI tiery stejně. */
 .card--badge-tier .card__poster-placeholder-title {
-  font-size: 32px;
+  font-size: 28px;
 }
 
 /* .card--badge-tier (Avengers/Epizody I-IX) dostává o něco výraznější
@@ -2034,17 +2050,16 @@ body {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: rgba(5, 7, 13, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--bg);
+  border: 1px solid var(--border);
   color: var(--text);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 4px 9px;
-  border-radius: 999px;
-  backdrop-filter: blur(3px);
+  border-radius: 3px;
 }
 
 /* Dlaždice (žádná skutečná grafika, viz posterPlaceholderHtml() v app.js)
@@ -2104,7 +2119,7 @@ body {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--text-faint);
-  text-align: center;
+  text-align: left;
 }
 
 /* Řádky se sériemi – žijí pod názvem, ne přes plakát. Sbalená řada je vždy
@@ -2200,7 +2215,7 @@ body {
      without this it gets silently squashed to fit instead of the list
      actually overflowing and scrolling like it's supposed to. */
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: 4px;
   border: 1.5px solid var(--border);
   background: var(--bg-elevated);
   overflow: hidden;
@@ -2373,7 +2388,6 @@ body {
   background: var(--done);
   border-color: var(--done);
   color: #06281c;
-  box-shadow: 0 0 12px var(--done-glow);
 }
 
 /* Seznam epizod - "Episode 1", "Episode 2", ... jsou zástupné popisky (data
@@ -2420,7 +2434,7 @@ body {
   appearance: none;
   flex: none;
   padding: 4px 9px;
-  border-radius: 6px;
+  border-radius: 3px;
   border: 1.5px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text-dim);
@@ -2585,7 +2599,6 @@ body {
   background: var(--done);
   border-color: var(--done);
   color: #06281c;
-  box-shadow: 0 0 20px var(--done-glow);
 }
 
 /* Dělicí linka + jemný barevný nádech pod dlaždicí, GENERICKY přes
@@ -2608,17 +2621,13 @@ body {
 .card__meta {
   box-sizing: border-box;
   padding: 9px 11px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--tile-color) 10%, transparent),
-    color-mix(in srgb, var(--tile-color) 4%, transparent)
-  );
+  background: color-mix(in srgb, var(--tile-color) 6%, transparent);
   border-top: 1px solid var(--tile-color-dim);
-  /* .card__title/.card__year už mají vlastní text-align: center - tohle je
-     jen navíc pro .card__badge--meta (inline-block, žádné vlastní
-     zarovnání), ať badge vystředěný nad rokem/seznamem řad sedí stejně
-     jako zbytek popisku, viz badge's own comment above. */
-  text-align: center;
+  /* Vlevo, ne na střed (redesign) - stejně jako nadpis na dlaždici nad
+     tím (vlevo dole), ať celá karta čte jako jeden sloupec textu, ne jako
+     vycentrovaná šablona. .card__year/.card__origin-earth mají stejné
+     zarovnání; .card__badge--meta (inline-block) ho dědí odsud. */
+  text-align: left;
 }
 
 /* Normally wraps to 2 lines, same as a season-list title - but NOT hard

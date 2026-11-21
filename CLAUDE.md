@@ -1102,6 +1102,31 @@ Games: Úsvit sklizně", Forum Film); yearBands use "N. Hladové hry" (the
 Czech novels' own term), "Druhé povstání" is this app's own rendering
 (capitalized as a proper name). Own accent: ember orange
 (`:root[data-franchise="hg"]`).
+  **"Victors" / "Přehled vítězů" header button (HG only)** - opens a
+native `<dialog>` (`showModal()`, top layer - no z-index fight, see
+Gotchas #4/#10) listing Games 1-75. `VICTORS_HG` (data.js, wired in as
+`FRANCHISE_DATA.hg.victors`; any franchise without a `victors` field hides
+the button via `populateVictorsButton()`) holds ONLY victors whose Games
+NUMBER is stated in canon/official promo (cross-checked against the Hunger
+Games Wiki's "List of victors" - its italic, fan-estimated numbers are
+excluded), every other row stays empty by request; the 75th is
+`noVictor: true`. Names stay in original form under CS (Czech sources
+are inconsistent about "-ová" forms); only "District N" -> "N. kraj" is
+translated. Rows show age too where the wiki states it as fact
+(`age` -> "(12. kraj, 16 let)"). Victors who certainly won but whose
+Games number is only a wiki estimate (Woof, Seeder, Brutus, Blight,
+Lyme, Cecelia, the unnamed District 4 victor from Sunrise on the
+Reaping) live in `VICTORS_HG.estimates` and render as a separate
+"Ostatní vítězové" / "Other victors" section under the list, one summarized range per
+victor - never guessed onto a single 1-75 row. The list is one plain
+column, 1-75 top to bottom (user request - an earlier 3x25 grid was
+rejected); `.victors-dialog__body` scrolls both sections inside the
+dialog, the page itself never does. Quarter Quell rows (25/50/75,
+`VICTORS_HG.quarterQuells`, EN+CS twist text) are tinted and carry a ◆
+marker - hovering the row on a mouse device (CSS, clicks ignored there)
+or tapping it on a touch screen only (`(hover: none)`, toggles `.is-open`)
+reveals the twist as a full-width line under the row, deliberately not a
+floating tooltip, which the dialog's scrolling body would clip.
 
 **Marvel One-Shots and the classic Netflix "Defenders Saga" shows - real
 Earth-616 content positioned by user request, not by strict date.**

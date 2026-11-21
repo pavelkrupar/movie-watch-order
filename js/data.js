@@ -4542,6 +4542,92 @@ const ORDERINGS_HG = [
   },
 ];
 
+// "Victors" overview (Hunger Games only, user request: "Přehled vítězů") -
+// every Games from the 1st to the 75th, with the victor's name and
+// district filled in ONLY where a Games number is actually stated in
+// canon (novels, films, or Lionsgate's official Capitol Couture promo
+// material), cross-checked against The Hunger Games Wiki's "List of
+// victors" table. Victors whose Games number is only a fan estimate there
+// (shown in italics on that page: Woof, Seeder, Brutus, Lyme, Blight,
+// Cecelia...) are deliberately left OUT - their row stays empty, same
+// "verify, don't invent" rule this file applies to episode titles.
+// Gloss/Cashmere: canon says only that the siblings won in consecutive
+// years; Capitol Couture dates Cashmere to the 64th, which puts Gloss at
+// the 63rd. The 75th (third Quarter Quell) crowned no victor - the Games
+// were interrupted by the arena's destruction - so it carries
+// `noVictor: true` rather than being left looking "unknown".
+//   Names stay in their original form under CS as well - Czech sources
+// aren't consistent about feminine "-ová" forms for this cast (e.g.
+// Kinobox writes "Lucy Gray Baird"), so no form is invented here; only
+// the district gets translated ("District 12" -> "12. kraj", see
+// buildVictorsDialog() in app.js). `names` is an array because the 74th
+// had two co-victors.
+const VICTORS_HG = {
+  totalGames: 75,
+  // `age` only where the wiki states it as fact (not in italics) -
+  // shown as "(District 12, age 16)" / "(12. kraj, 16 let)". On the 74th
+  // both co-victors were 16, so one shared age covers the row.
+  entries: [
+    { games: 10, names: ["Lucy Gray Baird"], district: 12, age: 16 },
+    { games: 11, names: ["Mags Flanagan"], district: 4, age: 16 },
+    { games: 34, names: ["Beetee Latier"], district: 3 },
+    { games: 38, names: ["Porter Millicent Tripp"], district: 5 },
+    { games: 45, names: ["Chaff"], district: 11 },
+    { games: 46, names: ["Palladium Barker"], district: 1 },
+    { games: 49, names: ["Wiress"], district: 3 },
+    { games: 50, names: ["Haymitch Abernathy"], district: 12, age: 16 },
+    { games: 62, names: ["Enobaria"], district: 2 },
+    { games: 63, names: ["Gloss"], district: 1, age: 15 },
+    { games: 64, names: ["Cashmere"], district: 1, age: 15 },
+    { games: 65, names: ["Finnick Odair"], district: 4, age: 14 },
+    { games: 67, names: ["Augustus Braun"], district: 1 },
+    { games: 70, names: ["Annie Cresta"], district: 4, age: 18 },
+    { games: 71, names: ["Johanna Mason"], district: 7, age: 17 },
+    { games: 74, names: ["Katniss Everdeen", "Peeta Mellark"], district: 12, age: 16 },
+    { games: 75, noVictor: true },
+  ],
+  // Quarter Quells ("Čtvrtohry" - every 25th Games, each with a special
+  // twist announced by the Capitol). Keyed by Games number; the twist
+  // text is shown on hover/click of the ◆ marker before that row's
+  // number (buildVictorsDialogContent() in app.js). Rules are canon:
+  // Catching Fire ch. 3 (25th and 50th - read out from the card box by
+  // President Snow - plus the 75th's own card), Sunrise on the Reaping
+  // for the 50th's four tributes per district.
+  quarterQuells: {
+    25: {
+      en: "1st Quarter Quell - every district had to hold an election and vote for the tributes who would represent it.",
+      cs: "1. Čtvrtohry - každý kraj musel uspořádat volby a sám odhlasovat splátce, kteří ho budou reprezentovat.",
+    },
+    50: {
+      en: "2nd Quarter Quell - twice as many tributes were reaped: four from each district, 48 in total.",
+      cs: "2. Čtvrtohry - losoval se dvojnásobný počet splátců: z každého kraje čtyři, celkem 48.",
+    },
+    75: {
+      en: "3rd Quarter Quell - tributes were reaped from each district's existing pool of victors.",
+      cs: "3. Čtvrtohry - splátci se losovali z dosavadních vítězů každého kraje.",
+    },
+  },
+  // Victors who DEFINITELY won (canon), but whose Games number is only a
+  // fan estimate on the wiki (its italic rows) - user request to show
+  // them too, summarized as one range each in a separate section under
+  // the 1-75 list rather than guessed onto a single row. Either a
+  // `from`/`to` range or, where the wiki narrows it to specific
+  // candidates (Brutus), an explicit `options` list. Ranges that include
+  // an already-confirmed Games (Blight's 48-59 spans Wiress's 49th and
+  // Haymitch's 50th) are left as-is - the confirmed rows above already
+  // make the exclusion obvious. `unnamed: true` = no name in canon (the
+  // District 4 victor Mags consoles in Sunrise on the Reaping, ch. 6).
+  estimates: [
+    { from: 12, to: 20, names: ["Woof"], district: 8 },
+    { from: 31, to: 33, names: ["Seeder"], district: 11 },
+    { from: 39, to: 45, unnamed: true, district: 4 },
+    { options: [44, 47, 48, 51], names: ["Brutus"], district: 2 },
+    { from: 48, to: 59, names: ["Blight"], district: 7 },
+    { from: 51, to: 55, names: ["Lyme"], district: 2 },
+    { from: 57, to: 61, names: ["Cecelia"], district: 8 },
+  ],
+};
+
 const FRANCHISE_DATA = {
   starwars: {
     movies: MOVIES_STARWARS,
@@ -4618,6 +4704,9 @@ const FRANCHISE_DATA = {
     storyLines: [],
     doomsdayWatchlist: [],
     coreMcuExclude: [],
+    // Only franchise with one so far - every other entry simply omits
+    // `victors`, which hides the header button (populateVictorsButton()).
+    victors: VICTORS_HG,
   },
 };
 

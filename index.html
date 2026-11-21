@@ -94,6 +94,10 @@
             <input type="checkbox" id="doomsdayWatchlistCheckbox" />
             <span>Watchlist for Doomsday</span>
           </label>
+
+          <!-- Hunger Games only - opens #victorsDialog below; label text and
+               visibility are set by populateVictorsButton() in js/app.js -->
+          <button type="button" class="header-toggle header-toggle--button" id="victorsBtn" aria-haspopup="dialog" aria-controls="victorsDialog"></button>
         </div>
 
         <p class="order-switch__desc" id="orderingDescription" aria-live="polite"></p>
@@ -154,6 +158,22 @@
     </p>
     <p>Created by Pavel Krupař with Claude Code</p>
   </footer>
+
+  <!-- Native <dialog> + showModal(), so it renders in the browser's top
+       layer - above every stacking context on the page (see Gotchas #4/#10
+       in CLAUDE.md) - and gets Escape-to-close for free. Content is built
+       by buildVictorsDialogContent() in js/app.js each time it opens. -->
+  <dialog class="victors-dialog" id="victorsDialog" aria-labelledby="victorsDialogTitle">
+    <div class="victors-dialog__head">
+      <h2 class="victors-dialog__title" id="victorsDialogTitle"></h2>
+      <button type="button" class="victors-dialog__close" id="victorsDialogClose" aria-label="Close">×</button>
+    </div>
+    <div class="victors-dialog__body">
+      <ol class="victors-list" id="victorsList"></ol>
+      <h3 class="victors-dialog__subtitle" id="victorsEstimatesTitle"></h3>
+      <ul class="victors-list victors-list--estimates" id="victorsEstimatesList"></ul>
+    </div>
+  </dialog>
 
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>

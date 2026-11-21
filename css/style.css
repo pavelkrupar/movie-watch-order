@@ -870,6 +870,225 @@ body {
   cursor: pointer;
 }
 
+/* Tlačítko "Přehled vítězů" (jen Hunger Games, viz populateVictorsButton()
+   v app.js) - stejný pill vzhled jako .header-toggle, ale je to obyčejný
+   <button>, ne checkbox: nic nefiltruje, jen otevírá #victorsDialog. Reset
+   výchozího vzhledu tlačítka (pozadí, font), aby vypadal stejně jako
+   sousední <label> toggly. */
+.header-toggle--button {
+  background: none;
+  line-height: inherit;
+}
+
+/* Dialog se seznamem vítězů - nativní <dialog> přes showModal(), takže
+   leží v top layeru prohlížeče nad vším (žádný boj se stacking contexty,
+   viz Gotchas #4/#10 v CLAUDE.md). Stránka sama se nikdy svisle neroluje -
+   roluje jen .victors-list uvnitř dialogu, max-height drží dialog vždy
+   uvnitř okna. */
+.victors-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(86vh, 860px);
+  padding: 22px 24px 18px;
+  border: 1px solid var(--accent-dim);
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 24px var(--accent-glow);
+  overflow: hidden;
+}
+
+/* :not([hidden])-styl past (Gotcha #3) - display: flex jen u otevřeného
+   dialogu, jinak by přebil výchozí display: none zavřeného <dialog>. */
+.victors-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.victors-dialog::backdrop {
+  background: rgba(3, 5, 12, 0.72);
+}
+
+.victors-dialog__head {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.victors-dialog__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+
+.victors-dialog__close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.victors-dialog__close:hover {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+/* Rolovací tělo dialogu - obsahuje seznam 1-75 i sekci odhadnutých
+   ročníků pod ním, takže roluje obojí dohromady. Roluje jen tohle,
+   stránka nikdy. min-height: 0 kvůli flexboxu (Gotcha #2), aby se tělo
+   opravdu rolovalo a nezmáčklo. */
+.victors-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+}
+
+/* 75 ročníků pod sebou v jednom sloupci (uživatelský požadavek - dříve
+   3 sloupce po 25). */
+.victors-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nadpis sekce "Ostatní vítězové" (jen odhadnutý ročník) pod hlavním seznamem. */
+.victors-dialog__subtitle {
+  margin: 22px 0 6px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.victors-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+/* Jméno se smršťuje a zalamuje UVNITŘ svého sloupce (flex: 1, min-width:
+   0) - bez toho by ho flex-wrap na řádku (potřebný pro popis Čtvrtoher)
+   u dlouhého řádku (74. ročník na mobilu) shodil celé pod číslo. */
+.victors-list__name {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Úvodní slot pro symbol ◆ Čtvrtoher - je na KAŽDÉM řádku (u ostatních
+   prázdný), aby čísla ročníků zůstala zarovnaná pod sebou. */
+.victors-list__marker {
+  flex: none;
+  width: 16px;
+  text-align: center;
+}
+
+/* Řádek Čtvrtoher - jemně podbarvený akcentem, ať je vidět i bez najetí. */
+.victors-list__item--quell {
+  background: linear-gradient(90deg, var(--accent-glow), transparent 70%);
+  border-radius: 4px;
+}
+
+.victors-quell {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Popis Čtvrtoher - celořádkový text POD řádkem (flex-basis 100 %), ne
+   plovoucí tooltip: plovoucí bublina by se ořízla o rolovací tělo
+   dialogu. Zobrazí se při najetí kamkoli na řádek (zařízení s myší),
+   na telefonu po klepnutí na řádek (.is-open - viz buildVictorsButton()
+   v app.js). */
+.victors-quell__info {
+  display: none;
+  flex: 1 0 100%;
+  padding: 2px 8px 5px 60px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Zařízení s myší: jen najetí, klik nic nedělá. Dotykové (hover: none):
+   jen klepnutí přes .is-open - JS handler v buildVictorsButton() se
+   řídí stejným media query, takže se oba režimy nikdy nepotkají. */
+@media (hover: hover) {
+  .victors-list__item--quell:hover .victors-quell__info {
+    display: block;
+  }
+}
+
+@media (hover: none) {
+  .victors-list__item--quell.is-open .victors-quell__info {
+    display: block;
+  }
+}
+
+.victors-list__games {
+  flex: none;
+  width: 28px;
+  text-align: right;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Rozsah ročníků ("12.–20.", "44./47./48./51.") je širší než
+   samotné číslo - pevná šířka zarovná jména pod sebe, tlumená barva
+   odliší odhad od potvrzeného ročníku. */
+.victors-list__games--range {
+  width: 96px;
+  text-align: left;
+  color: var(--text-dim);
+}
+
+.victors-list__item--empty .victors-list__games {
+  color: var(--text-dim);
+  opacity: 0.55;
+}
+
+/* nowrap - "(12. kraj)" se nikdy nerozdělí na dva řádky (kdyby se 74.
+   ročník se dvěma jmény na úzkém displeji zalomil, kraj přejde celý). */
+.victors-list__district {
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.victors-list__item--none .victors-list__name {
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Číslo ročníku Čtvrtoher vždy v plné barvě akcentu - i u 25. ročníku,
+   kde vítěz neznáme (jinak by ho .victors-list__item--empty ztlumil).
+   Musí stát ZA pravidlem --empty, obě mají stejnou specificitu. */
+.victors-list__item--quell .victors-list__games {
+  color: var(--accent);
+  opacity: 1;
+}
+
 /* Vysvětlující text aktivního pořadí (viz updateOrderingDescription v app.js) -
    mění se při přepnutí taby, stejně jako per-era popisek na ose */
 /* Pevná výška na přesně 2 řádky (Chronological je jednořádkový, Release

@@ -228,6 +228,13 @@
     doomsdayWatchlistCheckbox: document.getElementById("doomsdayWatchlistCheckbox"),
     extendedVersionsWrap: document.getElementById("extendedVersionsWrap"),
     extendedVersionsCheckbox: document.getElementById("extendedVersionsCheckbox"),
+    victorsBtn: document.getElementById("victorsBtn"),
+    victorsDialog: document.getElementById("victorsDialog"),
+    victorsDialogTitle: document.getElementById("victorsDialogTitle"),
+    victorsDialogClose: document.getElementById("victorsDialogClose"),
+    victorsList: document.getElementById("victorsList"),
+    victorsEstimatesTitle: document.getElementById("victorsEstimatesTitle"),
+    victorsEstimatesList: document.getElementById("victorsEstimatesList"),
     langSwitch: document.getElementById("langSwitch"),
     scroll: document.getElementById("timelineScroll"),
     track: document.getElementById("timelineTrack"),
@@ -302,6 +309,7 @@
     buildCoreMcuToggle();
     buildDoomsdayWatchlistToggle();
     buildExtendedVersionsToggle();
+    buildVictorsButton();
     render(); // render() figures out --era-label-h and card sizing from the active ordering
 
     window.addEventListener(
@@ -680,6 +688,7 @@
         updateFranchiseSelectUI();
         updateOrderingDescription();
         buildOrderSwitch();
+        populateVictorsButton(); // its label is localized UI chrome (see populateVictorsButton()'s own comment)
         render();
       });
     });
@@ -883,6 +892,7 @@
     populateCoreMcuToggle(); // hides the whole control if the new franchise has no otherEarth content at all
     populateDoomsdayWatchlistToggle(); // hides the whole control if the new franchise has no doomsdayWatchlist at all
     populateExtendedVersionsToggle(); // hides the whole control if the new franchise has no extendedRuntimeMin content at all
+    populateVictorsButton(); // hides the button if the new franchise has no victors list at all
     render();
   }
 
@@ -1374,6 +1384,113 @@
   function updateExtendedVersionsUI() {
     els.extendedVersionsCheckbox.checked = state.extendedVersions;
     els.extendedVersionsWrap.setAttribute("data-active", String(state.extendedVersions));
+  }
+
+  /* ---------------------------------------------------------------- */
+  /*  Victors overview (Hunger Games only) - a plain header BUTTON (not  */
+  /*  a filter or toggle, despite sharing .header-toggle's pill look)    */
+  /*  opening a native <dialog> that lists every Games 1..totalGames,    */
+  /*  filling in name + district only where FRANCHISE_DATA[...].victors  */
+  /*  (VICTORS_HG in data.js) has a verified entry - every other row     */
+  /*  stays deliberately empty. Never touches the timeline itself, so    */
+  /*  the "page never scrolls vertically" rule is unaffected: the list   */
+  /*  scrolls INSIDE the dialog (.victors-list's own overflow).          */
+  /* ---------------------------------------------------------------- */
+  function buildVictorsButton() {
+    populateVictorsButton();
+
+    els.victorsBtn.addEventListener("click", () => {
+      buildVictorsDialogContent(); // rebuilt on every open, so it always matches the current language
+      els.victorsDialog.showModal();
+    });
+    els.victorsDialogClose.addEventListener("click", () => els.victorsDialog.close());
+    // On a touch screen (no hover), a tap anywhere on a Quarter Quell
+    // row toggles the twist text open - the equivalent of the CSS row
+    // :hover reveal. On a mouse device clicks are deliberately ignored
+    // (user request: hover only) - same `(hover: none)` media query the
+    // CSS uses for `.is-open`, so the two modes never overlap. Delegated,
+    // since the list's rows are rebuilt on every open.
+    els.victorsList.addEventListener("click", (e) => {
+      if (!window.matchMedia("(hover: none)").matches) return;
+      const row = e.target.closest(".victors-list__item--quell");
+      if (!row) return;
+      const isOpen = row.classList.toggle("is-open");
+      row.querySelector(".victors-quell").setAttribute("aria-expanded", String(isOpen));
+    });
+    // A click on the dialog element itself (not on anything inside it)
+    // can only be a click on its ::backdrop - same "click outside closes"
+    // behavior as every header dropdown.
+    els.victorsDialog.addEventListener("click", (e) => {
+      if (e.target === els.victorsDialog) els.victorsDialog.close();
+    });
+  }
+
+  // Visibility + label - called at init, on every franchise switch, and
+  // on every language switch. The label is UI chrome, but localized on
+  // explicit request (the user named the button "Přehled vítězů"), same
+  // narrow exception as the progress-bar "Watched" labels in
+  // updateProgress().
+  function populateVictorsButton() {
+    const hasVictors = !!FRANCHISE_DATA[state.franchiseId]?.victors;
+    els.victorsBtn.style.display = hasVictors ? "" : "none";
+    els.victorsBtn.textContent = loc("Victors", "Přehled vítězů");
+    if (!hasVictors && els.victorsDialog.open) els.victorsDialog.close();
+  }
+
+  function buildVictorsDialogContent() {
+    const victors = FRANCHISE_DATA[state.franchiseId]?.victors;
+    if (!victors) return;
+    const byGames = new Map(victors.entries.map((v) => [v.games, v]));
+    els.victorsDialogTitle.textContent = loc("Hunger Games Victors", "Přehled vítězů Hladových her");
+    // "(District 12, age 16)" / "(12. kraj, 16 let)" - every age in the
+    // data is 14-18, so Czech always takes the plural "let".
+    const detailHtml = (v) => {
+      const parts = [loc(`District ${v.district}`, `${v.district}. kraj`)];
+      if (v.age) parts.push(loc(`age ${v.age}`, `${v.age} let`));
+      return `<span class="victors-list__district">(${parts.join(", ")})</span>`;
+    };
+    els.victorsDialogClose.setAttribute("aria-label", loc("Close", "Zavřít"));
+    const rows = [];
+    for (let n = 1; n <= victors.totalGames; n++) {
+      const v = byGames.get(n);
+      let text = "";
+      let modifier = v ? "" : " victors-list__item--empty";
+      if (v && v.noVictor) {
+        text = loc("No victor (Games interrupted)", "Bez vítěze (Hry přerušeny)");
+        modifier = " victors-list__item--none";
+      } else if (v) {
+        text = `${v.names.join(", ")} ${detailHtml(v)}`;
+      }
+      // Quarter Quell rows get a ◆ marker in the leading slot (empty on
+      // every other row, so numbers stay aligned) - hovering anywhere on
+      // the row (mouse devices, CSS) or tapping it (touch screens only,
+      // toggles .is-open) reveals that Quell's twist as a full-width line
+      // under the row.
+      const quell = victors.quarterQuells?.[n];
+      let marker = "";
+      let quellInfo = "";
+      if (quell) {
+        modifier += " victors-list__item--quell";
+        const label = loc("Quarter Quell - what was special", "Čtvrtohry - čím byly hry speciální");
+        marker = `<button type="button" class="victors-quell" aria-expanded="false" aria-label="${label}" title="${label}">◆</button>`;
+        quellInfo = `<span class="victors-quell__info">${loc(quell.en, quell.cs)}</span>`;
+      }
+      rows.push(
+        `<li class="victors-list__item${modifier}"><span class="victors-list__marker">${marker}</span><span class="victors-list__games">${n}.</span><span class="victors-list__name">${text}</span>${quellInfo}</li>`
+      );
+    }
+    els.victorsList.innerHTML = rows.join("");
+
+    const estimates = victors.estimates || [];
+    els.victorsEstimatesTitle.style.display = estimates.length ? "" : "none";
+    els.victorsEstimatesTitle.textContent = loc("Other victors", "Ostatní vítězové");
+    els.victorsEstimatesList.innerHTML = estimates
+      .map((v) => {
+        const games = v.options ? v.options.map((n) => `${n}.`).join("/") : `${v.from}.–${v.to}.`;
+        const name = v.unnamed ? `<em>${loc("Unnamed victor", "Nejmenovaný vítěz")}</em>` : v.names.join(", ");
+        return `<li class="victors-list__item"><span class="victors-list__games victors-list__games--range">${games}</span><span class="victors-list__name">${name} ${detailHtml(v)}</span></li>`;
+      })
+      .join("");
   }
 
   // The one place that decides whether a movie's THEATRICAL or EXTENDED

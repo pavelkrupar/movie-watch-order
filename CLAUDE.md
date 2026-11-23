@@ -1925,6 +1925,21 @@ fills instead of gradients (header, card meta, progress, Quell row, which
 now gets an inset left accent rule). Era titles and the victors dialog
 headings stay UPPERCASE on purpose (the user explicitly asked for
 "THE HUNGER GAMES UNIVERSE" casing earlier).
+  The wider IBM Plex face exposed a gap in `fitTilePlaceholderTitles()`:
+it only checked HEIGHT, so a single long word or a U+00A0-glued chunk
+("The Avengers", "of the Rings" - see the NBSP style convention) wider
+than the tile overflowed sideways, unnoticed (user-reported). It now checks
+WIDTH first: shrink the font down to `TILE_TITLE_KEEP_TOGETHER_MIN_RATIO`
+(75%) of the tier size to keep glued words together; if still too wide,
+swap the NBSPs back to normal spaces (user's choice: "The" may stand on
+its own line rather than the whole title shrinking to half size) and keep
+shrinking to `TILE_TITLE_FONT_MIN_PX`; only THEN the existing grow-tile/
+shrink-for-height steps. Original markup is kept in
+`data-original-html` so every resize starts from the glued version again
+(note `innerHTML` serializes U+00A0 as `&nbsp;`). `.card--short` tiles
+also got a smaller padding (8px). Known leftover: the One-Shot "A Funny
+Thing Happened on the Way to Thor's Hammer" still clips at the 11px floor
+on very short windows (~1280x650), same as before the redesign.
 
 ## Gotchas already hit (don't reintroduce)
 

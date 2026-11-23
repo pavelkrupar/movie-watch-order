@@ -167,6 +167,16 @@
   // overflow-y: auto is the last-resort net" safety this file already
   // relies on elsewhere (e.g. the unclamped .card__title in style.css).
   const TILE_HEIGHT_GROWTH_MAX_RATIO = 0.25;
+  // How far fitTilePlaceholderTitles() may shrink a title (as a fraction of
+  // its tier's own CSS font-size) to keep a NON-BREAKING chunk on one line -
+  // "The\u00A0Avengers", "of\u00A0the\u00A0Rings" (see the U+00A0 style
+  // convention in CLAUDE.md) - before giving up on keeping it together and
+  // letting those words break onto their own lines instead. Without this
+  // floor a badge-tier "The Avengers" on a small screen shrank to barely
+  // half its tier size just to protect one short word from standing alone,
+  // flattening the whole size hierarchy (user report after the IBM Plex
+  // font switch, which is wider than the old condensed face).
+  const TILE_TITLE_KEEP_TOGETHER_MIN_RATIO = 0.75;
   // cards deliberately don't fill the entire available height - a bit of
   // breathing room around the axis reads as more compact, less "bloated"
   const FILL_RATIO = 0.86;
@@ -2145,6 +2155,11 @@
    * .card--series-wide tile (already widened, see its own CSS comment)
    * grows taller from ITS OWN widened-but-still-square starting height,
    * not the narrow single-column one.
+   *   WIDTH is checked first, separately (see the comment inside): a
+   * single long word or a U+00A0-glued chunk ("The\u00A0Avengers") that's
+   * wider than the tile can't be fixed by a taller tile, only by a smaller
+   * font - down to TILE_TITLE_KEEP_TOGETHER_MIN_RATIO of the tier size -
+   * and past that by letting the glued words break onto their own lines.
    *   Runs after every render() and on every resize (a tile's size, and so
    * how much room a title has, changes with the viewport) - see both call
    * sites.
@@ -2153,9 +2168,13 @@
     els.track.querySelectorAll(".card__poster-placeholder-title").forEach((titleEl) => {
       const wrap = titleEl.parentElement; // .card__poster-placeholder
       const posterWrap = wrap.parentElement; // .card__poster-wrap - the element whose height fitTilePlaceholderTitles() grows, see the comment above
-      // Clear any previous pass's shrink/growth before measuring - a tile
-      // that's now bigger (e.g. wider after a resize, or its card widened)
-      // may well fit at its natural size again.
+      // Clear any previous pass's shrink/growth/un-gluing before measuring -
+      // a tile that's now bigger (e.g. wider after a resize, or its card
+      // widened) may well fit at its natural size, with its non-breaking
+      // spaces intact, again. The original markup is stashed on the first
+      // pass so a later pass can always restore it.
+      if (titleEl.dataset.originalHtml == null) titleEl.dataset.originalHtml = titleEl.innerHTML;
+      else titleEl.innerHTML = titleEl.dataset.originalHtml;
       titleEl.style.fontSize = "";
       posterWrap.style.height = "";
 
@@ -2163,24 +2182,54 @@
       if (!naturalH) return; // not actually laid out yet (e.g. display:none ancestor)
       const wrapStyle = getComputedStyle(wrap);
       const paddingV = parseFloat(wrapStyle.paddingTop) + parseFloat(wrapStyle.paddingBottom);
-      const titleFits = (availableH) => titleEl.scrollHeight <= availableH - paddingV;
+      const availableW = wrap.clientWidth - parseFloat(wrapStyle.paddingLeft) - parseFloat(wrapStyle.paddingRight);
+      // Width matters as much as height: a line can't wrap inside a single
+      // long word or a U+00A0-glued chunk, so the title box itself grows
+      // wider than the tile (it's a flex item - min-width: auto) and gets
+      // clipped sideways. Growing the tile's HEIGHT never helps that, only
+      // a smaller font (or letting the glued words break) does. 1px slack
+      // absorbs sub-pixel rounding (scrollWidth is an integer).
+      const widthFits = () => titleEl.scrollWidth <= availableW + 1;
+      const heightFits = (availableH) => titleEl.scrollHeight <= availableH - paddingV;
 
-      if (titleFits(naturalH)) return; // fits already, at full size - nothing to do
+      const tierFontSize = parseFloat(getComputedStyle(titleEl).fontSize);
+      let fontSize = tierFontSize;
+      const shrinkWhile = (stillTooBig, floorPx) => {
+        while (fontSize > floorPx && stillTooBig()) {
+          fontSize -= 1;
+          titleEl.style.fontSize = `${fontSize}px`;
+        }
+      };
+      const keepTogetherFloor = Math.max(TILE_TITLE_FONT_MIN_PX, Math.round(tierFontSize * TILE_TITLE_KEEP_TOGETHER_MIN_RATIO));
 
-      // 1st resort: grow the TILE, title stays at full font the whole time.
+      // 1st: something too WIDE - shrink a little (down to 75% of the tier
+      // size) to keep the glued words together; if that's not enough, let
+      // the U+00A0-glued words break like normal spaces ("The" on its own
+      // line beats a title shrunk to half size), and only then keep
+      // shrinking to the hard floor (a single long word can still need it).
+      if (!widthFits()) {
+        shrinkWhile(() => !widthFits(), keepTogetherFloor);
+        if (!widthFits()) {
+          // innerHTML serializes U+00A0 back out as "&nbsp;", so match both.
+          titleEl.innerHTML = titleEl.dataset.originalHtml.replace(/&nbsp;|\u00A0/g, " ");
+          titleEl.style.fontSize = "";
+          fontSize = tierFontSize;
+          shrinkWhile(() => !widthFits(), TILE_TITLE_FONT_MIN_PX);
+        }
+      }
+      if (heightFits(naturalH)) return; // fits now - nothing left to do
+
+      // 2nd: too TALL - grow the TILE, title stays at its current font.
       const grownH = naturalH * (1 + TILE_HEIGHT_GROWTH_MAX_RATIO);
       posterWrap.style.height = `${grownH}px`;
-      if (titleFits(grownH)) return;
+      if (heightFits(grownH)) return;
 
-      // 2nd resort: even the grown tile isn't enough - shrink the font at
-      // that same (already maximally grown) height, down to the floor.
-      let fontSize = parseFloat(getComputedStyle(titleEl).fontSize);
-      while (fontSize > TILE_TITLE_FONT_MIN_PX && !titleFits(grownH)) {
-        fontSize -= 1;
-        titleEl.style.fontSize = `${fontSize}px`;
-      }
+      // 3rd: even the grown tile isn't enough - shrink the font at that
+      // same (already maximally grown) height, down to the hard floor.
+      shrinkWhile(() => !heightFits(grownH), TILE_TITLE_FONT_MIN_PX);
     });
   }
+
 
   function buildSeasonRowHtml(series, season) {
     const fullyWatched = isSeasonFullyWatched(season);

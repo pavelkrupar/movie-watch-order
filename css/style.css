@@ -2015,6 +2015,14 @@ body {
    dlaždice - na hodně úzkém plátně se o zbytek stejně postará
    fitTilePlaceholderTitles() (app.js), stejný "shrink pak grow" mechanismus
    jako u každé jiné dlaždice. */
+/* Nejmenší dlaždice (One-Shoty) má i menší vnitřní okraj - na malém
+   okně je dlaždice tak úzká, že 14px z každé strany sebralo víc místa,
+   než se dalo dohnat zmenšením písma (fitTilePlaceholderTitles() v app.js
+   čte padding živě, takže tohle nic dalšího nepotřebuje). */
+.card--short .card__poster-placeholder {
+  padding: 8px;
+}
+
 .card--short .card__poster-placeholder-title {
   font-size: 13px;
   font-weight: 500;
